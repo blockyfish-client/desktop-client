@@ -5,6 +5,7 @@ const { ElectronBlocker } = require('@cliqz/adblocker-electron')
 const fetch = require('cross-fetch') // required 'fetch'
 const { Client } = require("discord-rpc");
 
+//adblock
 ElectronBlocker.fromPrebuiltAdsAndTracking(fetch).then((blocker) => {
   blocker.enableBlockingInSession(session.defaultSession);
 });
@@ -13,6 +14,7 @@ function matches(text, partial) {
     return text.toLowerCase().indexOf(partial.toLowerCase()) > -1;
 }
 
+//main window
 const createWindow = () => {
     const win = new BrowserWindow({
         width: 1080,
@@ -30,6 +32,7 @@ const createWindow = () => {
         icon: path.join(__dirname, 'img/icon.png'),
     })
     
+    //close confirmation dialog
     win.on('close', function(e) {
         const choice = require('electron').dialog.showMessageBoxSync(this,
           {
@@ -47,7 +50,7 @@ const createWindow = () => {
     win.loadURL('https://beta.deeeep.io')
     win.removeMenu();
     win.webContents.on('did-finish-load', function() {
-        // win.webContents.openDevTools()
+        win.webContents.openDevTools()
         win.webContents.setBackgroundThrottling(false)
         win.webContents.executeJavaScript(`
             // document.querySelector('head > link[href*="/assets/index"][rel="stylesheet"]').href = "https://thepiguy3141.github.io/doc-assets/images/misc/index.8b74f9b3.css"
@@ -59,6 +62,8 @@ const createWindow = () => {
                 else {
                     console.log("notifs: 0")
                 }
+
+                //rich presence status logging
                 if (document.querySelector('div.home-page').style.display == 'none') {
                     console.log("state: " + document.querySelector('.selected').innerText + "2")
                 }
@@ -75,11 +80,12 @@ const createWindow = () => {
                     document.querySelector('div.el-button-group.nice-btn-group.block.mt-2').style.bottom = '10px'
                     document.querySelector('div.el-button-group.nice-btn-group.block.mt-2').style.left = '10px'
                     document.querySelector('div.el-button-group.nice-btn-group.block.mt-2').style.width = '30vw'
+                    document.querySelector('div.el-button-group.nice-btn-group.block.mt-2').style.maxWidth = '300px'
                 }
                 if (document.querySelector('div.sidebar.left.p-2') != null) {
                     document.querySelector('div.sidebar.left.p-2').remove()
                 }
-                
+
                 //game ui modification
                 if (document.querySelector('div.game') != null) {
                     if (document.querySelector('div.flex.flex-col').style.marginTop != '40px') {
@@ -154,6 +160,29 @@ const createWindow = () => {
               })
             }
             `)
+            win.webContents.executeJavaScript(`
+            const drag = document.createElement('div')
+            document.querySelector('#app > div.ui > div').appendChild(drag)
+            drag.outerHTML = '<div style="-webkit-app-region: drag;width: 100vw;height: 20px;position: absolute;top: 0;left: 0;cursor: move;"></div>'
+            `)
+            win.webContents.executeJavaScript(`
+            document.body.addEventListener('keydown', function(e) {
+                if (e.key == "Escape") {
+                    if (document.querySelector('#app > div.ui > div').style.display != 'none') {
+                        document.querySelector('div.el-col.el-col-8.is-guttered > button').click()
+                    }
+                }
+            });
+            `)
+        win.on('blur', () => {
+            win.webContents.executeJavaScript(`
+            if (document.querySelector('#app > div.ui > div').classList.contains('playing') == true) {
+                if (document.querySelector('#app > div.ui > div').style.display == 'none') {
+                    window.dispatchEvent(new KeyboardEvent("keydown", {keyCode: 27}))
+                }
+            }
+            `)
+        });
 
         var old_mode = 'FFA'
         var old_menu = '0'
@@ -189,9 +218,6 @@ const createWindow = () => {
                 }
             }
         });
-        //notes
-        // window.dispatchEvent(new KeyboardEvent("keydown", {keyCode: 27}));
-        // document.querySelector('div.el-col.el-col-8.is-guttered > button').click()
         win.show();
         win.webContents.setWindowOpenHandler(({ url }) => {
             shell.openExternal(url);
