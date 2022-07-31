@@ -27,6 +27,9 @@
     "discord-rpc": "^4.0.1",
     "electron-squirrel-startup": "^1.0.0"
   },
+  "build": {
+    "asar": true
+  },
   "config": {
     "forge": {
       "packagerConfig": {},
@@ -34,7 +37,8 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "deeeep.io_beta_client"
+            "name": "deeeep.io_beta_client",
+            "asar": true
           }
         },
         {
