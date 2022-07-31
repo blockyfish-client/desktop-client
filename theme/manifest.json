@@ -1,0 +1,17 @@
+{
+   "background": {
+      "scripts": [ "background.js" ]
+   },
+   "browser_action": {
+      "default_title": "Click to toggle theme"
+   },
+   "description": "Better Theme for Deeeep.io - BETA!",
+   "icons": {
+      "128": "icon.png"
+   },
+   "manifest_version": 2,
+   "name": "Better Theme for Depio Beta",
+   "permissions": [ "webRequest", "https://deeeep.io/*", "https://mapmaker.deeeep.io/*", "https://beta.deeeep.io/*", "https://cdn.deeeep.io/*", "https://cdnjs.cloudflare.com/*", "webRequestBlocking", "storage" ],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "1.1.0"
+}
