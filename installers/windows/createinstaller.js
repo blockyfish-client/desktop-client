@@ -20,8 +20,8 @@ function getInstallerConfig () {
     outputDirectory: path.join(outPath, 'windows-installer'),
     exe: 'Deeeep.io.exe',
     setupExe: 'Pi-DDC-setup.exe',
-    setupIcon: path.join(rootPath, 'build', 'icon.ico'),
+    setupIcon: path.join(rootPath, 'img', 'icons', 'win', 'icon.ico'),
     iconUrl: "https://raw.githubusercontent.com/ThePiGuy3141/Deeeep.io-v4-Desktop-Client/master/build/icon.ico",
-    loadingGif: path.join(rootPath, 'build', 'loading.gif')
+    loadingGif: path.join(rootPath, 'img', 'loading.gif')
   })
 }
