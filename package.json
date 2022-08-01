@@ -1,17 +1,20 @@
 {
-  "name": "deeeep.io-beta-client",
+  "name": "deeeep.io",
   "version": "1.0.0",
-  "description": "A custom desktop client for deeeep.io v4 with some improvements",
+  "description": "A custom desktop client for deeeep.io v4 with some improvements. Made by pi. ",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
+    "start": "electron .",
+    "make-win": "npx electron-packager . Deeeep.io --overwrite --asar --platform=win32 --arch=ia32 --icon=build/icon.ico --prune=true --out=release-builds --version-string.CompanyName=pi --version-string.ProductName=\"Deeeep.io Desktop Client\"",
+    "pack-win": "node installers/windows/createinstaller.js"
   },
   "author": "pi",
   "license": "MIT",
   "devDependencies": {
     "electron": "^19.0.8",
-    "electron-packager": "^15.5.1"
+    "electron-packager": "^15.5.1",
+    "electron-winstaller": "^5.0.0"
   },
   "dependencies": {
     "@cliqz/adblocker-electron": "^1.23.8",

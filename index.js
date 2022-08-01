@@ -1,3 +1,8 @@
+const setupEvents = require('./installers/setupEvents')
+ if (setupEvents.handleSquirrelEvent()) {
+    return;
+}
+
 const { app, BrowserWindow, session } = require('electron')
 const path = require('path')
 const { shell } = require("electron")
