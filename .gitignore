@@ -260,3 +260,8 @@ release-builds/windows-installer/deeeep.io-beta-client-1.0.0-full.nupkg
 release-builds/windows-installer/Pi-DDC-setup-v1.0.0.exe
 release-builds/windows-installer/RELEASES
 release-builds/windows-installer/Setup.wxs
+release-builds/windows-installer/deeeep.io.1.0.0.nupkg
+release-builds/windows-installer/Setup.exe
+release-builds/windows-installer/deeeep.io-1.0.0-full.nupkg
+release-builds/windows-installer/deeeep.io.1.0.0.nupkg
+release-builds/windows-installer/Pi-DDC-setup.exe
