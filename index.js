@@ -155,7 +155,7 @@ const createWindow = () => {
             const evoMain = document.getElementById("evo-main")
             const evoBox = document.createElement("div")
             evoMain.appendChild(evoBox)
-            evoBox.outerHTML = '<img src="https://raw.githubusercontent.com/ThePiGuy3141/Deeeep.io-v4-Desktop-Client/master/img/evolution_tree_themed.png">'
+            evoBox.outerHTML = '<img src="https://raw.githubusercontent.com/blockyfish-client/Desktop-Client/master/img/evolution_tree_themed.png">'
             const evoCloses = document.getElementsByClassName("evo-close")
             const evoModal = document.getElementById("evo-modal")
             evoModal.classList.toggle("evo-hidden")
