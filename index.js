@@ -55,7 +55,7 @@ const createWindow = () => {
     win.loadURL('https://beta.deeeep.io')
     win.removeMenu();
     win.webContents.on('did-finish-load', function() {
-        win.webContents.openDevTools()
+        // win.webContents.openDevTools()
         win.webContents.setBackgroundThrottling(false)
         win.webContents.executeJavaScript(`
             // document.querySelector('head > link[href*="/assets/index"][rel="stylesheet"]').href = "https://thepiguy3141.github.io/doc-assets/images/misc/index.8b74f9b3.css"
@@ -229,13 +229,14 @@ const createWindow = () => {
             const updaterMain = document.getElementById("updater-main")
             const updaterBox = document.createElement("div")
             updaterMain.appendChild(updaterBox)
-            updaterBox.outerHTML = '<p>No updates available</p><svg id="updater-icon" xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="#374151" class="bi bi-arrow-clockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"></path><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"></path></svg>'
+            updaterBox.innerHTML = '<p>No updates available</p><svg id="updater-icon" xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="#374151" class="bi bi-arrow-clockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"></path><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"></path></svg>'
             const updaterCloses = document.getElementsByClassName("updater-close")
             const updaterModal = document.getElementById("updater-modal")
             updaterModal.classList.toggle("updater-hidden")
             for (const updaterClose of updaterCloses) {
               updaterClose.addEventListener("click", () => {
                 updaterModal.classList.toggle("updater-hidden")
+                updaterBox.innerHTML = '<p>No updates available</p><svg id="updater-icon" xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="#374151" class="bi bi-arrow-clockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"></path><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"></path></svg>'
               })
             }
             `)
@@ -250,8 +251,19 @@ const createWindow = () => {
                     updateImg.style.transform = 'rotateZ(0deg)'
                 }, 3000)
             }
+            async function getUpdates() {
+                let url_json = await (await (fetch('https://api.github.com/repos/blockyfish-client/desktop-client/releases/latest'))).json();
+                var download_url = url_json.assets[0].browser_download_url
+                var download_ver = url_json.tag_name
+                var ver_num = download_ver.replace("v", "").replace(".", "").replace(".", "")
+                if (ver_num > 100) {
+                    window.open(download_url)
+                    updaterBox.innerHTML = '<p>Downloading update...</p><svg id="updater-icon" xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="#374151" class="bi bi-arrow-clockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"></path><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"></path></svg>'
+                }
+            }
             updateButton.addEventListener("click", () => {
                 spinUpdateIcon()
+                getUpdates()
             })
             `)
         win.on('blur', () => {
@@ -300,9 +312,9 @@ const createWindow = () => {
         });
         win.show();
         win.webContents.setWindowOpenHandler(({ url }) => {
-            shell.openExternal(url);
-            return { action: 'deny' };
-        });
+                shell.openExternal(url);
+                return { action: 'deny' };
+            });
         var rpc = new Client({
             transport: "ipc",
         });
