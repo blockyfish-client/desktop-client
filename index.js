@@ -242,17 +242,13 @@ const createWindow = () => {
             win.webContents.executeJavaScript(`
             const updateButton = document.getElementById("updater-load")
             const updateImg = document.getElementById("updater-icon")
-            updateImg.style.transition = '.5s transform'
             async function spinUpdateIcon() {
-                updateImg.style.transition = '.5s transform'
-                updateImg.style.transform = 'rotateZ(180deg)'
-                setTimeout(function() {
-                    updateImg.style.transform = 'rotateZ(360deg)'
-                }, 500)
+                updateImg.style.transition = '3s transform ease-in-out'
+                updateImg.style.transform = 'rotateZ(1440deg)'
                 setTimeout(function() {
                     updateImg.style.transition = 'none'
                     updateImg.style.transform = 'rotateZ(0deg)'
-                }, 1000)
+                }, 3000)
             }
             updateButton.addEventListener("click", () => {
                 spinUpdateIcon()
