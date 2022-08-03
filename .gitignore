@@ -266,3 +266,4 @@ release-builds/windows-installer/deeeep.io-1.0.0-full.nupkg
 release-builds/windows-installer/deeeep.io.1.0.0.nupkg
 release-builds/windows-installer/Pi-DDC-setup.exe
 .vscode/launch.json
+release-builds/
