@@ -55,7 +55,7 @@ const createWindow = () => {
     win.loadURL('https://beta.deeeep.io')
     win.removeMenu();
     win.webContents.on('did-finish-load', function() {
-        // win.webContents.openDevTools()
+        win.webContents.openDevTools()
         win.webContents.setBackgroundThrottling(false)
         win.webContents.executeJavaScript(`
             // document.querySelector('head > link[href*="/assets/index"][rel="stylesheet"]').href = "https://thepiguy3141.github.io/doc-assets/images/misc/index.8b74f9b3.css"
@@ -178,6 +178,85 @@ const createWindow = () => {
                     }
                 }
             });
+            `)
+            win.webContents.executeJavaScript(`
+            const discord = document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(5) > button')
+            const github_parent = document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(5)').cloneNode(true)
+            const website_parent = document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(5)').cloneNode(true)
+            discord.classList.remove("black")
+            discord.classList.add("indigo")
+            const social_class = document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div')
+            social_class.insertBefore(github_parent, social_class.children[5])
+            social_class.insertBefore(website_parent, social_class.children[6])
+            github_parent.classList.add('github-div')
+            website_parent.classList.add('website-div')
+            const github = document.querySelector('div.github-div > button')
+            const website = document.querySelector('div.website-div > button')
+            const github_logo = document.querySelector('div.github-div > button > span > svg')
+            const website_logo = document.querySelector('div.website-div > button > span > svg')
+            github_logo.outerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-github" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>'
+            website_logo.outerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-globe" viewBox="0 0 16 16"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm7.5-6.923c-.67.204-1.335.82-1.887 1.855A7.97 7.97 0 0 0 5.145 4H7.5V1.077zM4.09 4a9.267 9.267 0 0 1 .64-1.539 6.7 6.7 0 0 1 .597-.933A7.025 7.025 0 0 0 2.255 4H4.09zm-.582 3.5c.03-.877.138-1.718.312-2.5H1.674a6.958 6.958 0 0 0-.656 2.5h2.49zM4.847 5a12.5 12.5 0 0 0-.338 2.5H7.5V5H4.847zM8.5 5v2.5h2.99a12.495 12.495 0 0 0-.337-2.5H8.5zM4.51 8.5a12.5 12.5 0 0 0 .337 2.5H7.5V8.5H4.51zm3.99 0V11h2.653c.187-.765.306-1.608.338-2.5H8.5zM5.145 12c.138.386.295.744.468 1.068.552 1.035 1.218 1.65 1.887 1.855V12H5.145zm.182 2.472a6.696 6.696 0 0 1-.597-.933A9.268 9.268 0 0 1 4.09 12H2.255a7.024 7.024 0 0 0 3.072 2.472zM3.82 11a13.652 13.652 0 0 1-.312-2.5h-2.49c.062.89.291 1.733.656 2.5H3.82zm6.853 3.472A7.024 7.024 0 0 0 13.745 12H11.91a9.27 9.27 0 0 1-.64 1.539 6.688 6.688 0 0 1-.597.933zM8.5 12v2.923c.67-.204 1.335-.82 1.887-1.855.173-.324.33-.682.468-1.068H8.5zm3.68-1h2.146c.365-.767.594-1.61.656-2.5h-2.49a13.65 13.65 0 0 1-.312 2.5zm2.802-3.5a6.959 6.959 0 0 0-.656-2.5H12.18c.174.782.282 1.623.312 2.5h2.49zM11.27 2.461c.247.464.462.98.64 1.539h1.835a7.024 7.024 0 0 0-3.072-2.472c.218.284.418.598.597.933zM10.855 4a7.966 7.966 0 0 0-.468-1.068C9.835 1.897 9.17 1.282 8.5 1.077V4h2.355z"/></svg>'
+            github.addEventListener("click", () => {
+                window.open('https://github.com/blockyfish-client/Desktop-Client')
+            })
+            website.classList.remove("black")
+            website.classList.add("pink")
+            website.addEventListener("click", () => {
+                window.open('https://blockfish.netlify.app')
+            })
+            `)
+            win.webContents.executeJavaScript(`
+            //updater button
+            const update_parent = document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(5)').cloneNode(true);
+            social_class.appendChild(update_parent);
+            update_parent.classList.add('update-div')
+            const update = document.querySelector('div.update-div > button')
+            const update_logo = document.querySelector('div.update-div > button > span > svg')
+            update.classList.remove("indigo")
+            update.classList.add("green", "update", "updater-close")
+            update_logo.outerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/></svg>'
+            `)
+            win.webContents.executeJavaScript(`
+            //updater modal
+            //styles
+            const updater_style = document.createElement('style')
+            document.querySelector('head').appendChild(updater_style)
+            updater_style.innerHTML = '.button{display:inline-flex;justify-content:center;align-items:center;line-height:1;height:32px;white-space:nowrap;cursor:pointer;text-align:center;box-sizing:border-box;outline:0;transition:.1s;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;vertical-align:middle;-webkit-appearance:none;min-height:2.5rem;border-radius:.25rem;padding:.75rem 1.25rem;font-size:.875rem}.box-x-close{position:absolute;top:.3rem;right:.5rem}.updater-red{background-color:#ef4444;border-color:#dc2626}.updater-red:hover{background-color:#dc2626;border-color:#b91c1c}.updater-black{background-color:#6b7280;border-color:#4b5563}.updater-black:hover{background-color:#4b5563;border-color:#374151}body .updater-button{border-bottom-width:4px;border-radius:1rem}.updater-box.active{outline:white solid 2px;filter:brightness(100%)}.updater-modal{background-color:#1f2937;border:2px solid #374151;border-radius:.75rem;padding: 0px 25px;}.updater-core{top:5px;right:5px;border:1px solid #fff;border-radius:25px;font-size:14px}#updater-main{justify-content: center;flex-wrap:wrap;width:88%;margin:auto;gap:15px}.updater-hidden{opacity: 0;pointer-events: none;}#updater-modal{transition: 0.2s;}'
+            //main div
+            const updater_div = document.createElement('div')
+            document.getElementById('app').appendChild(updater_div)
+            updater_div.outerHTML = '<div style="z-index: 100;" class="w-screen h-screen absolute" id="updater-modal"> <div style="background-color: rgba(0,0,0,.5);" class="w-full h-full absolute"></div><div class="w-full h-full absolute flex justify-center items-center"> <div class="flex flex-col updater-modal relative"> <div style="font-size: 1.3rem" class="text-center py-2">Updater</div><button class="updater-close box-x-close"><svg width="1.125em" height="1.125em" viewBox="0 0 24 24" class="svg-icon" color="gray" data-v-35f7fcad="" data-v-3140a19a="" data-v-daae3c72="" style="--sx:1; --sy:1; --r:0deg;"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" data-v-35f7fcad=""></path></svg></button> <div style="flex: 1;" class="text-center"> <div class="p-4 flex" id="updater-main"></div></div><div class="text-center py-4"><div id="updater-load" class="button updater-button updater-black" style="margin-right: 10px;">Check for Updates</div><div class="button updater-button updater-black updater-close">Close</div></div></div></div></div>'
+            const updaterMain = document.getElementById("updater-main")
+            const updaterBox = document.createElement("div")
+            updaterMain.appendChild(updaterBox)
+            updaterBox.outerHTML = '<p>No updates available</p><svg id="updater-icon" xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="#374151" class="bi bi-arrow-clockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"></path><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"></path></svg>'
+            const updaterCloses = document.getElementsByClassName("updater-close")
+            const updaterModal = document.getElementById("updater-modal")
+            updaterModal.classList.toggle("updater-hidden")
+            for (const updaterClose of updaterCloses) {
+              updaterClose.addEventListener("click", () => {
+                updaterModal.classList.toggle("updater-hidden")
+              })
+            }
+            `)
+            win.webContents.executeJavaScript(`
+            const updateButton = document.getElementById("updater-load")
+            const updateImg = document.getElementById("updater-icon")
+            updateImg.style.transition = '.5s transform'
+            async function spinUpdateIcon() {
+                updateImg.style.transition = '.5s transform'
+                updateImg.style.transform = 'rotateZ(180deg)'
+                setTimeout(function() {
+                    updateImg.style.transform = 'rotateZ(360deg)'
+                }, 500)
+                setTimeout(function() {
+                    updateImg.style.transition = 'none'
+                    updateImg.style.transform = 'rotateZ(0deg)'
+                }, 1000)
+            }
+            updateButton.addEventListener("click", () => {
+                spinUpdateIcon()
+            })
             `)
         win.on('blur', () => {
             win.webContents.executeJavaScript(`
