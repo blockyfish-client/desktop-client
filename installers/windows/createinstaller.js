@@ -1,5 +1,6 @@
 const createWindowsInstaller = require('electron-winstaller').createWindowsInstaller
 const path = require('path')
+import configJson from './package.json'
 
 getInstallerConfig()
   .then(createWindowsInstaller)
@@ -8,10 +9,13 @@ getInstallerConfig()
     process.exit(1)
   })
 
+
+  
 function getInstallerConfig () {
   console.log('creating windows installer')
   const rootPath = path.join('./')
   const outPath = path.join(rootPath, 'release-builds')
+  const version = configJson.version
 
   return Promise.resolve({
     appDirectory: path.join(outPath, 'Deeeep.io-win32-ia32/'),
@@ -19,7 +23,7 @@ function getInstallerConfig () {
     noMsi: true,
     outputDirectory: path.join(outPath, 'windows-installer'),
     exe: 'Deeeep.io.exe',
-    setupExe: 'Pi-blockyfishclient-setup.exe',
+    setupExe: 'Pi-blockyfishclient-setup-v' + version + '.exe',
     setupIcon: path.join(rootPath, 'img', 'icons', 'win', 'icon.ico'),
     iconUrl: "https://raw.githubusercontent.com/ThePiGuy3141/Deeeep.io-v4-Desktop-Client/master/build/icon.ico",
     loadingGif: path.join(rootPath, 'img', 'loading.gif')

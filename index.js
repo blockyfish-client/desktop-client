@@ -257,7 +257,7 @@ const createWindow = () => {
                 var download_url = url_json.assets[0].browser_download_url
                 var download_ver = url_json.tag_name
                 var ver_num = download_ver.replace("v", "").replace(".", "").replace(".", "")
-                if (ver_num > 110) {
+                if (ver_num > 111) {
                     window.open(download_url)
                     updateText.innerText = 'Downloading update...'
                 }
