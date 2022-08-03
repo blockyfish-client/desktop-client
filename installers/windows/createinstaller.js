@@ -1,6 +1,6 @@
 const createWindowsInstaller = require('electron-winstaller').createWindowsInstaller
 const path = require('path')
-import configJson from './package.json'
+const version = '1.1.1'
 
 getInstallerConfig()
   .then(createWindowsInstaller)
@@ -9,13 +9,10 @@ getInstallerConfig()
     process.exit(1)
   })
 
-
-  
 function getInstallerConfig () {
   console.log('creating windows installer')
   const rootPath = path.join('./')
   const outPath = path.join(rootPath, 'release-builds')
-  const version = configJson.version
 
   return Promise.resolve({
     appDirectory: path.join(outPath, 'Deeeep.io-win32-ia32/'),
