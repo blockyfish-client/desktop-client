@@ -3,6 +3,23 @@
 Go to the releases page for downloads. 
 
 ## Changelogs:
+### v1.1.1
+- Updater:
+  - Automatic update checking
+  - Does not automatically download when a new version is found
+  - Shows an option to download a newer version instead
+  - Shows current version and available version
+  - Update notification (small red dot on the updater button)
+- New installation gif. No more cringey iOS loading animation, spinny shark is better
+![loading_animation](https://raw.githubusercontent.com/blockyfish-client/Desktop-Client/master/img/loading.gif)  
+
+### v1.1.0
+- Updater. Doesn't have automatic update checking yet
+- More homepage buttons:
+  - Blockfish client website
+  - Blockyfish client github repo
+  - Updater  
+
 ### v1.0.0
 Initial release
 Features:

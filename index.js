@@ -55,7 +55,7 @@ const createWindow = () => {
     win.loadURL('https://beta.deeeep.io')
     win.removeMenu();
     win.webContents.on('did-finish-load', function() {
-        win.webContents.openDevTools()
+        // win.webContents.openDevTools()
         win.webContents.setBackgroundThrottling(false)
         win.webContents.executeJavaScript(`
             // document.querySelector('head > link[href*="/assets/index"][rel="stylesheet"]').href = "https://thepiguy3141.github.io/doc-assets/images/misc/index.8b74f9b3.css"
@@ -315,7 +315,7 @@ const createWindow = () => {
                 var download_ver = url_json.tag_name
                 var ver_num = download_ver.replace("v", "").replace(".", "").replace(".", "")
                 setTimeout(function() {
-                    if (ver_num > 111) {
+                    if (ver_num > 112) {
                         updateText.style.display = 'none'
                         updateImg.style.display = 'none'
                         updateAvailableDiv.style.display = 'flex'
