@@ -55,30 +55,37 @@ const createWindow = () => {
     win.loadURL('https://beta.deeeep.io')
     win.removeMenu();
     win.webContents.on('did-finish-load', function() {
-        // win.webContents.openDevTools()
+        win.webContents.openDevTools()
         win.webContents.setBackgroundThrottling(false)
         win.webContents.executeJavaScript(`
             // document.querySelector('head > link[href*="/assets/index"][rel="stylesheet"]').href = "https://thepiguy3141.github.io/doc-assets/images/misc/index.8b74f9b3.css"
             setInterval(function() {
-                //notif badge
-                if (document.querySelector('span.forum-notifications-badge') != null) {
-                    console.log("notifs: " + document.querySelector('span.forum-notifications-badge').innerText)
-                }
-                else {
-                    console.log("notifs: 0")
-                }
+                // //notif badge
+                // if (document.querySelector('span.forum-notifications-badge') != null) {
+                //     console.log("notifs: " + document.querySelector('span.forum-notifications-badge').innerText)
+                // }
+                // else {
+                //     console.log("notifs: 0")
+                // }
 
-                //rich presence status logging
-                if (document.querySelector('div.home-page').style.display == 'none') {
-                    console.log("state: " + document.querySelector('.selected').innerText + "2")
-                }
-                else {
-                    console.log("state: " + document.querySelector('.selected').innerText + "0")
-                }
+                // //rich presence status logging
+                // if (document.querySelector('div.home-page').style.display == 'none') {
+                //     console.log("state: " + document.querySelector('.selected').innerText + "2")
+                // }
+                // else {
+                //     console.log("state: " + document.querySelector('.selected').innerText + "0")
+                // }
 
                 //homepage ui modification
-                if (document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div').style.paddingRight != '150px') {
-                    document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div').style.paddingRight = '150px'
+                if (document.fullscreenElement) {
+                    if (document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div').style.paddingRight != '') {
+                        document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div').style.paddingRight = ''
+                    }
+                }
+                else {
+                    if (document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div').style.paddingRight != '150px') {
+                        document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div').style.paddingRight = '150px'
+                    }
                 }
                 if (document.querySelector('div.el-button-group.nice-btn-group.block.mt-2').style.position != 'fixed') {
                     document.querySelector('div.el-button-group.nice-btn-group.block.mt-2').style.position = 'fixed'
@@ -93,46 +100,72 @@ const createWindow = () => {
 
                 //game ui modification
                 if (document.querySelector('div.game') != null) {
-                    if (document.querySelector('div.flex.flex-col').style.marginTop != '40px') {
-                        document.querySelector('div.flex.flex-col').style.marginTop = '40px'
-                    }
-                    if (document.querySelector('div.buttons.button-bar > div > button').className.match('el-button--mini') == null) {
-                        if (document.querySelector('div.buttons.button-bar > div').style.position != 'absolute') {
-                            document.querySelector('div.buttons.button-bar > div').style.position = 'absolute'
-                            document.querySelector('div.buttons.button-bar > div').style.right = '150px'
-                            document.querySelector('div.buttons.button-bar > div').style.top = '0px'
+                    if (document.fullscreenElement) {
+                        if (document.querySelector('div.flex.flex-col').style.marginTop != '') {
+                            document.querySelector('div.flex.flex-col').style.marginTop = ''
+                        }
+                        if (document.querySelector('div.buttons.button-bar > div > button').className.match('el-button--mini') == null) {
+                            if (document.querySelector('div.buttons.button-bar > div').style.position != '') {
+                                document.querySelector('div.buttons.button-bar > div').style.position = ''
+                                document.querySelector('div.buttons.button-bar > div').style.right = ''
+                                document.querySelector('div.buttons.button-bar > div').style.top = ''
+                            }
+                        }
+                        else {
+                            if (document.querySelector('div.buttons.button-bar > div').style.position != '') {
+                                document.querySelector('div.buttons.button-bar > div').style.position = ''
+                                document.querySelector('div.buttons.button-bar > div').style.right = ''
+                                document.querySelector('div.buttons.button-bar > div').style.top = ''
+                                document.querySelector('div.side-0').style.marginTop = ''
+                                document.querySelector('div.side-0').style.marginLeft = ''
+                                document.querySelector('div.side-1').style.marginTop = ''
+                            }
+                        }
+                        if (document.querySelector('div.info.mb-1.mr-1').style.position != '') {
+                            document.querySelector('div.info.mb-1.mr-1').style.position = ''
+                            document.querySelector('div.info.mb-1.mr-1').style.left = ''
+                            document.querySelector('div.info.mb-1.mr-1').style.top = ''
+                            document.querySelector('div.top-left').style.marginTop = ''
+                            document.querySelector('div.latency.latency-1').style.marginLeft = ''
+                            document.querySelector('div.latency.latency-1').style.position = ''
                         }
                     }
                     else {
-                        if (document.querySelector('div.buttons.button-bar > div').style.position != 'absolute') {
-                            document.querySelector('div.buttons.button-bar > div').style.position = 'absolute'
-                            document.querySelector('div.buttons.button-bar > div').style.right = '0px'
-                            document.querySelector('div.buttons.button-bar > div').style.top = '200px'
-                            document.querySelector('div.side-0').style.marginTop = '25px'
-                            document.querySelector('div.side-0').style.marginLeft = '20px'
-                            document.querySelector('div.side-1').style.marginTop = '55px'
+                        if (document.querySelector('div.flex.flex-col').style.marginTop != '40px') {
+                            document.querySelector('div.flex.flex-col').style.marginTop = '40px'
+                        }
+                        if (document.querySelector('div.buttons.button-bar > div > button').className.match('el-button--mini') == null) {
+                            if (document.querySelector('div.buttons.button-bar > div').style.position != 'absolute') {
+                                document.querySelector('div.buttons.button-bar > div').style.position = 'absolute'
+                                document.querySelector('div.buttons.button-bar > div').style.right = '150px'
+                                document.querySelector('div.buttons.button-bar > div').style.top = '0px'
+                            }
+                        }
+                        else {
+                            if (document.querySelector('div.buttons.button-bar > div').style.position != 'absolute') {
+                                document.querySelector('div.buttons.button-bar > div').style.position = 'absolute'
+                                document.querySelector('div.buttons.button-bar > div').style.right = '0px'
+                                document.querySelector('div.buttons.button-bar > div').style.top = '200px'
+                                document.querySelector('div.side-0').style.marginTop = '25px'
+                                document.querySelector('div.side-0').style.marginLeft = '20px'
+                                document.querySelector('div.side-1').style.marginTop = '55px'
+                            }
+                        }
+                        if (document.querySelector('div.info.mb-1.mr-1').style.position != 'fixed') {
+                            document.querySelector('div.info.mb-1.mr-1').style.position = 'fixed'
+                            document.querySelector('div.info.mb-1.mr-1').style.left = '4px'
+                            document.querySelector('div.info.mb-1.mr-1').style.top = '4px'
+                            document.querySelector('div.top-left').style.marginTop = '20px'
+                            document.querySelector('div.latency.latency-1').style.marginLeft = '100px'
+                            document.querySelector('div.latency.latency-1').style.position = 'absolute'
                         }
                     }
-                    if (document.querySelector('div.info.mb-1.mr-1').style.position != 'fixed') {
-                        document.querySelector('div.info.mb-1.mr-1').style.position = 'fixed'
-                        document.querySelector('div.info.mb-1.mr-1').style.left = '4px'
-                        document.querySelector('div.info.mb-1.mr-1').style.top = '4px'
-                        document.querySelector('div.top-left').style.marginTop = '20px'
-                        document.querySelector('div.latency.latency-1').style.marginLeft = '100px'
-                        document.querySelector('div.latency.latency-1').style.position = 'absolute'
-                    }
                 }
-
-                //remove fullscreen button
-                if (document.querySelector('div.inner > button:nth-child(2) > span > svg > path').attributes[0].value == 'M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17V19H5V14H7V17H10Z') {
-                    document.querySelector('div.inner > button:nth-child(2)').remove()
-                }
-
                 //must be last
                 if (document.querySelector('div.sidebar.right > div:nth-child(3) > button > span > span').style.whiteSpace != 'pre-wrap') {
                     document.querySelector('div.sidebar.right > div:nth-child(3) > button > span > span').style.whiteSpace = 'pre-wrap'
                 }
-            }, 300)
+            }, 1000)
             `)
             win.webContents.executeJavaScript(`
             const button_clone = document.querySelector('div.p-2.sidebar.right.space-y-2 > div.container > div > div').cloneNode(true);
@@ -176,6 +209,16 @@ const createWindow = () => {
                     if (document.querySelector('#app > div.ui > div').style.display != 'none') {
                         document.querySelector('div.el-col.el-col-8.is-guttered > button').click()
                     }
+                }
+                if (e.key == "F11") {
+                    if (document.fullscreenElement) {
+                        document.exitFullscreen();
+                    } else {
+                        document.documentElement.requestFullscreen();
+                    }
+                }
+                else {
+                    console.log(e.key)
                 }
             });
             `)
@@ -298,15 +341,15 @@ const createWindow = () => {
             }, 60000)
             getUpdates()
             `)
-        win.on('blur', () => {
-            win.webContents.executeJavaScript(`
-            if (document.querySelector('#app > div.ui > div').classList.contains('playing') == true) {
-                if (document.querySelector('#app > div.ui > div').style.display == 'none') {
-                    window.dispatchEvent(new KeyboardEvent("keydown", {keyCode: 27}))
-                }
-            }
-            `)
-        });
+        // win.on('blur', () => {
+        //     win.webContents.executeJavaScript(`
+        //     if (document.querySelector('#app > div.ui > div').classList.contains('playing') == true) {
+        //         if (document.querySelector('#app > div.ui > div').style.display == 'none') {
+        //             window.dispatchEvent(new KeyboardEvent("keydown", {keyCode: 27}))
+        //         }
+        //     }
+        //     `)
+        // });
 
         var old_mode = 'FFA'
         var old_menu = '0'
@@ -350,9 +393,7 @@ const createWindow = () => {
         var rpc = new Client({
             transport: "ipc",
         });
-        rpc.login({
-            clientId: "918680181609213972"
-        })
+        rpc.login({clientId: "918680181609213972"}).catch(console.error)
         var startTime = new Date()
         rpc.on("ready", () => {
             rpc.setActivity({
