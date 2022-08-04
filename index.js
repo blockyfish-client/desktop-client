@@ -60,21 +60,21 @@ const createWindow = () => {
         win.webContents.executeJavaScript(`
             // document.querySelector('head > link[href*="/assets/index"][rel="stylesheet"]').href = "https://thepiguy3141.github.io/doc-assets/images/misc/index.8b74f9b3.css"
             setInterval(function() {
-                // //notif badge
-                // if (document.querySelector('span.forum-notifications-badge') != null) {
-                //     console.log("notifs: " + document.querySelector('span.forum-notifications-badge').innerText)
-                // }
-                // else {
-                //     console.log("notifs: 0")
-                // }
+                //notif badge
+                if (document.querySelector('span.forum-notifications-badge') != null) {
+                    console.log("notifs: " + document.querySelector('span.forum-notifications-badge').innerText)
+                }
+                else {
+                    console.log("notifs: 0")
+                }
 
-                // //rich presence status logging
-                // if (document.querySelector('div.home-page').style.display == 'none') {
-                //     console.log("state: " + document.querySelector('.selected').innerText + "2")
-                // }
-                // else {
-                //     console.log("state: " + document.querySelector('.selected').innerText + "0")
-                // }
+                //rich presence status logging
+                if (document.querySelector('div.home-page').style.display == 'none') {
+                    console.log("state: " + document.querySelector('.selected').innerText + "2")
+                }
+                else {
+                    console.log("state: " + document.querySelector('.selected').innerText + "0")
+                }
 
                 //homepage ui modification
                 if (document.fullscreenElement) {
