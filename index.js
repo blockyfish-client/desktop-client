@@ -58,6 +58,44 @@ const createWindow = () => {
         // win.webContents.openDevTools()
         win.webContents.setBackgroundThrottling(false)
         win.webContents.executeJavaScript(`
+            //css
+            const cursor_style = document.createElement('style')
+            document.querySelector('head').appendChild(cursor_style)
+            cursor_style.innerHTML = 'a,body,button,img,input,textarea,li,div{cursor:none!important}.mouse-cursor{position:fixed;left:0;top:0;pointer-events:none;border-radius:50%;-webkit-transform:translateZ(0);transform:translateZ(0);visibility:hidden;display:block}.cursor-inner{margin-left:-3px;margin-top:-3px;width:6px;height:6px;z-index:10000001;background-color:#ced0d4;-webkit-transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;filter:drop-shadow(0 0 2px white)}.cursor-inner.cursor-hover{margin-left:-4px;margin-top:-4px;width:8px;height:8px;background-color:#ced0d4}.cursor-outer{margin-left:-15px;margin-top:-15px;width:30px;height:30px;border:2px solid #ced0d4;-webkit-box-sizing:border-box;box-sizing:border-box;z-index:10000000;opacity:.7;-webkit-transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;filter:drop-shadow(0 0 3px black)}.cursor-outer.cursor-hover{margin-left:-25px;margin-top:-25px;width:50px;height:50px;opacity:.3}.cursor-hide{display:none!important}'
+            //dot
+            const cursor_inner = document.createElement('div')
+            document.body.appendChild(cursor_inner)
+            cursor_inner.outerHTML = '<div id="cursor-inner" class="mouse-cursor cursor-inner" style="visibility: visible; transform: translate(0px, 0px);"></div>'
+            const mouse_inner = document.getElementById('cursor-inner')
+            //circle
+            const cursor_outer = document.createElement('div')
+            document.body.appendChild(cursor_outer)
+            cursor_outer.outerHTML = '<div id="cursor-outer" class="mouse-cursor cursor-outer" style="visibility: visible; transform: translate(0px, 0px);"></div>'
+            const mouse_outer = document.getElementById('cursor-outer')
+            //effects
+            document.addEventListener('mousemove', (event) => {
+                mouse_inner.style.transform = 'translate(' + event.clientX + 'px, ' + event.clientY + 'px)'
+                mouse_outer.style.transform = 'translate(' + event.clientX + 'px, ' + event.clientY + 'px)'
+                // console.log(event.clientX + ', ' + event.clientY)
+                if (document.querySelector('button:hover') != null || document.querySelector('a:hover') != null || document.querySelector('input:hover') != null || document.querySelector('textarea:hover') != null || document.querySelector('img:hover') != null) {
+                    mouse_inner.classList.add('cursor-hover')
+                    mouse_outer.classList.add('cursor-hover')
+                }
+                else {
+                    mouse_inner.classList.remove('cursor-hover')
+                    mouse_outer.classList.remove('cursor-hover')
+                }
+            });
+            document.addEventListener('mouseleave', () => {
+                mouse_inner.classList.add('cursor-hide')
+                mouse_outer.classList.add('cursor-hide')
+            })
+            document.addEventListener('mouseenter', () => {
+                mouse_inner.classList.remove('cursor-hide')
+                mouse_outer.classList.remove('cursor-hide')
+            })
+        `)
+        win.webContents.executeJavaScript(`
             // document.querySelector('head > link[href*="/assets/index"][rel="stylesheet"]').href = "https://thepiguy3141.github.io/doc-assets/images/misc/index.8b74f9b3.css"
             setInterval(function() {
                 //notif badge
@@ -206,6 +244,7 @@ const createWindow = () => {
             win.webContents.executeJavaScript(`
             document.body.addEventListener('keydown', function(e) {
                 if (e.key == "Escape") {
+                    e.preventDefault()
                     if (document.querySelector('#app > div.ui > div').style.display != 'none') {
                         document.querySelector('div.el-col.el-col-8.is-guttered > button').click()
                     }
@@ -245,7 +284,7 @@ const createWindow = () => {
             website.classList.remove("black")
             website.classList.add("pink")
             website.addEventListener("click", () => {
-                window.open('https://blockfish.netlify.app')
+                window.open('https://blockyfish.netlify.app')
             })
             `)
             win.webContents.executeJavaScript(`
