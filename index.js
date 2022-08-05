@@ -364,11 +364,11 @@ const createWindow = () => {
                 var download_ver = url_json.tag_name
                 var ver_num = download_ver.replace("v", "").replace(".", "").replace(".", "")
                 setTimeout(function() {
-                    if (ver_num > 112) {
+                    if (ver_num > 113) {
                         updateText.style.display = 'none'
                         updateImg.style.display = 'none'
                         updateAvailableDiv.style.display = 'flex'
-                        updateAvailableText.outerHTML = '<p style="text-align: left;">Update available<br><span style="color: #aaa">v1.1.1 -&gt; ' + download_ver + '</span></p>'
+                        updateAvailableText.outerHTML = '<p style="text-align: left;">Update available<br><span style="color: #aaa">v1.1.3 -&gt; ' + download_ver + '</span></p>'
                         document.getElementById('update-notif').style.display = 'block'
                         updateDownloadButton.addEventListener("click", () => {
                             window.open(download_url)
