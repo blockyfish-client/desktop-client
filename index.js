@@ -367,11 +367,11 @@ const createWindow = () => {
                 var download_ver = url_json.tag_name
                 var ver_num = download_ver.replace("v", "").replace(".", "").replace(".", "")
                 setTimeout(function() {
-                    if (ver_num > 13) {
+                    if (ver_num > 114) {
                         updateText.style.display = 'none'
                         updateImg.style.display = 'none'
                         updateAvailableDiv.style.display = 'flex'
-                        updateAvailableText.outerHTML = '<p id="download-percent" style="text-align: left;">Update available<br><span style="color: #aaa">v1.1.3 -&gt; ' + download_ver + '</span></p>'
+                        updateAvailableText.outerHTML = '<p id="download-percent" style="text-align: left;">Update available<br><span style="color: #aaa">v1.1.4 -&gt; ' + download_ver + '</span></p>'
                         downloadPercentText = document.getElementById('download-percent')
                         document.getElementById('update-notif').style.display = 'block'
                         updateDownloadButton.addEventListener("click", () => {
