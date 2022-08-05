@@ -2,8 +2,7 @@ const setupEvents = require('./installers/setupEvents')
  if (setupEvents.handleSquirrelEvent()) {
     return;
 }
-
-const { app, BrowserWindow, session, ipcMain } = require('electron')
+const { app, BrowserWindow, session, remote } = require('electron')
 const electronDl = require('electron-dl')
 const path = require('path')
 const { shell } = require("electron")
@@ -11,6 +10,7 @@ const { ElectronBlocker } = require('@cliqz/adblocker-electron')
 const fetch = require('cross-fetch') // required 'fetch'
 const { Client } = require("discord-rpc")
 const child = require('child_process').execFile
+const fs = require('fs'); // Load the File System to execute our common tasks (CRUD)
 
 //adblock
 ElectronBlocker.fromPrebuiltAdsAndTracking(fetch).then((blocker) => {
@@ -19,6 +19,17 @@ ElectronBlocker.fromPrebuiltAdsAndTracking(fetch).then((blocker) => {
 
 function matches(text, partial) {
     return text.toLowerCase().indexOf(partial.toLowerCase()) > -1;
+}
+let downloadPath = app.getPath('downloads')
+if (fs.existsSync(downloadPath + "\\blockyfishclient-update-download.exe")) {
+    fs.unlink(downloadPath + "\\blockyfishclient-update-download.exe", (err) => {
+        if (err) {
+            alert("An error ocurred updating the file" + err.message);
+            console.log(err);
+            return;
+        }
+        console.log("File succesfully deleted");
+    });
 }
 
 //main window
@@ -57,7 +68,7 @@ const createWindow = () => {
     win.loadURL('https://beta.deeeep.io')
     win.removeMenu();
     win.webContents.on('did-finish-load', function() {
-        win.webContents.openDevTools()
+        // win.webContents.openDevTools()
         win.webContents.setBackgroundThrottling(false)
         win.webContents.executeJavaScript(`
             //css
@@ -471,8 +482,7 @@ const createWindow = () => {
             }
             if (matches(msg, "request_download:")) {
                 var url = msg.replace("request_download: ", "")
-                electronDl.download(BrowserWindow.getFocusedWindow(), url, {directory:"d:/Downloads", onProgress: function(progress) {setUpdateDownloadBar(Math.floor(progress.percent * 100))}, onCompleted: function(file) {runUpdateInstaller(file.path)}})
-                
+                electronDl.download(BrowserWindow.getFocusedWindow(), url, {directory:downloadPath, filename:"blockyfishclient-update-download.exe", onProgress: function(progress) {setUpdateDownloadBar(Math.floor(progress.percent * 100))}, onCompleted: function(file) {runUpdateInstaller(file.path)}})
             }
         });
         win.show();
