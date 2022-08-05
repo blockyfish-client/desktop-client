@@ -1,8 +1,30 @@
-# Deeeep.io Desktop Client for v4
+# Deeeep.io Desktop Client for v4  
 
-Go to the releases page for downloads. 
 
-## Changelogs:
+## Downloads:  
+
+Latest version: https://blockyfish.netlify.app  
+Older version: [Releases page](https://github.com/blockyfish-client/Desktop-Client/releases)
+
+## Changelogs:  
+
+### v1.1.4
+- Update process now doesn't require you to open your browser
+- Download progress bar
+- Update file saves to your default download folder
+- After updating, the downloaded file is removed  
+
+### v1.1.3
+- Custom cursor
+- Made images undraggable for a better user experience  
+
+### v1.1.2
+- Full screen support is here!
+  - Game layouts move around to avoid the title bar buttons overlay depending on whether you are in full screen mode or not. 
+  - F11 key to toggle full screen. Don't hold it down if you have epilepsies. 
+- Performance improvement. Done by reducing the fire rate of background scripts. 
+- Removed the pause game on unfocus feature because it's annoying and doesn't really help.  
+
 ### v1.1.1
 - Updater:
   - Automatic update checking
@@ -10,7 +32,7 @@ Go to the releases page for downloads.
   - Shows an option to download a newer version instead
   - Shows current version and available version
   - Update notification (small red dot on the updater button)
-- New installation gif. No more cringey iOS loading animation, spinny shark is better
+- New installation gif. No more cringey iOS loading animation, spinny shark is better  
 ![loading_animation](https://raw.githubusercontent.com/blockyfish-client/Desktop-Client/master/img/loading.gif)  
 
 ### v1.1.0
