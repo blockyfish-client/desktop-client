@@ -3,12 +3,14 @@ const setupEvents = require('./installers/setupEvents')
     return;
 }
 
-const { app, BrowserWindow, session } = require('electron')
+const { app, BrowserWindow, session, ipcMain } = require('electron')
+const electronDl = require('electron-dl')
 const path = require('path')
 const { shell } = require("electron")
 const { ElectronBlocker } = require('@cliqz/adblocker-electron')
 const fetch = require('cross-fetch') // required 'fetch'
-const { Client } = require("discord-rpc");
+const { Client } = require("discord-rpc")
+const child = require('child_process').execFile
 
 //adblock
 ElectronBlocker.fromPrebuiltAdsAndTracking(fetch).then((blocker) => {
@@ -55,7 +57,7 @@ const createWindow = () => {
     win.loadURL('https://beta.deeeep.io')
     win.removeMenu();
     win.webContents.on('did-finish-load', function() {
-        // win.webContents.openDevTools()
+        win.webContents.openDevTools()
         win.webContents.setBackgroundThrottling(false)
         win.webContents.executeJavaScript(`
             //css
@@ -316,7 +318,7 @@ const createWindow = () => {
             //styles
             const updater_style = document.createElement('style')
             document.querySelector('head').appendChild(updater_style)
-            updater_style.innerHTML = '.button{display:inline-flex;justify-content:center;align-items:center;line-height:1;height:32px;white-space:nowrap;cursor:pointer;text-align:center;box-sizing:border-box;outline:0;transition:.1s;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;vertical-align:middle;-webkit-appearance:none;min-height:2.5rem;border-radius:.25rem;padding:.75rem 1.25rem;font-size:.875rem}.box-x-close{position:absolute;top:.3rem;right:.5rem}.updater-green{background-color:#10b981;border-color:#059669}.updater-green:hover{background-color:#059669;border-color:#047857}.updater-blue{background-color:#3b82f6;border-color:#2563eb}.updater-blue:hover{background-color:#2563eb;border-color:#1d4ed8}.updater-black{background-color:#6b7280;border-color:#4b5563}.updater-black:hover{background-color:#4b5563;border-color:#374151}body .updater-button{border-bottom-width:4px;border-radius:1rem}.updater-box.active{outline:white solid 2px;filter:brightness(100%)}.updater-modal{background-color:#1f2937;border:2px solid #374151;border-radius:.75rem;width:300px}@media screen and (min-width:768px){.updater-modal{background-color:#1f2937;border:2px solid #374151;border-radius:.75rem;width:400px}}.updater-core{top:5px;right:5px;border:1px solid #fff;border-radius:25px;font-size:14px}#updater-main{justify-content:center;flex-wrap:wrap;width:88%;margin:auto;gap:15px;flex-direction:column;align-items:center}.updater-hidden{opacity:0;pointer-events:none}#updater-modal{transition: 0.2s opacity}#update-available{margin:10px;width:88%;background:#fff2;border-radius:10px;display:flex;flex-direction:row;align-items:center;padding:10px;justify-content:space-between}'
+            updater_style.innerHTML = '.button{display:inline-flex;justify-content:center;align-items:center;line-height:1;height:32px;white-space:nowrap;cursor:pointer;text-align:center;box-sizing:border-box;outline:0;transition:.1s;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;vertical-align:middle;-webkit-appearance:none;min-height:2.5rem;border-radius:.25rem;padding:.75rem 1.25rem;font-size:.875rem}.box-x-close{position:absolute;top:.3rem;right:.5rem}.updater-green{background-color:#10b981;border-color:#059669}.updater-green:hover{background-color:#059669;border-color:#047857}.updater-blue{background-color:#3b82f6;border-color:#2563eb}.updater-blue:hover{background-color:#2563eb;border-color:#1d4ed8}.updater-black:hover,.updater-blue.updater-disabled{background-color:#4b5563;border-color:#374151}.updater-blue.updater-disabled{color:#9ca3af;pointer-events:none}.updater-black{background-color:#6b7280;border-color:#4b5563}body .updater-button{border-bottom-width:4px;border-radius:1rem}.updater-box.active{outline:white solid 2px;filter:brightness(100%)}.updater-modal{background-color:#1f2937;border:2px solid #374151;border-radius:.75rem;width:300px}@media screen and (min-width:768px){.updater-modal{background-color:#1f2937;border:2px solid #374151;border-radius:.75rem;width:400px}}.updater-core{top:5px;right:5px;border:1px solid #fff;border-radius:25px;font-size:14px}#updater-main{justify-content:center;flex-wrap:wrap;width:88%;margin:auto;gap:15px;flex-direction:column;align-items:center}.updater-hidden{opacity:0;pointer-events:none}#updater-modal{transition:opacity .2s}#update-available{margin:10px;width:88%;background:#fff2;border-radius:10px;display:flex;flex-direction:row;align-items:center;padding:10px;justify-content:space-between}'
             //main div
             const updater_div = document.createElement('div')
             document.getElementById('app').appendChild(updater_div)
@@ -338,6 +340,7 @@ const createWindow = () => {
                 updateText.style.display = 'block'
                 updateImg.style.display = 'block'
                 updateAvailableDiv.style.display = 'none'
+                updateDownloadButton.classList.remove('updater-disabled')
             }
             for (const updaterClose of updaterCloses) {
               updaterClose.addEventListener("click", () => {
@@ -364,14 +367,19 @@ const createWindow = () => {
                 var download_ver = url_json.tag_name
                 var ver_num = download_ver.replace("v", "").replace(".", "").replace(".", "")
                 setTimeout(function() {
-                    if (ver_num > 113) {
+                    if (ver_num > 13) {
                         updateText.style.display = 'none'
                         updateImg.style.display = 'none'
                         updateAvailableDiv.style.display = 'flex'
-                        updateAvailableText.outerHTML = '<p style="text-align: left;">Update available<br><span style="color: #aaa">v1.1.3 -&gt; ' + download_ver + '</span></p>'
+                        updateAvailableText.outerHTML = '<p id="download-percent" style="text-align: left;">Update available<br><span style="color: #aaa">v1.1.3 -&gt; ' + download_ver + '</span></p>'
+                        downloadPercentText = document.getElementById('download-percent')
                         document.getElementById('update-notif').style.display = 'block'
                         updateDownloadButton.addEventListener("click", () => {
-                            window.open(download_url)
+                            if (updateDownloadButton.disabled != true) {
+                                // window.open(download_url)
+                                console.log("request_download: " + download_url)
+                                updateDownloadButton.classList.add('updater-disabled')
+                            }
                         })
                     }
                     else {
@@ -390,6 +398,34 @@ const createWindow = () => {
             }, 60000)
             getUpdates()
             `)
+            function setUpdateDownloadBar(percent) {
+                if (percent < 100) {
+                    win.webContents.executeJavaScript(`
+                    downloadPercentText.innerHTML = '<p id="download-percent" style="text-align: left;">Downloading - ` + percent + `%</p>'
+                    `)
+                    win.webContents.executeJavaScript(`
+                    updateAvailableDiv.style.backgroundImage = 'linear-gradient(90deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.34) ` + percent + `%, rgba(255,255,255,0) ` + percent + `%, rgba(255,255,255,0) 100%)'
+                    `)
+                }
+                else {
+                    win.webContents.executeJavaScript(`
+                    downloadPercentText.innerHTML = '<p id="download-percent" style="text-align: left;">Installing...</p>'
+                    updateAvailableDiv.style.backgroundImage = ''
+                    `)
+
+                }
+            }
+            function runUpdateInstaller(location) {
+                console.log(location)
+                child(location, function(err, data) {
+                    if(err){
+                       console.error(err);
+                       return;
+                    }
+                 
+                    console.log(data.toString());
+                });
+            }
         // win.on('blur', () => {
         //     win.webContents.executeJavaScript(`
         //     if (document.querySelector('#app > div.ui > div').classList.contains('playing') == true) {
@@ -432,6 +468,11 @@ const createWindow = () => {
                     old_menu = menu
                     old_url = url
                 }
+            }
+            if (matches(msg, "request_download:")) {
+                var url = msg.replace("request_download: ", "")
+                electronDl.download(BrowserWindow.getFocusedWindow(), url, {directory:"d:/Downloads", onProgress: function(progress) {setUpdateDownloadBar(Math.floor(progress.percent * 100))}, onCompleted: function(file) {runUpdateInstaller(file.path)}})
+                
             }
         });
         win.show();
