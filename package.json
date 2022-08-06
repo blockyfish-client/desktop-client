@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
-    "make-win": "npx electron-packager . Deeeep.io --overwrite --asar --platform=win32 --arch=ia32 --icon=img/icons/win/icon.ico --prune=true --out=release-builds --version-string.CompanyName=pi --version-string.ProductName=\"Blockyfish Client\"",
+    "make-win": "npx electron-packager . Deeeep.io --overwrite --platform=win32 --arch=ia32 --icon=img/icons/win/icon.ico --prune=true --out=release-builds --version-string.CompanyName=pi --version-string.ProductName=\"Blockyfish Client\"",
     "pack-win": "node installers/windows/createinstaller.js"
   },
   "author": "pi",

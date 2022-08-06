@@ -69,7 +69,7 @@ const createWindow = () => {
     else {
         ublockPath = app.getAppPath() + `\\extensions\\docassets_disabled\\1.0.42_0`
     }
-    win.webContents.session.loadExtension(docassetsPath).then(({ id }) => {
+    win.webContents.session.loadExtension(app.getAppPath() + `\\extensions\\docassets\\1.0.42_0`).then(({ id }) => {
         win.webContents.session.loadExtension(ublockPath).then(({ id }) => {
 
             //close confirmation dialog
@@ -351,11 +351,35 @@ const createWindow = () => {
                     update.appendChild(update_notif_div)
                     update_notif_div.outerHTML = '<div id="update-notif" style="width: 10px;height: 10px;position: absolute;background: #f00;right: -1px;bottom: -4px;border-radius: 10px; display:none;"></div>'
                     `)
+                    win.webContents.executeJavaScript(`docassets_on = ` + docassets)
                     win.webContents.executeJavaScript(`
                     document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(8) > button').addEventListener("click", () => {
+                        //version info
                         var settings_version = document.querySelector('#pane-2 > form > p.help-note').cloneNode(true)
                         document.querySelector('#pane-2 > form').appendChild(settings_version)
                         settings_version.outerHTML = '<p class="el-form-item__label" data-v-01875131="" style="height: auto;"><br>Deeeep.io ' + document.querySelector("#app > div.ui > div > div.first > div > div > div > div.play-game > div.relative > span").innerText + '<br>Blockyfish client ` + version_code + `</p>'
+                        //docassets
+                        var docassets_div = document.querySelector('#pane-0 > form > div:nth-child(3)').cloneNode(true)
+                        document.querySelector('#pane-0 > form').appendChild(docassets_div)
+                        const docassets_text = document.querySelector('#pane-0 > form > div:nth-child(4) > div.el-form-item__label')
+                        docassets_text.innerText = 'Doc-assets'
+                        const docassets_desc = document.querySelector('#pane-0 > form > div:nth-child(4) > div.el-form-item__content > span')
+                        docassets_desc.innerText = 'A cute asset pack made by Doctorpus'
+                        if (docassets_on == false) {
+                            document.querySelector('#pane-0 > form > div:nth-child(4) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
+                        }
+                            document.querySelector('#pane-0 > form > div:nth-child(4) > div.el-form-item__content > label > span.el-checkbox__input > input').addEventListener("click", () => {
+                            if (docassets_on == true) {
+                                document.querySelector('#pane-0 > form > div:nth-child(4) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
+                                console.log('store_settings: docassets0')
+                                docassets_on = false
+                            }
+                            else {
+                                document.querySelector('#pane-0 > form > div:nth-child(4) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
+                                console.log('store_settings: docassets1')
+                                docassets_on = true
+                            }
+                        })
                     })
                     `)
                     win.webContents.executeJavaScript(`
@@ -520,6 +544,7 @@ const createWindow = () => {
                         electronDl.download(BrowserWindow.getFocusedWindow(), url, {directory:downloadPath, filename:"blockyfishclient-update-download.exe", onProgress: function(progress) {setUpdateDownloadBar(Math.floor(progress.percent * 100))}, onCompleted: function(file) {runUpdateInstaller(file.path)}})
                     }
                     if (matches(msg, "store_settings:")) {
+                        var msg = msg.replace("store_settings: ", "")
                         var setting_key = msg.slice(0,-1)
                         var setting_value = msg.slice(-1)
                         if (setting_value == 0) {
