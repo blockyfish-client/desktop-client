@@ -74,8 +74,8 @@ const createWindow = () => {
             ublockPath = app.getAppPath() + `\\extensions\\docassets_disabled\\1.0.42_0`
         }    
     }
-    win.webContents.session.loadExtension(docassetsPath).then(({ id }) => {
-        win.webContents.session.loadExtension(ublockPath).then(({ id }) => {
+    win.webContents.session.loadExtension(docassetsPath).then(() => {
+        win.webContents.session.loadExtension(ublockPath).then(() => {
 
             //close confirmation dialog
             win.on('close', function(e) {
@@ -106,7 +106,7 @@ const createWindow = () => {
                     //css
                     const cursor_style = document.createElement('style')
                     document.querySelector('head').appendChild(cursor_style)
-                    cursor_style.innerHTML = 'a,body,button,img,input,textarea,li,div,tr,td{cursor:none!important}.mouse-cursor{position:fixed;left:0;top:0;pointer-events:none;border-radius:50%;-webkit-transform:translateZ(0);transform:translateZ(0);visibility:hidden;display:block}.cursor-inner{margin-left:-3px;margin-top:-3px;width:6px;height:6px;z-index:10000001;background-color:#ced0d4;-webkit-transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;filter:drop-shadow(0 0 2px white)}.cursor-inner.cursor-hover{margin-left:-4px;margin-top:-4px;width:8px;height:8px;background-color:#ced0d4}.cursor-outer{margin-left:-15px;margin-top:-15px;width:30px;height:30px;border:2px solid #ced0d4;-webkit-box-sizing:border-box;box-sizing:border-box;z-index:10000000;opacity:.7;-webkit-transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;filter:drop-shadow(0 0 3px black)}.cursor-outer.cursor-hover{margin-left:-25px;margin-top:-25px;width:50px;height:50px;opacity:.3}.cursor-hide{display:none!important}'
+                    cursor_style.innerHTML = 'a,body,button,img,input,textarea,li,div,tr,td,label,span{cursor:none!important}.mouse-cursor{position:fixed;left:0;top:0;pointer-events:none;border-radius:50%;-webkit-transform:translateZ(0);transform:translateZ(0);visibility:hidden;display:block}.cursor-inner{margin-left:-3px;margin-top:-3px;width:6px;height:6px;z-index:10000001;background-color:#ced0d4;-webkit-transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;filter:drop-shadow(0 0 2px white)}.cursor-inner.cursor-hover{margin-left:-4px;margin-top:-4px;width:8px;height:8px;background-color:#ced0d4}.cursor-outer{margin-left:-15px;margin-top:-15px;width:30px;height:30px;border:2px solid #ced0d4;-webkit-box-sizing:border-box;box-sizing:border-box;z-index:10000000;opacity:.7;-webkit-transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;filter:drop-shadow(0 0 3px black)}.cursor-outer.cursor-hover{margin-left:-25px;margin-top:-25px;width:50px;height:50px;opacity:.3}.cursor-hide{display:none!important}'
                     //dot
                     const cursor_inner = document.createElement('div')
                     document.body.appendChild(cursor_inner)
@@ -187,11 +187,12 @@ const createWindow = () => {
                             document.querySelector('div.el-button-group.nice-btn-group.block.mt-2').style.width = '30vw'
                             document.querySelector('div.el-button-group.nice-btn-group.block.mt-2').style.maxWidth = '300px'
                         }
-                        if (document.querySelector('div.sidebar.left.p-2') != null) {
-                            document.querySelector('div.sidebar.left.p-2').remove()
+                        if (document.querySelector('div.sidebar.left.p-2 > a').style.opacity != '0') {
+                            document.querySelector('div.sidebar.left.p-2 > a').style.opacity = '0'
+                            document.querySelector('div.sidebar.left.p-2 > a').style.pointerEvents = 'none'
                         }
                     
-                        //game ui modification
+                        //GAME UI MOD
                         if (document.querySelector('div.game') != null) {
                             if (document.fullscreenElement) {
                                 if (document.querySelector('div.flex.flex-col').style.marginTop != '') {
@@ -359,12 +360,7 @@ const createWindow = () => {
                     win.webContents.executeJavaScript(`docassets_on = ` + docassets)
                     win.webContents.executeJavaScript(`ublock_on = ` + ublock)
                     win.webContents.executeJavaScript(`
-                    document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(8) > button').addEventListener("click", () => {
-                        //version info
-                        var settings_version = document.querySelector('#pane-2 > form > p.help-note').cloneNode(true)
-                        document.querySelector('#pane-2 > form').appendChild(settings_version)
-                        settings_version.outerHTML = '<p class="el-form-item__label" data-v-01875131="" style="height: auto;"><br>Deeeep.io ' + document.querySelector("#app > div.ui > div > div.first > div > div > div > div.play-game > div.relative > span").innerText + '<br>Blockyfish client ` + version_code + `</p>'
-                        
+                    document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(8) > button').addEventListener("click", () => {                        
                         //docassets
                         var docassets_div = document.querySelector('#pane-0 > form > div:nth-child(3)').cloneNode(true)
                         document.querySelector('#pane-0 > form').appendChild(docassets_div)
@@ -375,7 +371,7 @@ const createWindow = () => {
                         if (docassets_on != true) {
                             document.querySelector('#pane-0 > form > div:nth-child(4) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
                         }
-                            document.querySelector('#pane-0 > form > div:nth-child(4) > div.el-form-item__content > label > span.el-checkbox__input > input').addEventListener("click", () => {
+                        document.querySelector('#pane-0 > form > div:nth-child(4) > div.el-form-item__content > label > span.el-checkbox__input > input').addEventListener("click", () => {
                             if (docassets_on == true) {
                                 document.querySelector('#pane-0 > form > div:nth-child(4) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
                                 console.log('store_settings: docassets0')
@@ -390,26 +386,31 @@ const createWindow = () => {
                         
                         //ublock
                         var ublock_div = document.querySelector('#pane-0 > form > div:nth-child(3)').cloneNode(true)
-                        document.querySelector('#pane-0 > form').appendChild(ublock_div)
-                        const ublock_text = document.querySelector('#pane-0 > form > div:nth-child(5) > div.el-form-item__label')
+                        document.querySelector('#pane-2 > form').appendChild(ublock_div)
+                        const ublock_text = document.querySelector('#pane-2 > form > div:nth-child(3) > div.el-form-item__label')
                         ublock_text.innerText = 'Adblock'
-                        const ublock_desc = document.querySelector('#pane-0 > form > div:nth-child(5) > div.el-form-item__content > span')
+                        const ublock_desc = document.querySelector('#pane-2 > form > div:nth-child(3) > div.el-form-item__content > span')
                         ublock_desc.innerText = 'Shows ads and support fede'
                         if (ublock_on == false) {
-                            document.querySelector('#pane-0 > form > div:nth-child(5) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
+                            document.querySelector('#pane-2 > form > div:nth-child(3) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
                         }
-                            document.querySelector('#pane-0 > form > div:nth-child(5) > div.el-form-item__content > label > span.el-checkbox__input > input').addEventListener("click", () => {
+                        document.querySelector('#pane-2 > form > div:nth-child(3) > div.el-form-item__content > label > span.el-checkbox__input > input').addEventListener("click", () => {
                             if (ublock_on == true) {
-                                document.querySelector('#pane-0 > form > div:nth-child(5) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
+                                document.querySelector('#pane-2 > form > div:nth-child(3) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
                                 console.log('store_settings: ublock0')
                                 ublock_on = false
                             }
                             else {
-                                document.querySelector('#pane-0 > form > div:nth-child(5) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
+                                document.querySelector('#pane-2 > form > div:nth-child(3) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
                                 console.log('store_settings: ublock1')
                                 ublock_on = true
                             }
                         })
+
+                        //version info
+                        var settings_version = document.querySelector('#pane-2 > form > p.help-note').cloneNode(true)
+                        document.querySelector('#pane-2 > form').appendChild(settings_version)
+                        settings_version.outerHTML = '<p class="help-note" data-v-01875131="" style="height: auto;"><br>Deeeep.io ' + document.querySelector("#app > div.ui > div > div.first > div > div > div > div.play-game > div.relative > span").innerText + '<br>Blockyfish client ` + version_code + `</p>'
                     })
                     `)
                     win.webContents.executeJavaScript(`
