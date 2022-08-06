@@ -100,7 +100,7 @@ const createWindow = () => {
             win.loadURL('https://beta.deeeep.io')
             win.removeMenu();
             win.webContents.on('did-finish-load', function() {
-                win.webContents.openDevTools()
+                // win.webContents.openDevTools()
                 win.webContents.setBackgroundThrottling(false)
                 win.webContents.executeJavaScript(`
                     //css
