@@ -32,7 +32,8 @@ if (fs.existsSync(downloadPath + "\\blockyfishclient-update-download.exe")) {
     });
 }
 
-var docassets = true
+var docassets = false
+var ublock = false
 
 //main window
 app.whenReady().then(async () => {
@@ -61,8 +62,14 @@ const createWindow = () => {
     else {
         docassetsPath = app.getAppPath() + `\\extensions\\docassets_disabled\\1.0.42_0`
     }
+    if (ublock == true) {
+        ublockPath = app.getAppPath() + `\\extensions\\ublock\\1.43.0_0`
+    }
+    else {
+        ublockPath = app.getAppPath() + `\\extensions\\docassets_disabled\\1.0.42_0`
+    }
     win.webContents.session.loadExtension(docassetsPath).then(({ id }) => {
-    win.webContents.session.loadExtension(app.getAppPath() + `\\extensions\\ublock\\1.43.0_0`).then(({ id }) => {
+    win.webContents.session.loadExtension(ublockPath).then(({ id }) => {
     
     //close confirmation dialog
     win.on('close', function(e) {
