@@ -8,6 +8,15 @@ Older version: [Releases page](https://github.com/blockyfish-client/Desktop-Clie
 
 ## Changelogs:  
 
+### v1.2.0
+- Doctorpus Assets!!
+- uBlock Origin for adblock
+- Pink verified badge for me!
+- Extension toggles are integrated into the settings page
+- Version info shown in settings
+- Changed the name length limit from the original 20 characters limit to real 22 characters limit
+- Note text in settings saying that you need to restart the client to change extension settings  
+
 ### v1.1.4
 - Update process now doesn't require you to open your browser
 - Download progress bar
