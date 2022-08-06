@@ -1,6 +1,6 @@
 {
   "name": "deeeep.io",
-  "version": "1.1.4",
+  "version": "1.2.0",
   "description": "A custom desktop client for deeeep.io v4 with some improvements. Made by pi. ",
   "main": "index.js",
   "scripts": {

@@ -14,8 +14,8 @@ const { ElectronChromeExtensions } = require('electron-chrome-extensions')
 const Store = require('electron-store');
 
 //version info
-const version_code = 'v1.1.4'
-const version_num = '114'
+const version_code = 'v1.2.0'
+const version_num = '120'
 
 function matches(text, partial) {
     return text.toLowerCase().indexOf(partial.toLowerCase()) > -1;
@@ -100,7 +100,7 @@ const createWindow = () => {
             win.loadURL('https://beta.deeeep.io')
             win.removeMenu();
             win.webContents.on('did-finish-load', function() {
-                // win.webContents.openDevTools()
+                win.webContents.openDevTools()
                 win.webContents.setBackgroundThrottling(false)
                 win.webContents.executeJavaScript(`
                     //css
@@ -364,6 +364,15 @@ const createWindow = () => {
                     win.webContents.executeJavaScript(`ublock_on = ` + ublock)
                     win.webContents.executeJavaScript(`
                     document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(8) > button').addEventListener("click", () => {                        
+                        //restart tooltip
+                        var modal_parent = document.querySelector('#app > div.modals-container > div > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div')
+                        var restart_tooltip = document.querySelector('#pane-2 > form > p.help-note').cloneNode(true)
+                        modal_parent.insertBefore(restart_tooltip, modal_parent.children[2])
+                        restart_tooltip.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="10" fill="currentColor" class="bi bi-exclamation-triangle" viewBox="0 0 16 16"><path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"></path><path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"></path></svg> Changes will take effect the next time you launch blockyfish client'
+                        restart_tooltip.style.alignSelf = 'center'
+                        restart_tooltip.style.color = '#f77'
+                        restart_tooltip.style.display = 'none'
+
                         //docassets
                         var docassets_div = document.querySelector('#pane-0 > form > div:nth-child(3)').cloneNode(true)
                         document.querySelector('#pane-0 > form').appendChild(docassets_div)
@@ -375,6 +384,7 @@ const createWindow = () => {
                             document.querySelector('#pane-0 > form > div:nth-child(4) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
                         }
                         document.querySelector('#pane-0 > form > div:nth-child(4) > div.el-form-item__content > label > span.el-checkbox__input > input').addEventListener("click", () => {
+                            restart_tooltip.style.display = 'block'
                             if (docassets_on == true) {
                                 document.querySelector('#pane-0 > form > div:nth-child(4) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
                                 console.log('store_settings: docassets0')
@@ -398,6 +408,7 @@ const createWindow = () => {
                             document.querySelector('#pane-2 > form > div:nth-child(3) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
                         }
                         document.querySelector('#pane-2 > form > div:nth-child(3) > div.el-form-item__content > label > span.el-checkbox__input > input').addEventListener("click", () => {
+                            restart_tooltip.style.display = 'block'
                             if (ublock_on == true) {
                                 document.querySelector('#pane-2 > form > div:nth-child(3) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
                                 console.log('store_settings: ublock0')
@@ -412,8 +423,16 @@ const createWindow = () => {
 
                         //version info
                         var settings_version = document.querySelector('#pane-2 > form > p.help-note').cloneNode(true)
-                        document.querySelector('#pane-2 > form').appendChild(settings_version)
-                        settings_version.outerHTML = '<p class="help-note" style="height: auto;"><br>Deeeep.io ' + document.querySelector("#app > div.ui > div > div.first > div > div > div > div.play-game > div.relative > span").innerText + '<br>Blockyfish client ` + version_code + `</p>'
+                        modal_parent.appendChild(settings_version)
+                        settings_version.innerHTML = 'Deeeep.io ' + document.querySelector("#app > div.ui > div > div.first > div > div > div > div.play-game > div.relative > span").innerText + '<br>Blockyfish client ` + version_code + `'
+                        settings_version.style.position = 'absolute'
+                        settings_version.style.bottom = '10px'
+                        settings_version.style.left = '10px'
+
+                        //settings panel sizing
+                        var settings_modal = document.querySelector('#app > div.modals-container > div > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div')
+                        settings_modal.style.width = '80vw'
+                        settings_modal.style.maxWidth = '500px'
                     })
                     `)
                     win.webContents.executeJavaScript(`
