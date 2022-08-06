@@ -169,6 +169,9 @@ const createWindow = () => {
                         for (const link of links) {
                             link.draggable = false
                         }
+                        if (document.querySelector('#app > div.ui > div > div.first > div > div > div > div.play-game > div.relative > div > div > input').maxLength != 22) {
+                            document.querySelector('#app > div.ui > div > div.first > div > div > div > div.play-game > div.relative > div > div > input').maxLength = 22
+                        }
                         //changing layouts according to fullscreen
                         if (document.fullscreenElement) {
                             if (document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div').style.paddingRight != '') {
@@ -410,7 +413,7 @@ const createWindow = () => {
                         //version info
                         var settings_version = document.querySelector('#pane-2 > form > p.help-note').cloneNode(true)
                         document.querySelector('#pane-2 > form').appendChild(settings_version)
-                        settings_version.outerHTML = '<p class="help-note" data-v-01875131="" style="height: auto;"><br>Deeeep.io ' + document.querySelector("#app > div.ui > div > div.first > div > div > div > div.play-game > div.relative > span").innerText + '<br>Blockyfish client ` + version_code + `</p>'
+                        settings_version.outerHTML = '<p class="help-note" style="height: auto;"><br>Deeeep.io ' + document.querySelector("#app > div.ui > div > div.first > div > div > div > div.play-game > div.relative > span").innerText + '<br>Blockyfish client ` + version_code + `</p>'
                     })
                     `)
                     win.webContents.executeJavaScript(`
@@ -499,6 +502,14 @@ const createWindow = () => {
                     }, 60000)
                     getUpdates()
                     `)
+                    function insertClientOwnerBadge() {
+                        win.webContents.executeJavaScript(`
+                        badgeParentDiv = document.querySelector('#app > div.vfm.vfm--inset.vfm--fixed.modal > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div > div > div > div.el-row.header > div.el-col.el-col-24.auto-col.fill > div')
+                        clientOwnerBadge = document.createElement('div')
+                        badgeParentDiv.insertBefore(clientOwnerBadge, badgeParentDiv.children[1])
+                        clientOwnerBadge.outerHTML = '<div class="el-image verified-icon el-tooltip__trigger el-tooltip__trigger" style="height: 1rem;margin-right: 0.25rem;width: 1rem;"><img src="/img/verified.png" class="el-image__inner" style="filter: hue-rotate(90deg);"></div>'
+                        `)
+                    }
                     function setUpdateDownloadBar(percent) {
                         if (percent < 100) {
                             win.webContents.executeJavaScript(`
@@ -611,6 +622,9 @@ const createWindow = () => {
                     if (matches(currentUrl, "/u/")) {
                         var detailText = 'Viewing ' + currentUrl.replace("https://beta.deeeep.io/u/", "") + "'s profile"
                         var labelText = ''
+                        if (currentUrl.replace("https://beta.deeeep.io/u/", "") == 'ItsGrandPi') {
+                            insertClientOwnerBadge()
+                        }
                     }
                     else if (matches(currentUrl, "/forum/")) {
                         var detailText = "Visiting the forums"
