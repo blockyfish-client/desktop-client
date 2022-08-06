@@ -2,24 +2,20 @@ const setupEvents = require('./installers/setupEvents')
  if (setupEvents.handleSquirrelEvent()) {
     return;
 }
-const { app, BrowserWindow, session, remote } = require('electron')
+const { app, BrowserWindow, session, remote, globalShortcut } = require('electron')
 const electronDl = require('electron-dl')
 const path = require('path')
 const { shell } = require("electron")
-const { ElectronBlocker } = require('@cliqz/adblocker-electron')
 const fetch = require('cross-fetch') // required 'fetch'
 const { Client } = require("discord-rpc")
 const child = require('child_process').execFile
-const fs = require('fs'); // Load the File System to execute our common tasks (CRUD)
+const fs = require('fs') // Load the File System to execute our common tasks (CRUD)
+const os = require("os")
+const { ElectronChromeExtensions } = require('electron-chrome-extensions')
 
 //version info
 const version_code = 'v1.1.4'
 const version_num = '114'
-
-//adblock
-ElectronBlocker.fromPrebuiltAdsAndTracking(fetch).then((blocker) => {
-  blocker.enableBlockingInSession(session.defaultSession);
-});
 
 function matches(text, partial) {
     return text.toLowerCase().indexOf(partial.toLowerCase()) > -1;
@@ -36,7 +32,10 @@ if (fs.existsSync(downloadPath + "\\blockyfishclient-update-download.exe")) {
     });
 }
 
+var docassets = true
+
 //main window
+app.whenReady().then(async () => {
 const createWindow = () => {
     const win = new BrowserWindow({
         width: 1080,
@@ -53,6 +52,17 @@ const createWindow = () => {
         },
         icon: path.join(__dirname, 'img/icon.png'),
     })
+
+    const extensions = new ElectronChromeExtensions()
+    extensions.addTab(win.webContents, win)
+    if (docassets == true) {
+        docassetsPath = app.getAppPath() + `\\extensions\\docassets\\1.0.42_0`
+    }
+    else {
+        docassetsPath = app.getAppPath() + `\\extensions\\docassets_disabled\\1.0.42_0`
+    }
+    win.webContents.session.loadExtension(docassetsPath).then(({ id }) => {
+    win.webContents.session.loadExtension(app.getAppPath() + `\\extensions\\ublock\\1.43.0_0`).then(({ id }) => {
     
     //close confirmation dialog
     win.on('close', function(e) {
@@ -69,6 +79,11 @@ const createWindow = () => {
         }
     });
 
+    //ctrl r for reload
+    globalShortcut.register('CommandOrControl+R', () => {
+        win.reload()
+    })
+    
     win.loadURL('https://beta.deeeep.io')
     win.removeMenu();
     win.webContents.on('did-finish-load', function() {
@@ -563,16 +578,16 @@ const createWindow = () => {
             }
         }
     });
-}
-
-app.whenReady().then(async () => {
-
-    createWindow()
-
-    app.on('activate', () => {
-        if (BrowserWindow.getAllWindows().length === 0) createWindow()
-    })
 })
+})
+}
+createWindow()
+})
+
+app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+})
+
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit()
 })

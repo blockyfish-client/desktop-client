@@ -17,11 +17,11 @@
     "electron-winstaller": "^5.0.0"
   },
   "dependencies": {
-    "@cliqz/adblocker-electron": "^1.23.8",
     "@cliqz/adblocker-webextension": "^1.23.8",
     "cross-fetch": "^3.1.5",
     "custom-electron-titlebar": "^4.1.0",
     "discord-rpc": "^4.0.1",
+    "electron-chrome-extensions": "^3.9.0",
     "electron-dl": "^3.3.1",
     "electron-squirrel-startup": "^1.0.0"
   }

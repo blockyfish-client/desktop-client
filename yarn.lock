@@ -9,22 +9,6 @@
   dependencies:
     "@cliqz/adblocker-extended-selectors" "^1.23.8"
 
-"@cliqz/adblocker-electron-preload@^1.23.8":
-  "integrity" "sha512-0oMnbnw2RPtw/aMDoUML5VrTGnCRVi0DaLujcxnP2dlEvVZgKrueNK6ZWOKmdIfy4UcxunxUpBnI7n3FV5hbhA=="
-  "resolved" "https://registry.npmjs.org/@cliqz/adblocker-electron-preload/-/adblocker-electron-preload-1.23.8.tgz"
-  "version" "1.23.8"
-  dependencies:
-    "@cliqz/adblocker-content" "^1.23.8"
-
-"@cliqz/adblocker-electron@^1.23.8":
-  "integrity" "sha512-V0pOZM9g3KjXuvTekXFjN5cn+oNYy6AJQ116grbABg0NDN1dPMyjz/EO3+HhczRrJkkgJkNrNyobjhRrm1iEpw=="
-  "resolved" "https://registry.npmjs.org/@cliqz/adblocker-electron/-/adblocker-electron-1.23.8.tgz"
-  "version" "1.23.8"
-  dependencies:
-    "@cliqz/adblocker" "^1.23.8"
-    "@cliqz/adblocker-electron-preload" "^1.23.8"
-    "tldts-experimental" "^5.6.21"
-
 "@cliqz/adblocker-extended-selectors@^1.23.8":
   "integrity" "sha512-5xx47oT2Q9E3vkfEm/EzSs7cAPi8WNWtu7kJcGa/urVkDchJwdkdelvQ2Dof+k5icI5AqZorZSsk9Q7w2bLxrA=="
   "resolved" "https://registry.npmjs.org/@cliqz/adblocker-extended-selectors/-/adblocker-extended-selectors-1.23.8.tgz"
@@ -497,6 +481,13 @@
   "resolved" "https://registry.npmjs.org/duplexer3/-/duplexer3-0.1.5.tgz"
   "version" "0.1.5"
 
+"electron-chrome-extensions@^3.9.0":
+  "integrity" "sha512-Q5E4n8ipsM1kpnZrOfDNpqRsZ1y1R8P62V/i+pDX4FNBXnt5+KgPTNxdffSTOk1Yjfo85hKkQRY4XxbErQgGUA=="
+  "resolved" "https://registry.npmjs.org/electron-chrome-extensions/-/electron-chrome-extensions-3.9.0.tgz"
+  "version" "3.9.0"
+  dependencies:
+    "debug" "^4.3.1"
+
 "electron-dl@^3.3.1":
   "integrity" "sha512-kmcSYZyHVEHHHFKlZWW58GiCmu2NSu3Rdwnl3+/fr/ftQYHJULVf1QkrCBPFE2bp/Ly113Za7c8wJZs1nBy04A=="
   "resolved" "https://registry.npmjs.org/electron-dl/-/electron-dl-3.3.1.tgz"
@@ -569,7 +560,7 @@
     "lodash.template" "^4.2.2"
     "temp" "^0.9.0"
 
-"electron@^19.0.10", "electron@>10", "electron@>11":
+"electron@^19.0.10", "electron@>10":
   "integrity" "sha512-EiWtPWdD7CzkRkp1cw7t0N9W2qhI5XZOudHX7daOh5wI076nsdV2dtlAf/XyTHhPNoKR5qhTWrSnYL9PY6D1vg=="
   "resolved" "https://registry.npmjs.org/electron/-/electron-19.0.10.tgz"
   "version" "19.0.10"
