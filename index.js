@@ -12,6 +12,10 @@ const { Client } = require("discord-rpc")
 const child = require('child_process').execFile
 const fs = require('fs'); // Load the File System to execute our common tasks (CRUD)
 
+//version info
+const version_code = 'v1.1.4'
+const version_num = '114'
+
 //adblock
 ElectronBlocker.fromPrebuiltAdsAndTracking(fetch).then((blocker) => {
   blocker.enableBlockingInSession(session.defaultSession);
@@ -325,6 +329,13 @@ const createWindow = () => {
             update_notif_div.outerHTML = '<div id="update-notif" style="width: 10px;height: 10px;position: absolute;background: #f00;right: -1px;bottom: -4px;border-radius: 10px; display:none;"></div>'
             `)
             win.webContents.executeJavaScript(`
+            document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(8) > button').addEventListener("click", () => {
+                var settings_version = document.querySelector('#pane-2 > form > p.help-note').cloneNode(true)
+                document.querySelector('#pane-2 > form').appendChild(settings_version)
+                settings_version.outerHTML = '<p class="el-form-item__label" data-v-01875131="" style="height: auto;"><br>Deeeep.io ' + document.querySelector("#app > div.ui > div > div.first > div > div > div > div.play-game > div.relative > span").innerText + '<br>Blockyfish client ` + version_code + `</p>'
+            })
+            `)
+            win.webContents.executeJavaScript(`
             //updater modal
             //styles
             const updater_style = document.createElement('style')
@@ -378,11 +389,11 @@ const createWindow = () => {
                 var download_ver = url_json.tag_name
                 var ver_num = download_ver.replace("v", "").replace(".", "").replace(".", "")
                 setTimeout(function() {
-                    if (ver_num > 114) {
+                    if (ver_num > ` + version_num + `) {
                         updateText.style.display = 'none'
                         updateImg.style.display = 'none'
                         updateAvailableDiv.style.display = 'flex'
-                        updateAvailableText.outerHTML = '<p id="download-percent" style="text-align: left;">Update available<br><span style="color: #aaa">v1.1.4 -&gt; ' + download_ver + '</span></p>'
+                        updateAvailableText.outerHTML = '<p id="download-percent" style="text-align: left;">Update available<br><span style="color: #aaa">` + version_code + ` -&gt; ' + download_ver + '</span></p>'
                         downloadPercentText = document.getElementById('download-percent')
                         document.getElementById('update-notif').style.display = 'block'
                         updateDownloadButton.addEventListener("click", () => {
