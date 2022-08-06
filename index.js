@@ -67,9 +67,14 @@ const createWindow = () => {
         ublockPath = app.getAppPath() + `\\extensions\\ublock\\1.43.0_0`
     }
     else {
-        ublockPath = app.getAppPath() + `\\extensions\\docassets_disabled\\1.0.42_0`
+        if (docassets == true) {
+            ublockPath = app.getAppPath() + `\\extensions\\docassets\\1.0.42_0`
+        }
+        else {
+            ublockPath = app.getAppPath() + `\\extensions\\docassets_disabled\\1.0.42_0`
+        }    
     }
-    win.webContents.session.loadExtension(app.getAppPath() + `\\extensions\\docassets\\1.0.42_0`).then(({ id }) => {
+    win.webContents.session.loadExtension(docassetsPath).then(({ id }) => {
         win.webContents.session.loadExtension(ublockPath).then(({ id }) => {
 
             //close confirmation dialog
@@ -352,12 +357,14 @@ const createWindow = () => {
                     update_notif_div.outerHTML = '<div id="update-notif" style="width: 10px;height: 10px;position: absolute;background: #f00;right: -1px;bottom: -4px;border-radius: 10px; display:none;"></div>'
                     `)
                     win.webContents.executeJavaScript(`docassets_on = ` + docassets)
+                    win.webContents.executeJavaScript(`ublock_on = ` + ublock)
                     win.webContents.executeJavaScript(`
                     document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(8) > button').addEventListener("click", () => {
                         //version info
                         var settings_version = document.querySelector('#pane-2 > form > p.help-note').cloneNode(true)
                         document.querySelector('#pane-2 > form').appendChild(settings_version)
                         settings_version.outerHTML = '<p class="el-form-item__label" data-v-01875131="" style="height: auto;"><br>Deeeep.io ' + document.querySelector("#app > div.ui > div > div.first > div > div > div > div.play-game > div.relative > span").innerText + '<br>Blockyfish client ` + version_code + `</p>'
+                        
                         //docassets
                         var docassets_div = document.querySelector('#pane-0 > form > div:nth-child(3)').cloneNode(true)
                         document.querySelector('#pane-0 > form').appendChild(docassets_div)
@@ -365,7 +372,7 @@ const createWindow = () => {
                         docassets_text.innerText = 'Doc-assets'
                         const docassets_desc = document.querySelector('#pane-0 > form > div:nth-child(4) > div.el-form-item__content > span')
                         docassets_desc.innerText = 'A cute asset pack made by Doctorpus'
-                        if (docassets_on == false) {
+                        if (docassets_on != true) {
                             document.querySelector('#pane-0 > form > div:nth-child(4) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
                         }
                             document.querySelector('#pane-0 > form > div:nth-child(4) > div.el-form-item__content > label > span.el-checkbox__input > input').addEventListener("click", () => {
@@ -378,6 +385,29 @@ const createWindow = () => {
                                 document.querySelector('#pane-0 > form > div:nth-child(4) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
                                 console.log('store_settings: docassets1')
                                 docassets_on = true
+                            }
+                        })
+                        
+                        //ublock
+                        var ublock_div = document.querySelector('#pane-0 > form > div:nth-child(3)').cloneNode(true)
+                        document.querySelector('#pane-0 > form').appendChild(ublock_div)
+                        const ublock_text = document.querySelector('#pane-0 > form > div:nth-child(5) > div.el-form-item__label')
+                        ublock_text.innerText = 'Adblock'
+                        const ublock_desc = document.querySelector('#pane-0 > form > div:nth-child(5) > div.el-form-item__content > span')
+                        ublock_desc.innerText = 'Shows ads and support fede'
+                        if (ublock_on == false) {
+                            document.querySelector('#pane-0 > form > div:nth-child(5) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
+                        }
+                            document.querySelector('#pane-0 > form > div:nth-child(5) > div.el-form-item__content > label > span.el-checkbox__input > input').addEventListener("click", () => {
+                            if (ublock_on == true) {
+                                document.querySelector('#pane-0 > form > div:nth-child(5) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
+                                console.log('store_settings: ublock0')
+                                ublock_on = false
+                            }
+                            else {
+                                document.querySelector('#pane-0 > form > div:nth-child(5) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
+                                console.log('store_settings: ublock1')
+                                ublock_on = true
                             }
                         })
                     })
