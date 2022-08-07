@@ -1,14 +1,63 @@
-# Deeeep.io Desktop Client for v4  
+# 🐠 Deeeep.io Desktop Client for v4  
 
+Blockyfish client is an alternative to the Deeeep.io Desktop Client. It is built with ElectronJS and features Discord Rich Presence and Doctorpus Assets. 
 
-## Downloads:  
+## 📦 Downloads  
 
 Latest version: https://blockyfish.netlify.app  
-Older version: [Releases page](https://github.com/blockyfish-client/Desktop-Client/releases)
+Older version: [releases page](https://github.com/blockyfish-client/Desktop-Client/releases)  
 
-## Changelogs:  
+## 🪄 Features  
+- Detailed rich presence for Discord  
+- Togglable adblocker  
+- Doctorpus assets  
+- Built-in evolution tree  
+- Auto update checker for client updates  
+- Taskbar notification badges for forum notifications  
+- Exit confirmation dialog  
+- Borderless window  
+- Esc key can pause and unpause the game  
 
-### v1.2.0
+## 📒 Planned features  
+- Auto-fill name  
+- Desktop notifications for forum replies  
+- Account switcher  
+- Custom themes  
+- Auto-loading in forums  
+
+## 🛠️ Building
+### Prerequisites
+- [NodeJS](https://nodejs.org/en/download/)
+- [Git](https://gitforwindows.org/)  
+
+### Building
+Clone the repo
+```
+mkdir blockyfish-client
+git clone https://github.com/blockyfish-client/Desktop-Client.git blockyfish-client
+```
+Install node modules
+```
+npm i
+```
+Run the app
+```
+npm run start
+```
+Build an installer
+```
+npm run make-win
+npm run pack-win
+```
+
+## 📬Feedback and contribution
+Tell us on our [discord server](https://discord.gg/8Amw32CrGR). 
+
+Message `.pi#3141` if you want to contribute
+
+## 📝 Changelogs  
+
+### v1.2.0 Doc-assets and uBlock
 - Doctorpus Assets!!
 - uBlock Origin for adblock
 - Pink verified badge for me!
@@ -44,7 +93,7 @@ Older version: [Releases page](https://github.com/blockyfish-client/Desktop-Clie
 - New installation gif. No more cringey iOS loading animation, spinny shark is better  
 ![loading_animation](https://raw.githubusercontent.com/blockyfish-client/Desktop-Client/master/img/loading.gif)  
 
-### v1.1.0
+### v1.1.0 Updater
 - Updater. Doesn't have automatic update checking yet
 - More homepage buttons:
   - Blockfish client website
