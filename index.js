@@ -13,6 +13,8 @@ const fs = require('fs') // Load the File System to execute our common tasks (CR
 const { ElectronChromeExtensions } = require('electron-chrome-extensions')
 const Store = require('electron-store');
 
+app.setAsDefaultProtocolClient("deeeepio")
+
 //version info
 const version_code = 'v1.2.0'
 const version_num = '120'
@@ -40,8 +42,10 @@ var ublock = store.get('ublock')
 app.whenReady().then(async () => {
 const createWindow = () => {
     const win = new BrowserWindow({
-        width: 1080,
-        height: 720,
+        width: store.get('window.width'),
+        height: store.get('window.height'),
+        x: store.get('window.x'),
+        y: store.get('window.y'),
         backgroundColor: '#000000',
         show: false,
         webPreferences: {
@@ -76,22 +80,30 @@ const createWindow = () => {
     }
     win.webContents.session.loadExtension(docassetsPath).then(() => {
         win.webContents.session.loadExtension(ublockPath).then(() => {
-
+        
             //close confirmation dialog
             win.on('close', function(e) {
                 const choice = require('electron').dialog.showMessageBoxSync(this,
-                  {
+                {
                     type: 'question',
                     buttons: ['Yes', 'No'],
                     title: 'Exit Deeeep.io',
                     message: 'Are you sure you want to quit?',
                     icon: path.join(__dirname, 'img/icon.png'),
-                  });
+                });
                 if (choice === 1) {
                   e.preventDefault();
                 }
+                else {
+                    if (win.isMaximized() == false) {
+                        store.set("window.width", win.getSize()[0])
+                        store.set("window.height", win.getSize()[1])
+                        store.set("window.x",  win.getPosition()[0])
+                        store.set("window.y", win.getPosition()[1])
+                    }
+                }
             });
-        
+
             //ctrl r for reload
             globalShortcut.register('CommandOrControl+R', () => {
                 win.reload()
