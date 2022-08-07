@@ -1,4 +1,4 @@
-# 🐠 Deeeep.io Desktop Client for v4  
+![Blockyfish Client Banner](https://raw.githubusercontent.com/blockyfish-client/Assets/main/blockyfishclientbanner.png)
 
 Blockyfish client is an alternative to the Deeeep.io Desktop Client. It is built with ElectronJS and features Discord Rich Presence and Doctorpus Assets. 
 
