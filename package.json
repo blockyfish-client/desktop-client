@@ -12,7 +12,7 @@
   "author": "Pi",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^12.0.0",
+    "electron": "^13.0.0",
     "electron-icon-maker": "^0.0.5",
     "electron-packager": "^15.5.1",
     "electron-winstaller": "^5.0.0"
