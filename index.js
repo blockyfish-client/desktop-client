@@ -16,8 +16,8 @@ const Store = require('electron-store');
 app.setAsDefaultProtocolClient("deeeepio")
 
 //version info
-const version_code = 'v1.2.0'
-const version_num = '120'
+const version_code = 'v1.2.1'
+const version_num = '121'
 
 function matches(text, partial) {
     return text.toLowerCase().indexOf(partial.toLowerCase()) > -1;
@@ -112,7 +112,7 @@ const createWindow = () => {
             win.loadURL('https://beta.deeeep.io')
             win.removeMenu();
             win.webContents.on('did-finish-load', function() {
-                win.webContents.openDevTools()
+                // win.webContents.openDevTools()
                 win.webContents.setBackgroundThrottling(false)
                 win.webContents.executeJavaScript(`
                     //css
