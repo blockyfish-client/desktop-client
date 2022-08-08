@@ -52,7 +52,7 @@ npm run make-win
 npm run pack-win
 ```
 
-## 📬Feedback and contribution
+## 📬 Feedback and contribution
 Tell us on our [discord server](https://discord.gg/8Amw32CrGR). 
 
 Message `.pi#3141` if you want to contribute
