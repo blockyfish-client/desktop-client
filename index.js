@@ -1,7 +1,10 @@
+// checks if the app is being run as an installer
 const setupEvents = require('./installers/setupEvents')
  if (setupEvents.handleSquirrelEvent()) {
     return;
 }
+
+// import stuff that makes client go brrrr
 const { app, BrowserWindow, globalShortcut } = require('electron')
 const electronDl = require('electron-dl')
 const path = require('path')
@@ -12,15 +15,20 @@ const fs = require('fs') // Load the File System to execute our common tasks (CR
 const { ElectronChromeExtensions } = require('electron-chrome-extensions')
 const Store = require('electron-store');
 
+// for the future, secret for now :)
 app.setAsDefaultProtocolClient("deeeepio")
 
-//version info
+// version info
 const version_code = 'v1.2.1'
 const version_num = '121'
 
+// custom function for later
 function matches(text, partial) {
     return text.toLowerCase().indexOf(partial.toLowerCase()) > -1;
 }
+
+// delete update installer, doesn't delete manually downloaded installer
+// unless the user is stupid or smart enough to rename it to the name here
 let downloadPath = app.getPath('downloads')
 if (fs.existsSync(downloadPath + "\\blockyfishclient-update-download.exe")) {
     fs.unlink(downloadPath + "\\blockyfishclient-update-download.exe", (err) => {
@@ -33,6 +41,7 @@ if (fs.existsSync(downloadPath + "\\blockyfishclient-update-download.exe")) {
     });
 }
 
+// import settings for stuff
 const store = new Store();
 var docassets = store.get('docassets')
 var ublock = store.get('ublock')
@@ -42,23 +51,33 @@ var twemoji = store.get('twemoji')
 app.whenReady().then(async () => {
 const createWindow = () => {
     const win = new BrowserWindow({
+        // load window settings
         width: store.get('window.width'),
         height: store.get('window.height'),
         x: store.get('window.x'),
         y: store.get('window.y'),
+
+        // black background (i should change this)
         backgroundColor: '#000000',
+
+        // dont show before webpage has loaded
         show: false,
         webPreferences: {
             nodeIntegration: true,
         },
+
+        // the overlay you see on top-right
         titleBarStyle: 'hidden',
         titleBarOverlay: {
             color: '#1f2937',
             symbolColor: '#ffffff',
         },
+
+        // icon lol
         icon: path.join(__dirname, 'img/icon.png'),
     })
 
+    // set extension paths
     const extensions = new ElectronChromeExtensions()
     extensions.addTab(win.webContents, win)
     if (docassets == true) {
@@ -78,10 +97,12 @@ const createWindow = () => {
             ublockPath = app.getAppPath() + `\\extensions\\docassets_disabled\\1.0.42_0`
         }    
     }
+
+    // load the extensions in
     win.webContents.session.loadExtension(docassetsPath).then(() => {
         win.webContents.session.loadExtension(ublockPath).then(() => {
         
-            //close confirmation dialog
+            // close confirmation dialog
             win.on('close', function(e) {
                 const choice = require('electron').dialog.showMessageBoxSync(this,
                 {
@@ -91,10 +112,15 @@ const createWindow = () => {
                     message: 'Are you sure you want to quit?',
                     icon: path.join(__dirname, 'img/icon.png'),
                 });
+
+                // if user click "no"
                 if (choice === 1) {
                   e.preventDefault();
                 }
+
+                // if user click "yes" 😢
                 else {
+                    // dont save settings if window is maximized because we dont want the app to start back in full screen
                     if (win.isMaximized() == false) {
                         store.set("window.width", win.getSize()[0])
                         store.set("window.height", win.getSize()[1])
@@ -104,15 +130,23 @@ const createWindow = () => {
                 }
             });
 
-            //ctrl r for reload
-            globalShortcut.register('CommandOrControl+R', () => {
-                win.reload()
-            })
+            // ctrl r for reload, debugging purposes, should not be needed
+            // globalShortcut.register('CommandOrControl+R', () => {
+            //     win.reload()
+            // })
 
+            // load the website
             win.loadURL('https://beta.deeeep.io')
+
+            // bye-bye stinky electron menu bar (no one likes you anyways)
             win.removeMenu();
+
+            //wait for the base webpage to finish loading before customizing it
             win.webContents.on('did-finish-load', function() {
+
                 // win.webContents.openDevTools()
+
+                // keep everything running otherwise youll see a stack of 500 chat messages when you come back
                 win.webContents.setBackgroundThrottling(false)
                 //twemoji
                 if (twemoji) {
@@ -163,23 +197,35 @@ const createWindow = () => {
                         mouse_outer.classList.remove('cursor-hide')
                     })
                 `)
+
+                //state checks and UI adjustments
                 win.webContents.executeJavaScript(`
                     // document.querySelector('head > link[href*="/assets/index"][rel="stylesheet"]').href = "https://thepiguy3141.github.io/doc-assets/images/misc/index.8b74f9b3.css"
+                    notif_count_old = 0
+                    rpc_state_old = 'FFA0'
                     setInterval(function() {
                         //notif badge
                         if (document.querySelector('span.forum-notifications-badge') != null) {
-                            console.log("notifs: " + document.querySelector('span.forum-notifications-badge').innerText)
+                            notif_count = document.querySelector('span.forum-notifications-badge').innerText
                         }
                         else {
-                            console.log("notifs: 0")
+                            notif_count = 0
+                        }
+                        if (notif_count != notif_count_old) {
+                            console.log("notifs: " + notif_count)
+                            notif_count_old = notif_count
                         }
                     
                         //rich presence status logging
                         if (document.querySelector('div.home-page').style.display == 'none') {
-                            console.log("state: " + document.querySelector('.selected').innerText + "2")
+                            rpc_state = document.querySelector('.selected').innerText + "2"
                         }
                         else {
-                            console.log("state: " + document.querySelector('.selected').innerText + "0")
+                            rpc_state = document.querySelector('.selected').innerText + "0"
+                        }
+                        if (rpc_state != rpc_state_old) {
+                            console.log("state: " + rpc_state)
+                            rpc_state_old = rpc_state
                         }
                     
                         //HOMEPAGE UI MOD
@@ -282,11 +328,15 @@ const createWindow = () => {
                             }
                         }
                         //must be last
-                        if (document.querySelector('div.sidebar.right > div:nth-child(3) > button > span > span').style.whiteSpace != 'pre-wrap') {
-                            document.querySelector('div.sidebar.right > div:nth-child(3) > button > span > span').style.whiteSpace = 'pre-wrap'
+                        if (document.querySelector('div.sidebar.right > div:nth-child(3) > button > span > span') != null) {
+                            if (document.querySelector('div.sidebar.right > div:nth-child(3) > button > span > span').style.whiteSpace != 'pre-wrap') {
+                                document.querySelector('div.sidebar.right > div:nth-child(3) > button > span > span').style.whiteSpace = 'pre-wrap'
+                            }
                         }
                     }, 1000)
                     `)
+
+                    //build evo button
                     win.webContents.executeJavaScript(`
                     const button_clone = document.querySelector('div.p-2.sidebar.right.space-y-2 > div.container > div > div').cloneNode(true);
                     document.querySelector('div.p-2.sidebar.right.space-y-2 > div.container > div').appendChild(button_clone);
@@ -297,7 +347,11 @@ const createWindow = () => {
                     evoText.innerHTML = "Evo Tree"
                     const evoIcon = document.querySelector("button.evo > span:nth-child(1) > svg:nth-child(1)")
                     `)
+
+                    //change evo icon
                     win.webContents.executeJavaScript('evoIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-diagram-3-fill" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5v-1zm-6 8A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5v-1zm6 0A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5v-1zm6 0a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5v-1z"/></svg>`')
+                    
+                    //build evo modal
                     win.webContents.executeJavaScript(`
                     const style = document.createElement('style')
                     document.querySelector('head').appendChild(style)
@@ -318,11 +372,15 @@ const createWindow = () => {
                       })
                     }
                     `)
+
+                    //build titlebar to drag window around
                     win.webContents.executeJavaScript(`
                     const drag = document.createElement('div')
                     document.querySelector('#app > div.ui > div').appendChild(drag)
                     drag.outerHTML = '<div style="-webkit-app-region: drag;width: 100vw;height: 20px;position: absolute;top: 0;left: 0;cursor: move;"></div>'
                     `)
+
+                    //custom keybinds
                     win.webContents.executeJavaScript(`
                     document.body.addEventListener('keydown', function(e) {
                         if (e.key == "Escape") {
@@ -338,11 +396,10 @@ const createWindow = () => {
                                 document.documentElement.requestFullscreen();
                             }
                         }
-                        else {
-                            console.log(e.key)
-                        }
                     });
                     `)
+
+                    //website and github button on top right menu
                     win.webContents.executeJavaScript(`
                     const discord = document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(5) > button')
                     const github_parent = document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(5)').cloneNode(true)
@@ -369,6 +426,8 @@ const createWindow = () => {
                         window.open('https://blockyfish.netlify.app')
                     })
                     `)
+
+                    //build updater button
                     win.webContents.executeJavaScript(`
                     //updater button
                     const update_parent = document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(5)').cloneNode(true);
@@ -383,9 +442,13 @@ const createWindow = () => {
                     update.appendChild(update_notif_div)
                     update_notif_div.outerHTML = '<div id="update-notif" style="width: 10px;height: 10px;position: absolute;background: #f00;right: -1px;bottom: -4px;border-radius: 10px; display:none;"></div>'
                     `)
+
+                    //fetch settings
                     win.webContents.executeJavaScript(`docassets_on = ` + docassets)
                     win.webContents.executeJavaScript(`ublock_on = ` + ublock)
                     win.webContents.executeJavaScript(`twemoji_on = ` + twemoji)
+                    
+                    //build custom settings item
                     win.webContents.executeJavaScript(`
                     document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(8) > button').addEventListener("click", () => {                        
                         //restart tooltip
@@ -492,6 +555,8 @@ const createWindow = () => {
                         settings_modal.style.maxWidth = '500px'
                     })
                     `)
+
+                    //build updater modal
                     win.webContents.executeJavaScript(`
                     //updater modal
                     //styles
@@ -528,6 +593,10 @@ const createWindow = () => {
                       })
                     }
                     `)
+
+                    //i love spinny things so there's a spinny feature in the updater :D
+                    // also update checking and downloading
+                    // and auto update check
                     win.webContents.executeJavaScript(`
                     async function spinUpdateIcon() {
                         setTimeout(function() {
@@ -578,6 +647,8 @@ const createWindow = () => {
                     }, 60000)
                     getUpdates()
                     `)
+
+                    // autoload posts in forums
                     win.webContents.executeJavaScript(`
                     function isInViewport(e) {
                         const rect = e.getBoundingClientRect();
@@ -596,6 +667,8 @@ const createWindow = () => {
                         })
                     })
                     `)
+
+                    //pink badge for me!!
                     function insertClientOwnerBadge() {
                         win.webContents.executeJavaScript(`
                         badgeParentDiv = document.querySelector('#app > div.vfm.vfm--inset.vfm--fixed.modal > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div > div > div > div.el-row.header > div.el-col.el-col-24.auto-col.fill > div')
@@ -604,6 +677,8 @@ const createWindow = () => {
                         clientOwnerBadge.outerHTML = '<div class="el-image verified-icon el-tooltip__trigger el-tooltip__trigger" style="height: 1rem;margin-right: 0.25rem;width: 1rem;"><img src="/img/verified.png" class="el-image__inner" style="filter: hue-rotate(90deg);"></div>'
                         `)
                     }
+
+                    //make progress bar and track download progress to keep people sane
                     function setUpdateDownloadBar(percent) {
                         if (percent < 100) {
                             win.webContents.executeJavaScript(`
@@ -621,6 +696,8 @@ const createWindow = () => {
                         
                         }
                     }
+
+                    //autorun update after downloaded
                     function runUpdateInstaller(location) {
                         console.log(location)
                         child(location, function(err, data) {
@@ -632,6 +709,10 @@ const createWindow = () => {
                             console.log(data.toString());
                         });
                     }
+
+                // pause game when switching to another window
+                // annoying feature so it got commented out
+                // and yeeted into unused-features-land
                 // win.on('blur', () => {
                 //     win.webContents.executeJavaScript(`
                 //     if (document.querySelector('#app > div.ui > div').classList.contains('playing') == true) {
@@ -642,12 +723,18 @@ const createWindow = () => {
                 //     `)
                 // });
                 
+
+                // set funny variables for discord rpc
                 var old_mode = 'FFA'
                 var old_menu = '0'
                 var old_url = 'https://beta.deeeep.io'
+
+                // intercept every console log 😈🔥
                 win.webContents.on("console-message", (ev, level, message, line, file) => {
                     var msg = `${message}`
                     console.log(msg);
+
+                    //find notification updates
                     if (matches(msg, "notifs:")) {
                         if (msg.length < 10) {
                             const msg_num = msg.charAt(msg.length - 1);
@@ -662,6 +749,8 @@ const createWindow = () => {
                             win.setOverlayIcon(path.join(__dirname, 'img/9_plus.png'), 'Over 9 notifications')
                         }
                     }
+
+                    //find rpc update events
                     if (matches(msg, "state:")) {
                         var msg = msg.replace("state: ", "")
                         var mode = msg.slice(0,-1)
@@ -674,10 +763,17 @@ const createWindow = () => {
                             old_url = url
                         }
                     }
+
+                    // download the file
+                    // yes, this is actually what starts the download
+                    // not that stupid bs 140 lines above
                     if (matches(msg, "request_download:")) {
                         var url = msg.replace("request_download: ", "")
                         electronDl.download(BrowserWindow.getFocusedWindow(), url, {directory:downloadPath, filename:"blockyfishclient-update-download.exe", onProgress: function(progress) {setUpdateDownloadBar(Math.floor(progress.percent * 100))}, onCompleted: function(file) {runUpdateInstaller(file.path)}})
                     }
+
+                    // store extension related settings so they can be loaded later
+                    // also saves your window size and location so you dont have to adjust it everytime
                     if (matches(msg, "store_settings:")) {
                         var msg = msg.replace("store_settings: ", "")
                         var setting_key = msg.slice(0,-1)
@@ -691,16 +787,32 @@ const createWindow = () => {
                         store.set(setting_key, setting_value_bool)
                     }
                 });
+
+                // show the window after literally all the scripts finish
+                // this is so that the app shows only when the UI in complete
+                // if this was shown before everything finished loading, 
+                // it would make me look noob and unprofessional
                 win.show();
+
+                // no u electron xd
+                // open all links in the default browser
+                // instead of yucky electron windows
                 win.webContents.setWindowOpenHandler(({ url }) => {
                         shell.openExternal(url);
                         return { action: 'deny' };
-                    });
+                });
+
+                // discord rpc stuff lol
                 var rpc = new Client({
                     transport: "ipc",
                 });
+
+                // log into the client to get icon and app name
                 rpc.login({clientId: "918680181609213972"}).catch(console.error)
                 var startTime = new Date()
+
+                // fallback in-case v5 comes and i am gone
+                // at least it will show something
                 rpc.on("ready", () => {
                     rpc.setActivity({
                         details: "Idle",
@@ -709,9 +821,14 @@ const createWindow = () => {
                         startTimestamp: startTime,
                     })
                 });
+
+                // update discord rpc
                 function setGameMode(mode, menu) {
+                    //greb url and eats it (jk)
                     var currentUrl = win.webContents.getURL()
                     console.log(currentUrl)
+
+                    // viewing <user>'s profile
                     if (matches(currentUrl, "/u/")) {
                         var detailText = 'Viewing ' + currentUrl.replace("https://beta.deeeep.io/u/", "") + "'s profile"
                         var labelText = ''
@@ -719,6 +836,8 @@ const createWindow = () => {
                             insertClientOwnerBadge()
                         }
                     }
+
+                    // these ones are self-explainatory
                     else if (matches(currentUrl, "/forum/")) {
                         var detailText = "Visiting the forums"
                         var labelText = ''
@@ -735,10 +854,15 @@ const createWindow = () => {
                         var detailText = 'In the menus'
                         var labelText = ''
                     }
+
+                    // if url is just "https://beta.deeeep.io", it means you are playing
                     else {
                         var detailText = "Playing " + mode
                         var labelText = 'Join game'
                     }
+
+                    // if the gamemode buttons exist, use them to update the status
+                    // otherwise it will use the fallback set previously and show "idle"
                     if (labelText != '') {
                         rpc.setActivity({
                             details: detailText,
@@ -750,6 +874,8 @@ const createWindow = () => {
                             ]
                         })
                     }
+
+                    // sike! this is the real fallback
                     else {
                         rpc.setActivity({
                             details: detailText,
@@ -763,13 +889,17 @@ const createWindow = () => {
         })
     })
 }
+
+// now you actually see it, the win.show() thing was all a lie
 createWindow()
 })
 
+// stupid mac os thing idk
 app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
 })
 
+// kill everything related to the app when you press the close button
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit()
 })
