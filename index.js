@@ -2,11 +2,10 @@ const setupEvents = require('./installers/setupEvents')
  if (setupEvents.handleSquirrelEvent()) {
     return;
 }
-const { app, BrowserWindow, session, remote, globalShortcut } = require('electron')
+const { app, BrowserWindow, globalShortcut } = require('electron')
 const electronDl = require('electron-dl')
 const path = require('path')
 const { shell } = require("electron")
-const fetch = require('cross-fetch') // required 'fetch'
 const { Client } = require("discord-rpc")
 const child = require('child_process').execFile
 const fs = require('fs') // Load the File System to execute our common tasks (CRUD)

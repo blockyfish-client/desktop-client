@@ -12,15 +12,13 @@
   "author": "Pi",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^19.0.10",
+    "electron": "^12.0.0",
     "electron-icon-maker": "^0.0.5",
     "electron-packager": "^15.5.1",
     "electron-winstaller": "^5.0.0"
   },
   "dependencies": {
     "@cliqz/adblocker-webextension": "^1.23.8",
-    "cross-fetch": "^3.1.5",
-    "custom-electron-titlebar": "^4.1.0",
     "discord-rpc": "^4.0.1",
     "electron-chrome-extensions": "^3.9.0",
     "electron-dl": "^3.3.1",
