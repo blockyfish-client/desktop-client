@@ -36,6 +36,7 @@ if (fs.existsSync(downloadPath + "\\blockyfishclient-update-download.exe")) {
 const store = new Store();
 var docassets = store.get('docassets')
 var ublock = store.get('ublock')
+var twemoji = store.get('twemoji')
 
 //main window
 app.whenReady().then(async () => {
@@ -113,6 +114,17 @@ const createWindow = () => {
             win.webContents.on('did-finish-load', function() {
                 // win.webContents.openDevTools()
                 win.webContents.setBackgroundThrottling(false)
+                //twemoji
+                if (twemoji) {
+                    win.webContents.executeJavaScript(`
+                    //css
+                    const twe_style = document.createElement('style')
+                    document.querySelector('head').appendChild(twe_style)
+                    twe_style.innerHTML = '@font-face { font-family: emoji; src: url(//xem.github.io/unicode13/Twemoji.ttf) } html{font-family: Quicksand,emoji}'
+                    `)
+                }
+
+                //custom cursor
                 win.webContents.executeJavaScript(`
                     //css
                     const cursor_style = document.createElement('style')
@@ -373,6 +385,7 @@ const createWindow = () => {
                     `)
                     win.webContents.executeJavaScript(`docassets_on = ` + docassets)
                     win.webContents.executeJavaScript(`ublock_on = ` + ublock)
+                    win.webContents.executeJavaScript(`twemoji_on = ` + twemoji)
                     win.webContents.executeJavaScript(`
                     document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(8) > button').addEventListener("click", () => {                        
                         //restart tooltip
@@ -390,9 +403,12 @@ const createWindow = () => {
                         const docassets_text = document.querySelector('#pane-0 > form > div:nth-child(4) > div.el-form-item__label')
                         docassets_text.innerText = 'Doc-assets'
                         const docassets_desc = document.querySelector('#pane-0 > form > div:nth-child(4) > div.el-form-item__content > span')
-                        docassets_desc.innerText = 'A cute asset pack made by Doctorpus'
-                        if (docassets_on != true) {
+                        docassets_desc.innerText = 'Cute asset pack made by Doctorpus'
+                        if (docassets_on == false) {
                             document.querySelector('#pane-0 > form > div:nth-child(4) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
+                        }
+                        else {
+                            document.querySelector('#pane-0 > form > div:nth-child(4) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
                         }
                         document.querySelector('#pane-0 > form > div:nth-child(4) > div.el-form-item__content > label > span.el-checkbox__input > input').addEventListener("click", () => {
                             restart_tooltip.style.display = 'block'
@@ -407,6 +423,33 @@ const createWindow = () => {
                                 docassets_on = true
                             }
                         })
+
+                        //twemoji
+                        var twemoji_div = document.querySelector('#pane-0 > form > div:nth-child(3)').cloneNode(true)
+                        document.querySelector('#pane-0 > form').appendChild(twemoji_div)
+                        const twemoji_text = document.querySelector('#pane-0 > form > div:nth-child(5) > div.el-form-item__label')
+                        twemoji_text.innerText = 'Twemoji'
+                        const twemoji_desc = document.querySelector('#pane-0 > form > div:nth-child(5) > div.el-form-item__content > span')
+                        twemoji_desc.innerHTML = "Emojis used in Discord and Twitter<br>Doesn't work in-game"
+                        if (twemoji_on == false) {
+                            document.querySelector('#pane-0 > form > div:nth-child(5) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
+                        }
+                        else {document.querySelector('#pane-0 > form > div:nth-child(5) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
+
+                        }
+                        document.querySelector('#pane-0 > form > div:nth-child(5) > div.el-form-item__content > label > span.el-checkbox__input > input').addEventListener("click", () => {
+                            restart_tooltip.style.display = 'block'
+                            if (twemoji_on == true) {
+                                document.querySelector('#pane-0 > form > div:nth-child(5) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
+                                console.log('store_settings: twemoji0')
+                                twemoji_on = false
+                            }
+                            else {
+                                document.querySelector('#pane-0 > form > div:nth-child(5) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
+                                console.log('store_settings: twemoji1')
+                                twemoji_on = true
+                            }
+                        })
                         
                         //ublock
                         var ublock_div = document.querySelector('#pane-0 > form > div:nth-child(3)').cloneNode(true)
@@ -417,6 +460,9 @@ const createWindow = () => {
                         ublock_desc.innerText = 'Shows ads and support fede'
                         if (ublock_on == false) {
                             document.querySelector('#pane-2 > form > div:nth-child(3) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
+                        }
+                        else {
+                            document.querySelector('#pane-2 > form > div:nth-child(3) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
                         }
                         document.querySelector('#pane-2 > form > div:nth-child(3) > div.el-form-item__content > label > span.el-checkbox__input > input').addEventListener("click", () => {
                             restart_tooltip.style.display = 'block'
