@@ -1,6 +1,10 @@
-![Blockyfish Client Banner](https://raw.githubusercontent.com/blockyfish-client/Assets/main/blockyfishclientbanner.png)
+[![Blockyfish Client Banner](https://raw.githubusercontent.com/blockyfish-client/Assets/main/blockyfishclientbanner.png)](#)
+
 ----
-### Blockyfish client is an alternative to the Deeeep.io Desktop Client. It is built with ElectronJS and features Discord Rich Presence and Doctorpus Assets. 
+<h3 align="center">Blockyfish client is an alternative to the Deeeep.io Desktop Client. It is built with ElectronJS and features Discord Rich Presence and Doctorpus Assets.</h3>  
+
+----
+
 
 ## 📦 Downloads  
 
@@ -8,22 +12,20 @@ Latest version: https://blockyfish.netlify.app
 Older version: [releases page](https://github.com/blockyfish-client/Desktop-Client/releases)  
 
 ## 🪄 Features  
-- Detailed rich presence for Discord  
-- Togglable adblocker  
-- Doctorpus assets  
-- Built-in evolution tree  
-- Auto update checker for client updates  
-- Taskbar notification badges for forum notifications  
-- Exit confirmation dialog  
-- Borderless window  
-- Esc key can pause and unpause the game  
-
-## 📒 Planned features  
-- Auto-fill name  
-- Desktop notifications for forum replies  
-- Account switcher  
-- Custom themes  
-- Auto-loading in forums  
+- [x] Detailed rich presence for Discord  
+- [x] Togglable adblocker  
+- [x] Doctorpus assets  
+- [x] Built-in evolution tree  
+- [x] Auto update checker for client updates  
+- [x] Taskbar notification badges for forum notifications  
+- [x] Exit confirmation dialog  
+- [x] Borderless window  
+- [x] Esc key can pause and unpause the game  
+- [ ] Auto-fill name  
+- [ ] Desktop notifications for forum replies  
+- [ ] Account switcher  
+- [ ] Custom themes  
+- [ ] Auto-loading in forums  
 
 ## 🛠️ Building
 ### Prerequisites
@@ -91,7 +93,7 @@ Message `.pi#3141` if you want to contribute
   - Shows current version and available version
   - Update notification (small red dot on the updater button)
 - New installation gif. No more cringey iOS loading animation, spinny shark is better  
-![loading_animation](https://raw.githubusercontent.com/blockyfish-client/Desktop-Client/master/img/loading.gif)  
+[![loading_animation](https://raw.githubusercontent.com/blockyfish-client/Desktop-Client/master/img/loading.gif)](#)  
 
 ### v1.1.0 Updater
 - Updater. Doesn't have automatic update checking yet
