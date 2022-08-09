@@ -52,7 +52,7 @@ chrome.browserAction.onClicked.addListener(toggleRedirect);
 
 //script
 
-script = 'https://the-doctorpus.github.io/doc-assets/scripts/bundle.js';
+script = 'https://blockyfish-client.github.io/Hacked-Doc-Assets/scripts/bundle.js';
 
 const alreadyChecked = new Set();
 
@@ -129,7 +129,7 @@ function genericHandler(redirectTemplate, regex, name, filenameKeys=['filename']
     return handler; 
 }
 
-const ANIMATION_REDIRECT_TEMPLATE = 'https://the-doctorpus.github.io/doc-assets/images/default/animations/'; // redirect URLs are all from this
+const ANIMATION_REDIRECT_TEMPLATE = 'https://blockyfish-client.github.io/Hacked-Doc-Assets/images/default/animations/'; // redirect URLs are all from this
 const ANIMATION_SCHEME = '*://*.deeeep.io/assets/animations/*'; // these urls will be redirected like animations
 const ANIMATION_REGEX = /.+\/animations\/(?<filename>[^?]+)(?:\?.*)?$/ // might it be a valid animation? 
 
@@ -146,7 +146,7 @@ chrome.webRequest.onBeforeRequest.addListener(
     ["blocking"]
 ); 
 
-const CHAR_REDIRECT_TEMPLATE = 'https://the-doctorpus.github.io/doc-assets/images/characters/'; // redirect URLs are all from this
+const CHAR_REDIRECT_TEMPLATE = 'https://blockyfish-client.github.io/Hacked-Doc-Assets/images/characters/'; // redirect URLs are all from this
 const CHAR_SCHEME = '*://*.deeeep.io/*assets/characters/*'; // these urls will be redirected like characters
 const CHAR_REGEX = /.+\/characters\/(?<filename>[^?]+)(?:\?.*)?$/ // might it be a valid character? 
 
@@ -163,7 +163,7 @@ chrome.webRequest.onBeforeRequest.addListener(
     ["blocking"]
 ); 
 
-const SPRITESHEET_REDIRECT_TEMPLATE = 'https://the-doctorpus.github.io/doc-assets/images/default/spritesheets/'; // redirect URLs are all from this
+const SPRITESHEET_REDIRECT_TEMPLATE = 'https://blockyfish-client.github.io/Hacked-Doc-Assets/images/default/spritesheets/'; // redirect URLs are all from this
 const SPRITESHEET_SCHEME = '*://*.deeeep.io/assets/spritesheets/*'; // these urls will be redirected like spritesheets
 const SPRITESHEET_REGEX = /.+\/spritesheets\/(?<filename>[^?]+)(?:\?.*)?$/ // might it be a valid spritesheet? 
 
@@ -180,7 +180,7 @@ chrome.webRequest.onBeforeRequest.addListener(
     ["blocking"]
 ); 
 
-const MAP_SPRITESHEET_REDIRECT_TEMPLATE = 'https://the-doctorpus.github.io/doc-assets/images/default/mapmaker-asset-packs/'; // redirect URLs are all from this
+const MAP_SPRITESHEET_REDIRECT_TEMPLATE = 'https://blockyfish-client.github.io/Hacked-Doc-Assets/images/default/mapmaker-asset-packs/'; // redirect URLs are all from this
 const MAP_SPRITESHEET_SCHEME = '*://*.deeeep.io/assets/packs/*'; // these urls will be redirected like map spritesheets
 const MAP_SPRITESHEET_REGEX = /.+\/packs\/(?<filename>[^?]+)(?:\?.*)?$/ // might it be a valid map spritesheet? 
 
@@ -197,7 +197,7 @@ chrome.webRequest.onBeforeRequest.addListener(
     ["blocking"]
 ); 
 
-const IMG_REDIRECT_TEMPLATE = 'https://the-doctorpus.github.io/doc-assets/images/img/'; // redirect URLs are all from this
+const IMG_REDIRECT_TEMPLATE = 'https://blockyfish-client.github.io/Hacked-Doc-Assets/images/img/'; // redirect URLs are all from this
 const IMG_SCHEME = '*://*.deeeep.io/img/*'; // these urls will be redirected like ui sprites
 const IMG_REGEX = /.+\/img\/(?<filename>[^?]+)(?:\?.*)?$/ // might it be a valid ui sprite? 
 
@@ -214,7 +214,7 @@ chrome.webRequest.onBeforeRequest.addListener(
     ["blocking"]
 ); 
 
-const PET_REDIRECT_TEMPLATE = 'https://the-doctorpus.github.io/doc-assets/images/custom/pets/';
+const PET_REDIRECT_TEMPLATE = 'https://blockyfish-client.github.io/Hacked-Doc-Assets/images/custom/pets/';
 const PET_SCHEME = '*://*.deeeep.io/custom/pets/*'
 const PET_REGEX = /.+\/pets\/(?<filename>[^?]+)(?:\?.*)?$/
 
@@ -231,8 +231,8 @@ chrome.webRequest.onBeforeRequest.addListener(
     ["blocking"]
 ); 
 
-const SKIN_REDIRECT_TEMPLATE = 'https://the-doctorpus.github.io/doc-assets/images/skans/'; // redirect URLs are all from this
-const CDN_SKIN_REDIRECT_TEMPLATE = 'https://the-doctorpus.github.io/doc-assets/images/skans/custom/'; // redirect URLs are all from this
+const SKIN_REDIRECT_TEMPLATE = 'https://blockyfish-client.github.io/Hacked-Doc-Assets/images/skans/'; // redirect URLs are all from this
+const CDN_SKIN_REDIRECT_TEMPLATE = 'https://blockyfish-client.github.io/Hacked-Doc-Assets/images/skans/custom/'; // redirect URLs are all from this
 const SKIN_SCHEME = '*://*.deeeep.io/assets/skins/*'; // these urls will be redirected like skins
 const CDN_SKIN_SCHEME = '*://cdn.deeeep.io/custom/skins/*';
 const SKIN_REGEX = /.+\/skins\/(?<filename>[^?]+)(?:\?.*)?$/; // might it be a valid skin? 
@@ -264,7 +264,7 @@ chrome.webRequest.onBeforeRequest.addListener(
     ["blocking"]
 );
 
-const MISC_REDIRECT_TEMPLATE = 'https://the-doctorpus.github.io/doc-assets/images/misc/'; // redirect URLs are all from this
+const MISC_REDIRECT_TEMPLATE = 'https://blockyfish-client.github.io/Hacked-Doc-Assets/images/misc/'; // redirect URLs are all from this
 const MISC_SCHEME = '*://*.deeeep.io/assets/*'; // these urls will be redirected like ui sprites
 const MISC_REGEX = /.+\/assets\/(?<filename>[^/?]+)(?:\?.*)?$/ // might it be a valid ui sprite? 
 
