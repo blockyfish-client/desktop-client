@@ -203,6 +203,7 @@ const createWindow = () => {
                     // document.querySelector('head > link[href*="/assets/index"][rel="stylesheet"]').href = "https://thepiguy3141.github.io/doc-assets/images/misc/index.8b74f9b3.css"
                     notif_count_old = 0
                     rpc_state_old = 'FFA0'
+                    console.log("state: FFA0")
                     setInterval(function() {
                         //notif badge
                         if (document.querySelector('span.forum-notifications-badge') != null) {
@@ -680,10 +681,12 @@ const createWindow = () => {
                     //pink badge for me!!
                     function insertClientOwnerBadge() {
                         win.webContents.executeJavaScript(`
-                        badgeParentDiv = document.querySelector('#app > div.vfm.vfm--inset.vfm--fixed.modal > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div > div > div > div.el-row.header > div.el-col.el-col-24.auto-col.fill > div')
-                        clientOwnerBadge = document.createElement('div')
-                        badgeParentDiv.insertBefore(clientOwnerBadge, badgeParentDiv.children[1])
-                        clientOwnerBadge.outerHTML = '<div class="el-image verified-icon el-tooltip__trigger el-tooltip__trigger" style="height: 1rem;margin-right: 0.25rem;width: 1rem;"><img src="/img/verified.png" class="el-image__inner" style="filter: hue-rotate(90deg);"></div>'
+                        if (document.querySelector('#app > div.vfm.vfm--inset.vfm--fixed.modal > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div > div > div > div.el-row.header > div.el-col.el-col-24.auto-col.fill > div > div:nth-child(2) > img') == null) {
+                            badgeParentDiv = document.querySelector('#app > div.vfm.vfm--inset.vfm--fixed.modal > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div > div > div > div.el-row.header > div.el-col.el-col-24.auto-col.fill > div')
+                            clientOwnerBadge = document.createElement('div')
+                            badgeParentDiv.insertBefore(clientOwnerBadge, badgeParentDiv.children[1])
+                            clientOwnerBadge.outerHTML = '<div class="el-image verified-icon el-tooltip__trigger el-tooltip__trigger" style="height: 1rem;margin-right: 0.25rem;width: 1rem;"><img src="/img/verified.png" class="el-image__inner" style="filter: hue-rotate(90deg);"></div>'
+                        }
                         `)
                     }
 
@@ -737,6 +740,7 @@ const createWindow = () => {
                 var old_mode = 'FFA'
                 var old_menu = '0'
                 var old_url = 'https://beta.deeeep.io'
+                var rpcLoop = 0
 
                 // intercept every console log 😈🔥
                 win.webContents.on("console-message", (ev, level, message, line, file) => {
@@ -766,10 +770,14 @@ const createWindow = () => {
                         var menu = msg.slice(-1)
                         var url = win.webContents.getURL()
                         if (mode != old_mode || menu != old_menu || url != old_url) {
-                            setGameMode(mode, menu)
+                            // setGameMode(mode, menu)
                             old_mode = mode
                             old_menu = menu
                             old_url = url
+                        }
+                        if (rpcLoop != 1) {
+                            setInterval(function() {setGameMode(mode, menu)}, 300)
+                            rpcLoop = 1
                         }
                     }
 
@@ -927,7 +935,7 @@ const createWindow = () => {
                 function setGameMode(mode, menu) {
                     //greb url and eats it (jk)
                     var currentUrl = win.webContents.getURL()
-                    console.log(currentUrl)
+                    // console.log(currentUrl)
 
                     // viewing <user>'s profile
                     if (matches(currentUrl, "/u/")) {
