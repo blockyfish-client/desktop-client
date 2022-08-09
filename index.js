@@ -154,7 +154,7 @@ const createWindow = () => {
                     //css
                     const twe_style = document.createElement('style')
                     document.querySelector('head').appendChild(twe_style)
-                    twe_style.innerHTML = '@font-face { font-family: emoji; src: url(//xem.github.io/unicode13/Twemoji.ttf) } html{font-family: Quicksand,emoji}'
+                    twe_style.innerHTML = '@font-face { font-family: emoji; font-weight: normal; src: url(//xem.github.io/unicode13/Twemoji.ttf) } html{font-family: Quicksand,emoji} @font-face { font-family: emoji; font-weight: bold; src: url(//xem.github.io/unicode13/Twemoji.ttf) } html{font-family: Quicksand,emoji}'
                     `)
                 }
 
@@ -785,6 +785,55 @@ const createWindow = () => {
                             var setting_value_bool = true
                         }
                         store.set(setting_key, setting_value_bool)
+                    }
+
+                    // if game has loaded, inject the hacks xd
+                    if (matches(msg, "Common.playLoadProgress (old, new),100,0")) {
+                        win.webContents.executeJavaScript(`
+                        setInterval(function () {
+                        for (let i = 0; i < game.currentScene.terrainManager.terrains.length; i++) {
+                                game.currentScene.terrainManager.terrains[i].alpha = 0.5;
+                            }
+                            game.currentScene.ceilingsContainer.alpha = 0.3
+                            game.viewport.clampZoom({
+                                minWidth: 0,
+                                maxWidth: 1e7,
+                            })
+                            game.currentScene.terrainManager.shadow.setShadowSize(1000000)
+
+                            // TWEMOJI
+                            // for names
+                            var ownerName = game.currentScene.myAnimal.entityName
+                            if (ownerName == '') {
+                                var ownerName = 'Unnamed'
+                            }
+                            game.currentScene.myAnimal.nameObject.textStyles.default.fontFamily = "Quicksand, 'emoji'"
+                            game.currentScene.myAnimal.updateName('')
+                            game.currentScene.myAnimal.updateName(ownerName)
+                            for (let i = 0; i < game.currentScene.entityManager.animalsList.length; i++) {
+                                var name = game.currentScene.entityManager.animalsList[i].entityName
+                                if (name == '') {
+                                    var name = 'Unnamed'
+                                }
+                                game.currentScene.entityManager.animalsList[i].nameObject.textStyles.default.fontFamily = "Quicksand, 'emoji'"
+                                game.currentScene.entityManager.animalsList[i].updateName('')
+                                game.currentScene.entityManager.animalsList[i].updateName(name)
+                            }
+
+                            // for chat messages
+                            for (let i = 0; i < game.currentScene.chatMessages.length; i++) {
+                                var chatMsg = game.currentScene.chatMessages[i].text._text
+
+                                game.currentScene.chatMessages[i].text.textStyles.default.fontFamily = "Quicksand, 'emoji'"
+                                game.currentScene.chatMessages[i].setText('')
+                                game.currentScene.chatMessages[i].setText(chatMsg)
+                            }
+                        }, 100);
+
+                        //no flashbang/ink
+                        game.currentScene.toggleFlash = function() {}
+                        game.currentScene.viewingGhosts = true
+                        `)
                     }
                 });
 
