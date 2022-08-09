@@ -373,30 +373,39 @@ const createWindow = () => {
                     }
                     `)
 
+                    // build asset swapper modal
+                    win.webContents.executeJavaScript(`
+                    const aswp_style = document.createElement('style')
+                    document.querySelector('head').appendChild(aswp_style)
+                    aswp_style.innerHTML = '.button{display:inline-flex;justify-content:center;align-items:center;line-height:1;height:32px;white-space:nowrap;cursor:pointer;text-align:center;box-sizing:border-box;outline:0;transition:.1s;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;vertical-align:middle;-webkit-appearance:none;min-height:2.5rem;border-radius:.25rem;padding:.75rem 1.25rem;font-size:.875rem}.box-x-close{position:absolute;top:.3rem;right:.5rem}body .aswp-button{border-bottom-width:4px;border-radius:1rem}.aswp-gre{background-color:#ef4444;border-color:#dc2626}.aswp-gre:hover{background-color:#dc2626;border-color:#b91c1c}.aswp-black{background-color:#6b7280;border-color:#4b5563}.aswp-black:hover{background-color:#4b5563;border-color:#374151}.aswp-box.active{outline:white solid 1px;filter:brightness(100%)}.aswp-modal{background-color:#1f2937;border:2px solid #374151;border-radius:.75rem;width:300px;height:200px}.aswp-core{top:5px;right:5px;border:1px solid #fff;border-radius:25px;font-size:14px}#aswp-main{flex-wrap:wrap;width:88%;height:100%;margin:auto;gap:15px}.aswp-hidden{opacity:0;pointer-events:none}#aswp-modal{transition:opacity .2s}'
+                    const aswp_div = document.createElement('div')
+                    document.getElementById('app').appendChild(aswp_div)
+                    aswp_div.outerHTML = '<div style="z-index: 100;" class="w-screen h-screen absolute" id="aswp-modal"> <div style="background-color: rgba(0,0,0,.5);" class="w-full h-full absolute"></div><div class="w-full h-full absolute flex justify-center items-center"> <div class="flex flex-col aswp-modal relative"> <div style="font-size: 1.3rem" class="text-center py-2">Asset Swapper</div><button class="aswp-close box-x-close"><svg width="1.125em" height="1.125em" viewBox="0 0 24 24" class="svg-icon" color="gray" style="--sx:1; --sy:1; --r:0deg;"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" fill="currentColor"></path></svg></button> <div style="flex: 1;" class="text-center"> <div class="p-4 flex" id="aswp-main"></div></div><div class="text-center py-4"> <div class="button aswp-button aswp-black aswp-close">Ok</div></div></div></div></div>'
+                    const aswpMain = document.getElementById("aswp-main")
+                    const aswpBox = document.createElement("div")
+                    aswpMain.appendChild(aswpBox)
+                    aswpBox.outerHTML = '<input id="aswp-input" style="padding: 5px;border-radius: 5px;height: 35px;background-color: #0003;margin: auto;text-align: center;" placeholder="Input skin ID">'
+                    const aswpCloses = document.getElementsByClassName("aswp-close")
+                    const aswpModal = document.getElementById("aswp-modal")
+                    aswpModal.classList.toggle("aswp-hidden")
+                    function toggleAswp() {
+                        aswpModal.classList.toggle("aswp-hidden")
+                    }
+                    document.getElementById('aswp-input').addEventListener("input", () => {
+                        game.currentScene.myAnimal.setSkin(document.getElementById('aswp-input').value)
+                    })
+                    for (const aswpClose of aswpCloses) {
+                        aswpClose.addEventListener("click", () => {
+                            toggleAswp()
+                        })
+                    }
+                    `)
+
                     //build titlebar to drag window around
                     win.webContents.executeJavaScript(`
                     const drag = document.createElement('div')
                     document.querySelector('#app > div.ui > div').appendChild(drag)
                     drag.outerHTML = '<div style="-webkit-app-region: drag;width: 100vw;height: 20px;position: absolute;top: 0;left: 0;cursor: move;"></div>'
-                    `)
-
-                    //custom keybinds
-                    win.webContents.executeJavaScript(`
-                    document.body.addEventListener('keydown', function(e) {
-                        if (e.key == "Escape") {
-                            e.preventDefault()
-                            if (document.querySelector('#app > div.ui > div').style.display != 'none') {
-                                document.querySelector('div.el-col.el-col-8.is-guttered > button').click()
-                            }
-                        }
-                        if (e.key == "F11") {
-                            if (document.fullscreenElement) {
-                                document.exitFullscreen();
-                            } else {
-                                document.documentElement.requestFullscreen();
-                            }
-                        }
-                    });
                     `)
 
                     //website and github button on top right menu
@@ -803,13 +812,15 @@ const createWindow = () => {
 
                             // TWEMOJI
                             // for names
-                            var ownerName = game.currentScene.myAnimal.entityName
-                            if (ownerName == '') {
-                                var ownerName = 'Unnamed'
+                            if (game.currentScene.myAnimal != null) {
+                                var ownerName = game.currentScene.myAnimal.entityName
+                                if (ownerName == '') {
+                                    var ownerName = 'Unnamed'
+                                }
+                                game.currentScene.myAnimal.nameObject.textStyles.default.fontFamily = "Quicksand, 'emoji'"
+                                game.currentScene.myAnimal.updateName('')
+                                game.currentScene.myAnimal.updateName(ownerName)
                             }
-                            game.currentScene.myAnimal.nameObject.textStyles.default.fontFamily = "Quicksand, 'emoji'"
-                            game.currentScene.myAnimal.updateName('')
-                            game.currentScene.myAnimal.updateName(ownerName)
                             for (let i = 0; i < game.currentScene.entityManager.animalsList.length; i++) {
                                 var name = game.currentScene.entityManager.animalsList[i].entityName
                                 if (name == '') {
@@ -834,10 +845,51 @@ const createWindow = () => {
                         game.currentScene.toggleFlash = function() {}
                         game.currentScene.viewingGhosts = true
                         `)
+
+                        // asset swapper
+                        win.webContents.executeJavaScript(`
+                        var aswp_button = document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1)').cloneNode(true)
+                        var aswp_parent_div = document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div')
+                        aswp_parent_div.insertBefore(aswp_button, aswp_parent_div.children[0])
+                        var aswp_svg = document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1) > span > svg')
+                        aswp_svg.outerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-layers-fill" viewBox="0 0 16 16"><path d="M7.765 1.559a.5.5 0 0 1 .47 0l7.5 4a.5.5 0 0 1 0 .882l-7.5 4a.5.5 0 0 1-.47 0l-7.5-4a.5.5 0 0 1 0-.882l7.5-4z"/><path d="m2.125 8.567-1.86.992a.5.5 0 0 0 0 .882l7.5 4a.5.5 0 0 0 .47 0l7.5-4a.5.5 0 0 0 0-.882l-1.86-.992-5.17 2.756a1.5 1.5 0 0 1-1.41 0l-5.17-2.756z"/></svg>'
+                        var aswp_key = document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1) > span > div')
+                        aswp_key.innerText = 'K'
+                        document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1)').addEventListener("mousedown", () => {
+                            if (document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none') {
+                                toggleAswp()
+                            }
+                        })
+                        `)
                     }
                 });
 
-                // show the window after literally all the scripts finish
+                //custom keybinds
+                win.webContents.executeJavaScript(`
+                document.body.addEventListener('keydown', function(e) {
+                    if (e.key == "Escape") {
+                        e.preventDefault()
+                        if (document.querySelector('#app > div.ui > div').style.display != 'none') {
+                            document.querySelector('div.el-col.el-col-8.is-guttered > button').click()
+                        }
+                    }
+                    if (e.key == "F11") {
+                        if (document.fullscreenElement) {
+                            document.exitFullscreen();
+                        } else {
+                            document.documentElement.requestFullscreen();
+                        }
+                    }
+                    if (e.key.toLowerCase() == "k") {
+                        if (document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
+                            e.preventDefault()
+                            toggleAswp()
+                        }
+                    }
+                });
+                `)
+
+                // show the window after all the scripts finish
                 // this is so that the app shows only when the UI in complete
                 // if this was shown before everything finished loading, 
                 // it would make me look noob and unprofessional
