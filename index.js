@@ -27,6 +27,13 @@ function matches(text, partial) {
     return text.toLowerCase().indexOf(partial.toLowerCase()) > -1;
 }
 
+// emulate a keystroke
+function sendKeybinding(win, keyCode) {
+    win.webContents.sendInputEvent({ type: 'keyDown', keyCode });
+    win.webContents.sendInputEvent({ type: 'char', keyCode });
+    win.webContents.sendInputEvent({ type: 'keyUp', keyCode });
+}
+
 // delete update installer, doesn't delete manually downloaded installer
 // unless the user is stupid or smart enough to rename it to the name here
 let downloadPath = app.getPath('downloads')
@@ -46,6 +53,19 @@ const store = new Store();
 var docassets = store.get('docassets')
 var ublock = store.get('ublock')
 var twemoji = store.get('twemoji')
+console.log(store.get('quick_chat.1'))
+if (store.get('quick_chat.1') == undefined) {
+    store.set("quick_chat.1", "gg")
+}
+if (store.get('quick_chat.2') == undefined) {
+    store.set("quick_chat.2", "lol")
+}
+if (store.get('quick_chat.3') == undefined) {
+    store.set("quick_chat.3", "thank you")
+}
+if (store.get('quick_chat.4') == undefined) {
+    store.set("quick_chat.4", "ow!")
+}
 
 //main window
 app.whenReady().then(async () => {
@@ -144,7 +164,7 @@ const createWindow = () => {
             //wait for the base webpage to finish loading before customizing it
             win.webContents.on('did-finish-load', function() {
 
-                win.webContents.openDevTools()
+                // win.webContents.openDevTools()
 
                 // keep everything running otherwise youll see a stack of 500 chat messages when you come back
                 win.webContents.setBackgroundThrottling(false)
@@ -405,6 +425,13 @@ const createWindow = () => {
                     }
                     `)
 
+                    // css for quick chat
+                    win.webContents.executeJavaScript(`
+                    const qc_style = document.createElement('style')
+                    document.querySelector('head').appendChild(qc_style)
+                    qc_style.innerHTML = '#quick-chat-container{width:600px;min-height:360px;display:flex;flex-direction:column;position:absolute}.quick-chat.row{display:flex;flex-direction:row;height:100px}.quick-chat.one{justify-content:center}.quick-chat.two{justify-content:space-between}.quick-chat>div{width:180px;height:100px;background-color:#0006;border-radius:10px;display:flex;padding:5px;opacity:.8}.quick-chat>div:hover{opacity:1;box-shadow:0 0 .5rem rgb(255 255 255 / 50%)}.quick-chat>div>p{text-align:center;width:100%;margin:auto;color:#fff;overflow-wrap:break-word}'
+                    `)
+
                     //build titlebar to drag window around
                     win.webContents.executeJavaScript(`
                     const drag = document.createElement('div')
@@ -566,6 +593,27 @@ const createWindow = () => {
                         var settings_modal = document.querySelector('#app > div.modals-container > div > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div')
                         settings_modal.style.width = '80vw'
                         settings_modal.style.maxWidth = '500px'
+
+                        // quick chat messages
+                        var qc_settings_main = document.createElement('div')
+                        document.querySelector('#pane-1 > form').appendChild(qc_settings_main)
+                        qc_settings_main.outerHTML = '<div class="el-form-item"><label class="el-form-item__label">Quick chat #1</label><input maxlength="60" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-1" value="` + store.get('quick_chat.1') + `"></div><div class="el-form-item"><label class="el-form-item__label">Quick chat #2</label><input maxlength="60" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-2"value="` + store.get('quick_chat.2') + `"></div><div class="el-form-item"><label class="el-form-item__label">Quick chat #3</label><input maxlength="60" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-3"value="` + store.get('quick_chat.3') + `"></div><div class="el-form-item"><label class="el-form-item__label">Quick chat #4</label><input maxlength="60" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-4" value="` + store.get('quick_chat.4') + `"></div>'
+                        document.getElementById('qc-msg-1').addEventListener("change", () => {
+                            restart_tooltip.style.display = 'block'
+                            console.log("qc_ms_1: " + document.getElementById('qc-msg-1').value)
+                        })
+                        document.getElementById('qc-msg-2').addEventListener("change", () => {
+                            restart_tooltip.style.display = 'block'
+                            console.log("qc_ms_2: " + document.getElementById('qc-msg-2').value)
+                        })
+                        document.getElementById('qc-msg-3').addEventListener("change", () => {
+                            restart_tooltip.style.display = 'block'
+                            console.log("qc_ms_3: " + document.getElementById('qc-msg-3').value)
+                        })
+                        document.getElementById('qc-msg-4').addEventListener("change", () => {
+                            restart_tooltip.style.display = 'block'
+                            console.log("qc_ms_4: " + document.getElementById('qc-msg-4').value)
+                        })
                     })
                     `)
 
@@ -804,6 +852,34 @@ const createWindow = () => {
                         store.set(setting_key, setting_value_bool)
                     }
 
+                    // store quick chat messages
+                    if (matches(msg, "qc_ms_1: ")) {
+                        var msg = msg.replace("qc_ms_1: ", "")
+                        store.set("quick_chat.1", msg)
+                    }
+                    if (matches(msg, "qc_ms_2: ")) {
+                        var msg = msg.replace("qc_ms_2: ", "")
+                        store.set("quick_chat.2", msg)
+                    }
+                    if (matches(msg, "qc_ms_3: ")) {
+                        var msg = msg.replace("qc_ms_3: ", "")
+                        store.set("quick_chat.3", msg)
+                    }
+                    if (matches(msg, "qc_ms_4: ")) {
+                        var msg = msg.replace("qc_ms_4: ", "")
+                        store.set("quick_chat.4", msg)
+                    }
+
+                    // send quick-chat message
+                    if (matches(msg, "send_chat_msg:")) {
+                        var msg = msg.replace("send_chat_msg: ", "")
+                        sendKeybinding(win, 'enter')
+                        for (var i = 0; i < msg.length; i++) {
+                            sendKeybinding(win, msg[i])
+                        }
+                        sendKeybinding(win, 'enter')
+                    }
+
                     // if game has loaded, inject the hacks xd
                     if (matches(msg, "Common.playLoadProgress (old, new),100,0")) {
                         win.webContents.executeJavaScript(`
@@ -909,6 +985,39 @@ const createWindow = () => {
                         document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1)').addEventListener("mousedown", () => {
                             if (document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none') {
                                 toggleAswp()
+                            }
+                        })
+                        `)
+
+                        //quick chat UI
+                        win.webContents.executeJavaScript(`
+                        var qc_div = document.createElement('div')
+                        document.querySelector('div.game').insertBefore(qc_div, document.querySelector('div.game').children[0])
+                        qc_div.outerHTML = '<div id=quick-chat-container style=display:none><div class="quick-chat row one"><div><p>` + store.get('quick_chat.1') + `</div></div><div class="quick-chat row two"><div><p>` + store.get('quick_chat.4') + `</div><div><p>` + store.get('quick_chat.2') + `</div></div><div class="quick-chat row one"><div><p>` + store.get('quick_chat.3') + `</div></div></div>'
+                        var quickChatDiv = document.getElementById('quick-chat-container')
+                        document.body.addEventListener("mousemove", (e) => {
+                            window.mouseX = e.clientX
+                            window.mouseY = e.clientY 
+                        })
+                        window.posSet = false
+                        document.body.addEventListener("keydown", (e) => {
+                            if (e.key.toLowerCase() == "c" && document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
+                                if (!posSet) {
+                                    quickChatDiv.style.display = "block"
+                                    let x = mouseX - 300
+                                    let y = mouseY - 150
+                                    quickChatDiv.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
+                                    window.posSet = true
+                                }
+                            }
+                        })
+                        document.body.addEventListener("keyup", (e) => {
+                            if (e.key.toLowerCase() == "c") {
+                                if (document.querySelector('#quick-chat-container > div > div:hover') != null) {
+                                    console.log("send_chat_msg: " + document.querySelector('#quick-chat-container > div > div:hover').innerText)
+                                }
+                                quickChatDiv.style.display = "none"
+                                window.posSet = false
                             }
                         })
                         `)
