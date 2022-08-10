@@ -57,8 +57,8 @@ const createWindow = () => {
         x: store.get('window.x'),
         y: store.get('window.y'),
 
-        // black background (i should change this)
-        backgroundColor: '#000000',
+        // background
+        backgroundColor: '#1f2937',
 
         // dont show before webpage has loaded
         show: false,
