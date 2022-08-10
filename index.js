@@ -521,7 +521,7 @@ const createWindow = () => {
                     });
 
                     //define function for building custom items
-                    function buildCustomSettingsItems() {
+                    function buildCustomSettingsItems(qc1, qc2, qc3, qc4) {
                         if (document.getElementById('pane-0') != null) {
                             //restart tooltip
                             var modal_parent = document.querySelector('#app > div.modals-container > div > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div')
@@ -629,9 +629,8 @@ const createWindow = () => {
                             // quick chat messages
                             var qc_settings_main = document.createElement('div')
                             document.querySelector('#pane-1 > form').appendChild(qc_settings_main)
-                            qc_settings_main.outerHTML = '<div class="el-form-item"><label class="el-form-item__label">Quick chat #1</label><input maxlength="60" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-1" value="` + qc1 + `"></div><div class="el-form-item"><label class="el-form-item__label">Quick chat #2</label><input maxlength="60" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-2"value="` + qc2 + `"></div><div class="el-form-item"><label class="el-form-item__label">Quick chat #3</label><input maxlength="60" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-3"value="` + qc3 + `"></div><div class="el-form-item"><label class="el-form-item__label">Quick chat #4</label><input maxlength="60" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-4" value="` + qc4 + `"></div>'
+                            qc_settings_main.outerHTML = '<div class="el-form-item"><label class="el-form-item__label">Quick chat #1</label><input maxlength="60" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-1" value="' + qc1 + '"></div><div class="el-form-item"><label class="el-form-item__label">Quick chat #2</label><input maxlength="60" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-2"value="' + qc2 + '"></div><div class="el-form-item"><label class="el-form-item__label">Quick chat #3</label><input maxlength="60" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-3"value="' + qc3 + '"></div><div class="el-form-item"><label class="el-form-item__label">Quick chat #4</label><input maxlength="60" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-4" value="' + qc4 + '"></div>'
                             document.getElementById('qc-msg-1').addEventListener("change", () => {
-                                restart_tooltip.style.display = 'block'
                                 console.log("qc_ms_1: " + document.getElementById('qc-msg-1').value)
                             })
                             document.getElementById('qc-msg-2').addEventListener("change", () => {
@@ -915,7 +914,7 @@ const createWindow = () => {
 
                     //load custom settings
                     if (matches(msg, "Modal Added:[object HTMLDivElement]")) {
-                        win.webContents.executeJavaScript(`buildCustomSettingsItems()`)
+                        win.webContents.executeJavaScript(`buildCustomSettingsItems('` + qc1 + `', '` + qc2 + `', '` + qc3 + `', '` + qc4 + `')`)
                     }
 
                     // if game has loaded, inject the hacks xd
