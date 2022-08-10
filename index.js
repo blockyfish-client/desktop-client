@@ -144,7 +144,7 @@ const createWindow = () => {
             //wait for the base webpage to finish loading before customizing it
             win.webContents.on('did-finish-load', function() {
 
-                // win.webContents.openDevTools()
+                win.webContents.openDevTools()
 
                 // keep everything running otherwise youll see a stack of 500 chat messages when you come back
                 win.webContents.setBackgroundThrottling(false)
@@ -197,6 +197,13 @@ const createWindow = () => {
                         mouse_outer.classList.remove('cursor-hide')
                     })
                 `)
+                //<div style="width: 100%;height: 100%;position: absolute;z-index: 9999;pointer-events: none;display: flex;"><img draggable="false" src="https://raw.githubusercontent.com/blockyfish-client/Assets/main/evo_circle.png" style="max-width: 80vw;max-height: 80vh;align-self: center;margin: auto;"></div>
+                // win.webContents.executeJavaScript(`
+                // const evo_wheel = document.createElement('div')
+                // document.querySelector('div.game').insertBefore(evo_wheel, document.querySelector('div.game').children[0])
+                // evo_wheel.outerHTML = '<div style="width: 100%;height: 100%;position: absolute;z-index: 9999;pointer-events: none;display: flex;"><img id="evo-wheel" draggable="false" src="https://raw.githubusercontent.com/blockyfish-client/Assets/main/evo_circle.png" style="max-width: 80vw;max-height: 80vh;align-self: center;margin: auto;"></div>'
+                // `)
+
 
                 //state checks and UI adjustments
                 win.webContents.executeJavaScript(`
@@ -852,6 +859,12 @@ const createWindow = () => {
                         //no flashbang/ink
                         game.currentScene.toggleFlash = function() {}
                         game.currentScene.viewingGhosts = true
+
+                        //evo wheel
+                        var evo_wheel = document.createElement('div')
+                        document.querySelector('div.game').insertBefore(evo_wheel, document.querySelector('div.game').children[0])
+                        evo_wheel.outerHTML = '<div style="width: 100%;height: 100%;position: absolute;z-index: 9999;pointer-events: none;display: flex;"><img id="evo-wheel" draggable="false" src="https://raw.githubusercontent.com/blockyfish-client/Assets/main/evo_circle.png" style="max-width: 80vw;max-height: 80vh;align-self: center;margin: auto;transition: .3s all;transform: scale(0);opacity: 0;"></div>'        
+                        evo_wheel = document.getElementById('evo-wheel')
                         `)
 
                         // asset swapper
@@ -874,6 +887,10 @@ const createWindow = () => {
 
                 //custom keybinds
                 win.webContents.executeJavaScript(`
+                var evo_wheel_rot = 0
+                setInterval(function() {
+                    evo_wheel_rot += 1
+                }, 100)
                 document.body.addEventListener('keydown', function(e) {
                     if (e.key == "Escape") {
                         e.preventDefault()
@@ -893,6 +910,18 @@ const createWindow = () => {
                             e.preventDefault()
                             toggleAswp()
                         }
+                    }
+                    if (e.key.toLowerCase() == "y") {
+                        rot = evo_wheel_rot
+                        evo_wheel.style.transform = 'scale(1) rotate(' + rot + 'deg)'
+                        evo_wheel.style.opacity = 1
+                    }
+                });
+                document.body.addEventListener('keyup', function(e) {
+                    if (e.key.toLowerCase() == "y") {
+                        rot = evo_wheel_rot - 90
+                        evo_wheel.style.transform = 'scale(0) rotate(' + rot + 'deg)'
+                        evo_wheel.style.opacity = 0
                     }
                 });
                 `)
