@@ -53,17 +53,25 @@ const store = new Store();
 var docassets = store.get('docassets')
 var ublock = store.get('ublock')
 var twemoji = store.get('twemoji')
-if (store.get('quick_chat.1') == undefined) {
+var qc1 = store.get('quick_chat.1')
+var qc2 = store.get('quick_chat.2')
+var qc3 = store.get('quick_chat.3')
+var qc4 = store.get('quick_chat.4')
+if (qc1 == undefined) {
     store.set("quick_chat.1", "gg")
+    qc1 = "gg"
 }
-if (store.get('quick_chat.2') == undefined) {
+if (qc2 == undefined) {
     store.set("quick_chat.2", "lol")
+    qc2 = "lol"
 }
-if (store.get('quick_chat.3') == undefined) {
+if (qc3 == undefined) {
     store.set("quick_chat.3", "thank you")
+    qc3 = "thank you"
 }
-if (store.get('quick_chat.4') == undefined) {
+if (qc4 == undefined) {
     store.set("quick_chat.4", "ow!")
+    qc4 = "ow!"
 }
 
 //main window
@@ -146,6 +154,10 @@ const createWindow = () => {
                         store.set("window.x",  win.getPosition()[0])
                         store.set("window.y", win.getPosition()[1])
                     }
+                    store.set("quick_chat.1", qc1)
+                    store.set("quick_chat.2", qc2)
+                    store.set("quick_chat.3", qc3)
+                    store.set("quick_chat.4", qc4)
                 }
             });
 
@@ -596,7 +608,7 @@ const createWindow = () => {
                         // quick chat messages
                         var qc_settings_main = document.createElement('div')
                         document.querySelector('#pane-1 > form').appendChild(qc_settings_main)
-                        qc_settings_main.outerHTML = '<div class="el-form-item"><label class="el-form-item__label">Quick chat #1</label><input maxlength="60" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-1" value="` + store.get('quick_chat.1') + `"></div><div class="el-form-item"><label class="el-form-item__label">Quick chat #2</label><input maxlength="60" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-2"value="` + store.get('quick_chat.2') + `"></div><div class="el-form-item"><label class="el-form-item__label">Quick chat #3</label><input maxlength="60" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-3"value="` + store.get('quick_chat.3') + `"></div><div class="el-form-item"><label class="el-form-item__label">Quick chat #4</label><input maxlength="60" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-4" value="` + store.get('quick_chat.4') + `"></div>'
+                        qc_settings_main.outerHTML = '<div class="el-form-item"><label class="el-form-item__label">Quick chat #1</label><input maxlength="60" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-1" value="` + qc1 + `"></div><div class="el-form-item"><label class="el-form-item__label">Quick chat #2</label><input maxlength="60" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-2"value="` + qc2 + `"></div><div class="el-form-item"><label class="el-form-item__label">Quick chat #3</label><input maxlength="60" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-3"value="` + qc3 + `"></div><div class="el-form-item"><label class="el-form-item__label">Quick chat #4</label><input maxlength="60" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-4" value="` + qc4 + `"></div>'
                         document.getElementById('qc-msg-1').addEventListener("change", () => {
                             restart_tooltip.style.display = 'block'
                             console.log("qc_ms_1: " + document.getElementById('qc-msg-1').value)
@@ -854,19 +866,19 @@ const createWindow = () => {
                     // store quick chat messages
                     if (matches(msg, "qc_ms_1: ")) {
                         var msg = msg.replace("qc_ms_1: ", "")
-                        store.set("quick_chat.1", msg)
+                        qc1 = msg
                     }
                     if (matches(msg, "qc_ms_2: ")) {
                         var msg = msg.replace("qc_ms_2: ", "")
-                        store.set("quick_chat.2", msg)
+                        qc2 = msg
                     }
                     if (matches(msg, "qc_ms_3: ")) {
                         var msg = msg.replace("qc_ms_3: ", "")
-                        store.set("quick_chat.3", msg)
+                        qc3 = msg
                     }
                     if (matches(msg, "qc_ms_4: ")) {
                         var msg = msg.replace("qc_ms_4: ", "")
-                        store.set("quick_chat.4", msg)
+                        qc4 = msg
                     }
 
                     // send quick-chat message
@@ -992,7 +1004,7 @@ const createWindow = () => {
                         win.webContents.executeJavaScript(`
                         var qc_div = document.createElement('div')
                         document.querySelector('div.game').insertBefore(qc_div, document.querySelector('div.game').children[0])
-                        qc_div.outerHTML = '<div id=quick-chat-container style=display:none><div class="quick-chat row one"><div><p>` + store.get('quick_chat.1') + `</div></div><div class="quick-chat row two"><div><p>` + store.get('quick_chat.4') + `</div><div><p>` + store.get('quick_chat.2') + `</div></div><div class="quick-chat row one"><div><p>` + store.get('quick_chat.3') + `</div></div></div>'
+                        qc_div.outerHTML = '<div id=quick-chat-container style=display:none><div class="quick-chat row one"><div><p>` + qc1 + `</div></div><div class="quick-chat row two"><div><p>` + qc4 + `</div><div><p>` + qc2 + `</div></div><div class="quick-chat row one"><div><p>` + qc3 + `</div></div></div>'
                         var quickChatDiv = document.getElementById('quick-chat-container')
                         document.body.addEventListener("mousemove", (e) => {
                             window.mouseX = e.clientX
