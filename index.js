@@ -144,7 +144,7 @@ const createWindow = () => {
             //wait for the base webpage to finish loading before customizing it
             win.webContents.on('did-finish-load', function() {
 
-                // win.webContents.openDevTools()
+                win.webContents.openDevTools()
 
                 // keep everything running otherwise youll see a stack of 500 chat messages when you come back
                 win.webContents.setBackgroundThrottling(false)
@@ -209,7 +209,6 @@ const createWindow = () => {
                 win.webContents.executeJavaScript(`
                     // document.querySelector('head > link[href*="/assets/index"][rel="stylesheet"]').href = "https://thepiguy3141.github.io/doc-assets/images/misc/index.8b74f9b3.css"
                     notif_count_old = 0
-                    rpc_state_old = 'FFA0'
                     console.log("state: FFA0")
                     setInterval(function() {
                         //notif badge
@@ -231,10 +230,7 @@ const createWindow = () => {
                         else {
                             rpc_state = document.querySelector('.selected').innerText + "0"
                         }
-                        if (rpc_state != rpc_state_old) {
-                            console.log("state: " + rpc_state)
-                            rpc_state_old = rpc_state
-                        }
+                        console.log("state: " + rpc_state)
                     
                         //HOMEPAGE UI MOD
                         //making everything undraggable
@@ -686,15 +682,17 @@ const createWindow = () => {
                     `)
 
                     //pink badge for me!!
-                    function insertClientOwnerBadge() {
-                        win.webContents.executeJavaScript(`
-                        if (document.querySelector('#app > div.vfm.vfm--inset.vfm--fixed.modal > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div > div > div > div.el-row.header > div.el-col.el-col-24.auto-col.fill > div > div:nth-child(2) > img') == null) {
-                            badgeParentDiv = document.querySelector('#app > div.vfm.vfm--inset.vfm--fixed.modal > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div > div > div > div.el-row.header > div.el-col.el-col-24.auto-col.fill > div')
-                            clientOwnerBadge = document.createElement('div')
-                            badgeParentDiv.insertBefore(clientOwnerBadge, badgeParentDiv.children[1])
-                            clientOwnerBadge.outerHTML = '<div class="el-image verified-icon el-tooltip__trigger el-tooltip__trigger" style="height: 1rem;margin-right: 0.25rem;width: 1rem;"><img src="/img/verified.png" class="el-image__inner" style="filter: hue-rotate(90deg);"></div>'
-                        }
-                        `)
+                    async function insertClientOwnerBadge() {
+                        setTimeout(function() {
+                            win.webContents.executeJavaScript(`
+                            if (document.querySelector('#app > div.vfm.vfm--inset.vfm--fixed.modal > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div > div > div > div.el-row.header > div.el-col.el-col-24.auto-col.fill > div > div:nth-child(2) > img') == null) {
+                                badgeParentDiv = document.querySelector('#app > div.vfm.vfm--inset.vfm--fixed.modal > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div > div > div > div.el-row.header > div.el-col.el-col-24.auto-col.fill > div')
+                                clientOwnerBadge = document.createElement('div')
+                                badgeParentDiv.insertBefore(clientOwnerBadge, badgeParentDiv.children[1])
+                                clientOwnerBadge.outerHTML = '<div class="el-image verified-icon el-tooltip__trigger el-tooltip__trigger" style="height: 1rem;margin-right: 0.25rem;width: 1rem;"><img src="/img/verified.png" class="el-image__inner" style="filter: hue-rotate(90deg);"></div>'
+                            }
+                            `)
+                        }, 100)
                     }
 
                     //make progress bar and track download progress to keep people sane
@@ -747,7 +745,6 @@ const createWindow = () => {
                 var old_mode = 'FFA'
                 var old_menu = '0'
                 var old_url = 'https://beta.deeeep.io'
-                var rpcLoop = 0
 
                 // intercept every console log 😈🔥
                 win.webContents.on("console-message", (ev, level, message, line, file) => {
@@ -777,14 +774,10 @@ const createWindow = () => {
                         var menu = msg.slice(-1)
                         var url = win.webContents.getURL()
                         if (mode != old_mode || menu != old_menu || url != old_url) {
-                            // setGameMode(mode, menu)
+                            setGameMode(mode, menu)
                             old_mode = mode
                             old_menu = menu
                             old_url = url
-                        }
-                        if (rpcLoop != 1) {
-                            setInterval(function() {setGameMode(mode, menu)}, 300)
-                            rpcLoop = 1
                         }
                     }
 
@@ -863,8 +856,45 @@ const createWindow = () => {
                         //evo wheel
                         var evo_wheel = document.createElement('div')
                         document.querySelector('div.game').insertBefore(evo_wheel, document.querySelector('div.game').children[0])
-                        evo_wheel.outerHTML = '<div style="width: 100%;height: 100%;position: absolute;z-index: 9999;pointer-events: none;display: flex;"><img id="evo-wheel" draggable="false" src="https://raw.githubusercontent.com/blockyfish-client/Assets/main/evo_circle.png" style="max-width: 80vw;max-height: 80vh;align-self: center;margin: auto;transition: .3s all;transform: scale(0);opacity: 0;"></div>'        
+                        evo_wheel.outerHTML = '<div style="width: 100%;height: 100%;position: absolute;pointer-events: none;display: flex;"><img id="evo-wheel" draggable="false" src="https://raw.githubusercontent.com/blockyfish-client/Assets/main/evo_circle.png" style="z-index: -9999;max-width: 80vw;max-height: 80vh;align-self: center;margin: auto;transition: 0.1s all;transform: scale(0);opacity: 0;"></div>'        
                         evo_wheel = document.getElementById('evo-wheel')
+
+                        evo_wheel.style.transform = 'scale(1) rotate(0deg)'
+                        evo_wheel.style.transform = 'scale(0) rotate(-90deg)'
+                        evo_wheel.style.transition = '.3s all'
+
+                        async function preloadEvoWheel() {
+                            evo_wheel.style.transform = 'scale(1) rotate(0deg)'
+                            evo_wheel.style.opacity = 1
+                            setTimeout(() => {
+                                evo_wheel.style.transform = 'scale(0) rotate(-90deg)'
+                                evo_wheel.style.opacity = 0
+                            }, 1000)
+                            setTimeout(() => {
+                                evo_wheel.style.zIndex = 9999
+                            }, 1500)
+                        }
+
+                        preloadEvoWheel()
+
+                        //Y shortcut key
+                        document.body.addEventListener('keydown', function(e) {
+                            if (e.isComposing || e.keyCode === 229) {
+                                return;
+                            }
+                            if (e.key.toLowerCase() == "y" && document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
+                                rot = evo_wheel_rot
+                                evo_wheel.style.transform = 'scale(1) rotate(' + rot + 'deg)'
+                                evo_wheel.style.opacity = 1
+                            }
+                        });
+                        document.body.addEventListener('keyup', function(e) {
+                            if (e.key.toLowerCase() == "y") {
+                                rot = evo_wheel_rot - 90
+                                evo_wheel.style.transform = 'scale(0) rotate(' + rot + 'deg)'
+                                evo_wheel.style.opacity = 0
+                            }
+                        });
                         `)
 
                         // asset swapper
@@ -911,18 +941,6 @@ const createWindow = () => {
                             toggleAswp()
                         }
                     }
-                    if (e.key.toLowerCase() == "y") {
-                        rot = evo_wheel_rot
-                        evo_wheel.style.transform = 'scale(1) rotate(' + rot + 'deg)'
-                        evo_wheel.style.opacity = 1
-                    }
-                });
-                document.body.addEventListener('keyup', function(e) {
-                    if (e.key.toLowerCase() == "y") {
-                        rot = evo_wheel_rot - 90
-                        evo_wheel.style.transform = 'scale(0) rotate(' + rot + 'deg)'
-                        evo_wheel.style.opacity = 0
-                    }
                 });
                 `)
 
@@ -968,9 +986,9 @@ const createWindow = () => {
 
                     // viewing <user>'s profile
                     if (matches(currentUrl, "/u/")) {
-                        var detailText = 'Viewing ' + currentUrl.replace("https://beta.deeeep.io/u/", "") + "'s profile"
+                        var detailText = 'Viewing ' + currentUrl.replace("https://beta.deeeep.io/u/", "").replace(/\?host=....../i, "") + "'s profile"
                         var labelText = ''
-                        if (currentUrl.replace("https://beta.deeeep.io/u/", "") == 'ItsGrandPi') {
+                        if (currentUrl.replace("https://beta.deeeep.io/u/", "").replace(/\?host=....../i, "") == 'ItsGrandPi') {
                             insertClientOwnerBadge()
                         }
                     }
