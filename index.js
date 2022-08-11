@@ -175,7 +175,7 @@ const createWindow = () => {
             //wait for the base webpage to finish loading before customizing it
             win.webContents.on('did-finish-load', function() {
 
-                // win.webContents.openDevTools()
+                win.webContents.openDevTools()
 
                 // keep everything running otherwise youll see a stack of 500 chat messages when you come back
                 win.webContents.setBackgroundThrottling(false)
@@ -960,7 +960,7 @@ const createWindow = () => {
                                 game.currentScene.chatMessages[i].setText('')
                                 game.currentScene.chatMessages[i].setText(chatMsg)
                             }
-                        }, 100);
+                        }, 200);
 
                         //no flashbang/ink
                         game.currentScene.toggleFlash = function() {}
@@ -1061,13 +1061,31 @@ const createWindow = () => {
 
                         // control click listener
                         win.webContents.executeJavaScript(`
+                        var ctrl_overlay = document.createElement('div')
+                        document.querySelector('div.game').insertBefore(ctrl_overlay, document.querySelector('div.game').children[0])
+                        ctrl_overlay.outerHTML = '<div id="ctrl-overlay" style="width: 100%;height: 100%;position: absolute;display: block;z-index:10000;pointer-events:none;"></div>'
+                        `)
+                        win.webContents.executeJavaScript(`
+                        window.addEventListener("keydown",
+                            function(e) {
+                                if (e.ctrlKey) {
+                                    document.getElementById('ctrl-overlay').style.pointerEvents = 'all'
+                                }
+                            },
+                        false);
                         window.addEventListener("click",
                             function(e) {
                                 if (e.ctrlKey) {
-                                    e.preventDefault()
                                     game.inputManager.handleLongPress(50000)
                                 }
                             },
+                        false);
+                        window.addEventListener("keyup",
+                        function(e) {
+                            if (!e.ctrlKey) {
+                                document.getElementById('ctrl-overlay').style.pointerEvents = 'none'
+                            }
+                        },
                         false);
                         `)
                     }
