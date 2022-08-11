@@ -1058,6 +1058,18 @@ const createWindow = () => {
                             }
                         })
                         `)
+
+                        // control click listener
+                        win.webContents.executeJavaScript(`
+                        window.addEventListener("click",
+                            function(e) {
+                                if (e.ctrlKey) {
+                                    e.preventDefault()
+                                    game.inputManager.handleLongPress(50000)
+                                }
+                            },
+                        false);
+                        `)
                     }
                 });
 
