@@ -180,7 +180,7 @@ const createWindow = () => {
             //wait for the base webpage to finish loading before customizing it
             win.webContents.on('did-finish-load', function() {
 
-                // win.webContents.openDevTools()
+                win.webContents.openDevTools()
 
                 // keep everything running otherwise youll see a stack of 500 chat messages when you come back
                 win.webContents.setBackgroundThrottling(false)
@@ -1021,18 +1021,28 @@ const createWindow = () => {
 
                         // asset swapper
                         win.webContents.executeJavaScript(`
-                        var aswp_button = document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1)').cloneNode(true)
-                        var aswp_parent_div = document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div')
-                        aswp_parent_div.insertBefore(aswp_button, aswp_parent_div.children[0])
-                        var aswp_svg = document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1) > span > svg')
-                        aswp_svg.outerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-layers-fill" viewBox="0 0 16 16"><path d="M7.765 1.559a.5.5 0 0 1 .47 0l7.5 4a.5.5 0 0 1 0 .882l-7.5 4a.5.5 0 0 1-.47 0l-7.5-4a.5.5 0 0 1 0-.882l7.5-4z"/><path d="m2.125 8.567-1.86.992a.5.5 0 0 0 0 .882l7.5 4a.5.5 0 0 0 .47 0l7.5-4a.5.5 0 0 0 0-.882l-1.86-.992-5.17 2.756a1.5 1.5 0 0 1-1.41 0l-5.17-2.756z"/></svg>'
-                        var aswp_key = document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1) > span > div')
-                        aswp_key.innerText = 'K'
-                        document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1)').addEventListener("mousedown", () => {
-                            if (document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none') {
-                                toggleAswp()
-                            }
-                        })
+                        async function createAssetSwapButton() {
+                            setInterval(function() {
+                                if (document.querySelector('div.top-right') != null) {
+                                    if (!document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1) > span > svg').classList.contains('bi')) {
+                                        var aswp_button = document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1)').cloneNode(true)
+                                        var aswp_parent_div = document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div')
+                                        aswp_parent_div.insertBefore(aswp_button, aswp_parent_div.children[0])
+                                        var aswp_svg = document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1) > span > svg')
+                                        aswp_svg.outerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-layers-fill" viewBox="0 0 16 16"><path d="M7.765 1.559a.5.5 0 0 1 .47 0l7.5 4a.5.5 0 0 1 0 .882l-7.5 4a.5.5 0 0 1-.47 0l-7.5-4a.5.5 0 0 1 0-.882l7.5-4z"/><path d="m2.125 8.567-1.86.992a.5.5 0 0 0 0 .882l7.5 4a.5.5 0 0 0 .47 0l7.5-4a.5.5 0 0 0 0-.882l-1.86-.992-5.17 2.756a1.5 1.5 0 0 1-1.41 0l-5.17-2.756z"/></svg>'
+                                        var aswp_key = document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1) > span > div')
+                                        aswp_key.innerText = 'K'
+                                        document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1)').addEventListener("mousedown", () => {
+                                            if (document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none') {
+                                                toggleAswp()
+                                            }
+                                        })
+                                    }
+                                }
+    
+                            }, 500)
+                        }
+                        createAssetSwapButton()
                         `)
 
                         //quick chat UI
@@ -1077,19 +1087,37 @@ const createWindow = () => {
 
                         //fish levels:
                         // 101: thresher shark
+                        // 107: beaked whale
+                        // 109: beluga
                         win.webContents.executeJavaScript(`
                         function showCtrlOverlay(e) {
                             if (e.ctrlKey || e.altKey) {
                                 if (game.currentScene.myAnimal._visibleFishLevel != 101) {
                                     document.getElementById('ctrl-overlay').style.pointerEvents = 'all'
                                 }
-                                else if (game.currentScene.myAnimal._visibleFishLevel == 101 && !e.shiftKey) {
+                                else if (!e.shiftKey) {
+                                    if (game.currentScene.myAnimal._visibleFishLevel == 101)
                                     document.getElementById('ctrl-overlay').style.pointerEvents = 'all'
                                 }
                                 else {
                                     document.getElementById('ctrl-overlay').style.pointerEvents = 'none'
                                 }
                             }
+                        }
+                        async function superShot() {
+                            game.inputManager.handleLongPress(1)
+                            setTimeout(() => {
+                                game.inputManager.handleLongPress(5000)
+                            }, 50)
+                            setTimeout(() => {
+                                game.inputManager.handleLongPress(5000)
+                            }, 100)
+                            setTimeout(() => {
+                                game.inputManager.handleLongPress(5000)
+                            }, 150)
+                            setTimeout(() => {
+                                game.inputManager.handleLongPress(5000)
+                            }, 200)
                         }
                         window.addEventListener("keydown",
                             function(e) {
@@ -1099,7 +1127,11 @@ const createWindow = () => {
                         window.addEventListener("click",
                             function(e) {
                                 if (e.ctrlKey) {
-                                    if (e.shiftKey && game.currentScene.myAnimal._visibleFishLevel != 101) {
+                                    if (e.shiftKey && (game.currentScene.myAnimal._visibleFishLevel == 109 || game.currentScene.myAnimal._visibleFishLevel == 107)) {
+                                        console.log('hi')
+                                        superShot()
+                                    }
+                                    else if (e.shiftKey && game.currentScene.myAnimal._visibleFishLevel != 101) {
                                         game.inputManager.handleLongPress(-5)
                                     }
                                     else {
