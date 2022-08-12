@@ -59,6 +59,30 @@ Message `.pi#3141` if you want to contribute
 
 ## 📝 Changelogs  
 
+### v1.3.2 Special key combos
+- Control-shift-click:
+  - On land, most animals will jump as high as bullfrog when you click
+  - Allows thresher shark to achieve insane speed!
+- Alt-click lets you do a tiny hop, useful for getting off the ground when running away
+
+### v1.3.1 Control-click boosting
+- Control-click boosting! A new type of hack. Hold down control and click to use your charged boost instantly!! Useful for animals with long charge boost time like catfish, torpedo ray, and beaked whale. 
+
+### v1.3.0 Hacks, quick chats, and circular evo tree
+- Added hacks. 
+  - Transparent terrain
+  - Anti-ink and anti-flashbang
+  - No darkness
+  - Infinite zoom
+- Hold "Y" while playing to show a circular diep.io-style evolution tree. 
+- Hold "C" while playing to open a pie menu for quick chat messages. These can be configured by going to settings on the home menu. 
+- Twemoji. Emojis found in Twitter and Discord. Can be turned off in settings. 
+
+### v1.2.1 Rebranding
+
+- Rebrand to Blockyfish! New icon!
+- Saves window position and size on close
+
 ### v1.2.0 Doc-assets and uBlock
 - Doctorpus Assets!!
 - uBlock Origin for adblock
