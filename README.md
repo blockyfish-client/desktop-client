@@ -59,6 +59,9 @@ Message `.pi#3141` if you want to contribute
 
 ## 📝 Changelogs  
 
+### v1.3.3 Hotfix for bug
+- Fixed a bug where if you put an apostrophe ( ' ) in the quick chat message, the settings will not load again after that.
+
 ### v1.3.2 Special key combos
 - Control-shift-click:
   - On land, most animals will jump as high as bullfrog when you click
