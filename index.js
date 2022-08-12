@@ -19,12 +19,17 @@ const Store = require('electron-store');
 app.setAsDefaultProtocolClient("deeeepio")
 
 // version info
-const version_code = 'v1.3.1'
-const version_num = '131'
+const version_code = 'v1.3.3'
+const version_num = '133'
 
 // custom function for later
 function matches(text, partial) {
     return text.toLowerCase().indexOf(partial.toLowerCase()) > -1;
+}
+
+//escape strings
+function addslashes( str ) {
+    return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
 }
 
 // emulate a keystroke
@@ -175,7 +180,7 @@ const createWindow = () => {
             //wait for the base webpage to finish loading before customizing it
             win.webContents.on('did-finish-load', function() {
 
-                // win.webContents.openDevTools()
+                win.webContents.openDevTools()
 
                 // keep everything running otherwise youll see a stack of 500 chat messages when you come back
                 win.webContents.setBackgroundThrottling(false)
@@ -887,18 +892,22 @@ const createWindow = () => {
                     // store quick chat messages
                     if (matches(msg, "qc_ms_1: ")) {
                         var msg = msg.replace("qc_ms_1: ", "")
+                        msg = addslashes(msg)
                         qc1 = msg
                     }
                     if (matches(msg, "qc_ms_2: ")) {
                         var msg = msg.replace("qc_ms_2: ", "")
+                        msg = addslashes(msg)
                         qc2 = msg
                     }
                     if (matches(msg, "qc_ms_3: ")) {
                         var msg = msg.replace("qc_ms_3: ", "")
+                        msg = addslashes(msg)
                         qc3 = msg
                     }
                     if (matches(msg, "qc_ms_4: ")) {
                         var msg = msg.replace("qc_ms_4: ", "")
+                        msg = addslashes(msg)
                         qc4 = msg
                     }
 
@@ -1065,24 +1074,46 @@ const createWindow = () => {
                         document.querySelector('div.game').insertBefore(ctrl_overlay, document.querySelector('div.game').children[0])
                         ctrl_overlay.outerHTML = '<div id="ctrl-overlay" style="width: 100%;height: 100%;position: absolute;display: block;z-index:10000;pointer-events:none;"></div>'
                         `)
+
+                        //fish levels:
+                        // 101: thresher shark
                         win.webContents.executeJavaScript(`
-                        window.addEventListener("keydown",
-                            function(e) {
-                                if (e.ctrlKey) {
+                        function showCtrlOverlay(e) {
+                            if (e.ctrlKey || e.altKey) {
+                                if (game.currentScene.myAnimal._visibleFishLevel != 101) {
                                     document.getElementById('ctrl-overlay').style.pointerEvents = 'all'
                                 }
+                                else if (game.currentScene.myAnimal._visibleFishLevel == 101 && !e.shiftKey) {
+                                    document.getElementById('ctrl-overlay').style.pointerEvents = 'all'
+                                }
+                                else {
+                                    document.getElementById('ctrl-overlay').style.pointerEvents = 'none'
+                                }
+                            }
+                        }
+                        window.addEventListener("keydown",
+                            function(e) {
+                                showCtrlOverlay(e)
                             },
                         false);
                         window.addEventListener("click",
                             function(e) {
                                 if (e.ctrlKey) {
-                                    game.inputManager.handleLongPress(50000)
+                                    if (e.shiftKey && game.currentScene.myAnimal._visibleFishLevel != 101) {
+                                        game.inputManager.handleLongPress(-5)
+                                    }
+                                    else {
+                                        game.inputManager.handleLongPress(5000)
+                                    }
+                                }
+                                if (e.altKey) {
+                                    game.inputManager.handleLongPress(350)
                                 }
                             },
                         false);
                         window.addEventListener("keyup",
                         function(e) {
-                            if (!e.ctrlKey) {
+                            if (!e.ctrlKey && !e.altKey) {
                                 document.getElementById('ctrl-overlay').style.pointerEvents = 'none'
                             }
                         },
