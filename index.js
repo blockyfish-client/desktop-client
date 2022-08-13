@@ -1024,8 +1024,8 @@ const createWindow = () => {
                         async function createAssetSwapButton() {
                             setInterval(function() {
                                 if (document.querySelector('div.top-right') != null) {
-                                    if (!document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1) > span > svg').classList.contains('bi')) {
-                                        var aswp_button = document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1)').cloneNode(true)
+                                    if (!document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1) > span > svg').classList.contains('bi') && !document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(2) > span > svg').classList.contains('bi')) {
+                                        var aswp_button = document.querySelector('div.top-right > div.buttons.button-bar > div > button > span > div').parentElement.parentElement.cloneNode(true)
                                         var aswp_parent_div = document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div')
                                         aswp_parent_div.insertBefore(aswp_button, aswp_parent_div.children[0])
                                         var aswp_svg = document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1) > span > svg')
