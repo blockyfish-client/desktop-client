@@ -19,8 +19,8 @@ const Store = require('electron-store');
 app.setAsDefaultProtocolClient("deeeepio")
 
 // version info
-const version_code = 'v1.3.3'
-const version_num = '133'
+const version_code = 'v1.3.4'
+const version_num = '134'
 
 // custom function for later
 function matches(text, partial) {
