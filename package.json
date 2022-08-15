@@ -27,6 +27,7 @@
     "electron-chrome-extensions": "^3.9.0",
     "electron-dl": "^3.3.1",
     "electron-squirrel-startup": "^1.0.0",
-    "electron-store": "^8.1.0"
+    "electron-store": "^8.1.0",
+    "request": "^2.88.2"
   }
 }
