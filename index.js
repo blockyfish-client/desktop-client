@@ -857,7 +857,11 @@ const createWindow = () => {
                         var msg = msg.replace("state: ", "")
                         var mode = msg.slice(0,-1)
                         var menu = msg.slice(-1)
-                        var url = win.webContents.getURL()
+                        try {
+                          var url = win.webContents.getURL()
+                        } catch (e) {
+                            console.log('oops')
+                        }
                         if (mode != old_mode || menu != old_menu || url != old_url) {
                             setGameMode(mode, menu)
                             old_mode = mode
