@@ -198,49 +198,43 @@ const createWindow = () => {
                 }
 
                 //custom cursor
-                win.webContents.executeJavaScript(`
-                    //css
-                    const cursor_style = document.createElement('style')
-                    document.querySelector('head').appendChild(cursor_style)
-                    cursor_style.innerHTML = 'a,body,button,img,input,textarea,li,div,tr,td,label,span{cursor:none!important}.mouse-cursor{position:fixed;left:0;top:0;pointer-events:none;border-radius:50%;-webkit-transform:translateZ(0);transform:translateZ(0);visibility:hidden;display:block}.cursor-inner{margin-left:-3px;margin-top:-3px;width:6px;height:6px;z-index:10000001;background-color:#ced0d4;-webkit-transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;filter:drop-shadow(0 0 2px white)}.cursor-inner.cursor-hover{margin-left:-4px;margin-top:-4px;width:8px;height:8px;background-color:#ced0d4}.cursor-outer{margin-left:-15px;margin-top:-15px;width:30px;height:30px;border:2px solid #ced0d4;-webkit-box-sizing:border-box;box-sizing:border-box;z-index:10000000;opacity:.7;-webkit-transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;filter:drop-shadow(0 0 3px black)}.cursor-outer.cursor-hover{margin-left:-25px;margin-top:-25px;width:50px;height:50px;opacity:.3}.cursor-hide{display:none!important}'
-                    //dot
-                    const cursor_inner = document.createElement('div')
-                    document.body.appendChild(cursor_inner)
-                    cursor_inner.outerHTML = '<div id="cursor-inner" class="mouse-cursor cursor-inner" style="visibility: visible; transform: translate(0px, 0px);"></div>'
-                    const mouse_inner = document.getElementById('cursor-inner')
-                    //circle
-                    const cursor_outer = document.createElement('div')
-                    document.body.appendChild(cursor_outer)
-                    cursor_outer.outerHTML = '<div id="cursor-outer" class="mouse-cursor cursor-outer" style="visibility: visible; transform: translate(0px, 0px);"></div>'
-                    const mouse_outer = document.getElementById('cursor-outer')
-                    //effects
-                    document.addEventListener('mousemove', (event) => {
-                        mouse_inner.style.transform = 'translate(' + event.clientX + 'px, ' + event.clientY + 'px)'
-                        mouse_outer.style.transform = 'translate(' + event.clientX + 'px, ' + event.clientY + 'px)'
-                        // console.log(event.clientX + ', ' + event.clientY)
-                        if (document.querySelector('button:hover') != null || document.querySelector('a:hover') != null || document.querySelector('input:hover') != null || document.querySelector('textarea:hover') != null || document.querySelector('img:hover') != null) {
-                            mouse_inner.classList.add('cursor-hover')
-                            mouse_outer.classList.add('cursor-hover')
-                        }
-                        else {
-                            mouse_inner.classList.remove('cursor-hover')
-                            mouse_outer.classList.remove('cursor-hover')
-                        }
-                    });
-                    document.addEventListener('mouseleave', () => {
-                        mouse_inner.classList.add('cursor-hide')
-                        mouse_outer.classList.add('cursor-hide')
-                    })
-                    document.addEventListener('mouseenter', () => {
-                        mouse_inner.classList.remove('cursor-hide')
-                        mouse_outer.classList.remove('cursor-hide')
-                    })
-                `)
-                //<div style="width: 100%;height: 100%;position: absolute;z-index: 9999;pointer-events: none;display: flex;"><img draggable="false" src="https://raw.githubusercontent.com/blockyfish-client/Assets/main/evo_circle.png" style="max-width: 80vw;max-height: 80vh;align-self: center;margin: auto;"></div>
                 // win.webContents.executeJavaScript(`
-                // const evo_wheel = document.createElement('div')
-                // document.querySelector('div.game').insertBefore(evo_wheel, document.querySelector('div.game').children[0])
-                // evo_wheel.outerHTML = '<div style="width: 100%;height: 100%;position: absolute;z-index: 9999;pointer-events: none;display: flex;"><img id="evo-wheel" draggable="false" src="https://raw.githubusercontent.com/blockyfish-client/Assets/main/evo_circle.png" style="max-width: 80vw;max-height: 80vh;align-self: center;margin: auto;"></div>'
+                //     //css
+                //     const cursor_style = document.createElement('style')
+                //     document.querySelector('head').appendChild(cursor_style)
+                //     cursor_style.innerHTML = 'a,body,button,img,input,textarea,li,div,tr,td,label,span{cursor:none!important}.mouse-cursor{position:fixed;left:0;top:0;pointer-events:none;border-radius:50%;-webkit-transform:translateZ(0);transform:translateZ(0);visibility:hidden;display:block}.cursor-inner{margin-left:-3px;margin-top:-3px;width:6px;height:6px;z-index:10000001;background-color:#ced0d4;-webkit-transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;filter:drop-shadow(0 0 2px white)}.cursor-inner.cursor-hover{margin-left:-4px;margin-top:-4px;width:8px;height:8px;background-color:#ced0d4}.cursor-outer{margin-left:-15px;margin-top:-15px;width:30px;height:30px;border:2px solid #ced0d4;-webkit-box-sizing:border-box;box-sizing:border-box;z-index:10000000;opacity:.7;-webkit-transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;filter:drop-shadow(0 0 3px black)}.cursor-outer.cursor-hover{margin-left:-25px;margin-top:-25px;width:50px;height:50px;opacity:.3}.cursor-hide{display:none!important}'
+                //     //dot
+                //     const cursor_inner = document.createElement('div')
+                //     document.body.appendChild(cursor_inner)
+                //     cursor_inner.outerHTML = '<div id="cursor-inner" class="mouse-cursor cursor-inner" style="visibility: visible; transform: translate(0px, 0px);"></div>'
+                //     const mouse_inner = document.getElementById('cursor-inner')
+                //     //circle
+                //     const cursor_outer = document.createElement('div')
+                //     document.body.appendChild(cursor_outer)
+                //     cursor_outer.outerHTML = '<div id="cursor-outer" class="mouse-cursor cursor-outer" style="visibility: visible; transform: translate(0px, 0px);"></div>'
+                //     const mouse_outer = document.getElementById('cursor-outer')
+                //     //effects
+                //     document.addEventListener('mousemove', (event) => {
+                //         mouse_inner.style.transform = 'translate(' + event.clientX + 'px, ' + event.clientY + 'px)'
+                //         mouse_outer.style.transform = 'translate(' + event.clientX + 'px, ' + event.clientY + 'px)'
+                //         // console.log(event.clientX + ', ' + event.clientY)
+                //         if (document.querySelector('button:hover') != null || document.querySelector('a:hover') != null || document.querySelector('input:hover') != null || document.querySelector('textarea:hover') != null || document.querySelector('img:hover') != null) {
+                //             mouse_inner.classList.add('cursor-hover')
+                //             mouse_outer.classList.add('cursor-hover')
+                //         }
+                //         else {
+                //             mouse_inner.classList.remove('cursor-hover')
+                //             mouse_outer.classList.remove('cursor-hover')
+                //         }
+                //     });
+                //     document.addEventListener('mouseleave', () => {
+                //         mouse_inner.classList.add('cursor-hide')
+                //         mouse_outer.classList.add('cursor-hide')
+                //     })
+                //     document.addEventListener('mouseenter', () => {
+                //         mouse_inner.classList.remove('cursor-hide')
+                //         mouse_outer.classList.remove('cursor-hide')
+                //     })
                 // `)
 
                 //state checks and UI adjustments
@@ -770,7 +764,7 @@ const createWindow = () => {
 
                     //pink badge for me!!
                     async function insertClientOwnerBadge() {
-                        setTimeout(function() {
+                        // setTimeout(function() {
                             win.webContents.executeJavaScript(`
                             if (document.querySelector('#app > div.vfm.vfm--inset.vfm--fixed.modal > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div > div > div > div.el-row.header > div.el-col.el-col-24.auto-col.fill > div > div:nth-child(2) > img') == null) {
                                 badgeParentDiv = document.querySelector('#app > div.vfm.vfm--inset.vfm--fixed.modal > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div > div > div > div.el-row.header > div.el-col.el-col-24.auto-col.fill > div')
@@ -779,7 +773,7 @@ const createWindow = () => {
                                 clientOwnerBadge.outerHTML = '<div class="el-image verified-icon el-tooltip__trigger el-tooltip__trigger" style="height: 1rem;margin-right: 0.25rem;width: 1rem;"><img src="/img/verified.png" class="el-image__inner" style="filter: hue-rotate(90deg);"></div>'
                             }
                             `)
-                        }, 100)
+                        // }, 100)
                     }
 
                     //make progress bar and track download progress to keep people sane
@@ -827,13 +821,14 @@ const createWindow = () => {
                 //     `)
                 // });
                 
-                request('https://blockyfish.netlify.app/banlist.json', {json: true}, (error, res, body) => {
+                request('https://blockyfish.netlify.app/data.json', {json: true}, (error, res, body) => {
                     if (error) {
                         return  console.log(error)
                     };
                 
                     if (!error && res.statusCode == 200) {
-                        var e = body.users
+                        var e = body.ban
+                        var v = body.verified
                         // console.log(e)
                         win.webContents.executeJavaScript(`
                         setInterval(async function() {
@@ -1201,8 +1196,7 @@ const createWindow = () => {
                             `)
                         }
                 });
-            });
-
+                
                 //custom keybinds
                 win.webContents.executeJavaScript(`
                 var evo_wheel_rot = 0
@@ -1231,30 +1225,30 @@ const createWindow = () => {
                     }
                 });
                 `)
-
+                
                 // show the window after all the scripts finish
                 // this is so that the app shows only when the UI in complete
                 // if this was shown before everything finished loading, 
                 // it would make me look noob and unprofessional
                 win.show();
-
+                
                 // no u electron xd
                 // open all links in the default browser
                 // instead of yucky electron windows
                 win.webContents.setWindowOpenHandler(({ url }) => {
-                        shell.openExternal(url);
-                        return { action: 'deny' };
+                    shell.openExternal(url);
+                    return { action: 'deny' };
                 });
-
+                
                 // discord rpc stuff lol
                 var rpc = new Client({
                     transport: "ipc",
                 });
-
+                
                 // log into the client to get icon and app name
                 rpc.login({clientId: "918680181609213972"}).catch(console.error)
                 var startTime = new Date()
-
+                
                 // fallback in-case v5 comes and i am gone
                 // at least it will show something
                 rpc.on("ready", () => {
@@ -1265,22 +1259,29 @@ const createWindow = () => {
                         startTimestamp: startTime,
                     })
                 });
-
+                
                 // update discord rpc
                 function setGameMode(mode, menu) {
                     //greb url and eats it (jk)
                     var currentUrl = win.webContents.getURL()
                     // console.log(currentUrl)
-
+                    
                     // viewing <user>'s profile
                     if (matches(currentUrl, "/u/")) {
                         var detailText = 'Viewing ' + currentUrl.replace("https://beta.deeeep.io/u/", "").replace(/\?host=....../i, "") + "'s profile"
                         var labelText = ''
-                        if (currentUrl.replace("https://beta.deeeep.io/u/", "").replace(/\?host=....../i, "") == 'ItsGrandPi') {
-                            insertClientOwnerBadge()
-                        }
+                        request('https://apibeta.deeeep.io/users/u/' + currentUrl.replace("https://beta.deeeep.io/u/", "").replace(/\?host=....../i, ""), {json: true}, (error, res, body) => {
+                            if (error) {
+                                return  console.log(error)
+                            };
+                            if (!error && res.statusCode == 200) {
+                                if (v.includes(body.id)) {
+                                    insertClientOwnerBadge()
+                                }
+                            };
+                        });
                     }
-
+                    
                     // these ones are self-explainatory
                     else if (matches(currentUrl, "/forum/")) {
                         var detailText = "Visiting the forums"
@@ -1298,13 +1299,13 @@ const createWindow = () => {
                         var detailText = 'In the menus'
                         var labelText = ''
                     }
-
+                    
                     // if url is just "https://beta.deeeep.io", it means you are playing
                     else {
                         var detailText = "Playing " + mode
                         var labelText = 'Join game'
                     }
-
+                    
                     // if the gamemode buttons exist, use them to update the status
                     // otherwise it will use the fallback set previously and show "idle"
                     if (labelText != '') {
@@ -1318,7 +1319,7 @@ const createWindow = () => {
                             ]
                         })
                     }
-
+                    
                     // sike! this is the real fallback
                     else {
                         rpc.setActivity({
@@ -1329,6 +1330,7 @@ const createWindow = () => {
                         })
                     }
                 }
+            });
             });
         })
     })
