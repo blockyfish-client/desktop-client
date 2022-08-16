@@ -973,6 +973,16 @@ const createWindow = () => {
                         if (matches(msg, "Common.playLoadProgress (old, new),100,0")) {
                             win.webContents.executeJavaScript(`
                             setInterval(function () {
+                                for (let i = 0; i < game.currentScene.entityManager.animalsList.length; i++) {
+                                    if (game.currentScene.entityManager.animalsList[i].alpha < 0.5) {
+                                        game.currentScene.entityManager.animalsList[i].alpha = 0.5
+                                    }
+                                    if (game.currentScene.entityManager.animalsList[i].inner.alpha < 0.5) {
+                                        game.currentScene.entityManager.animalsList[i].inner.alpha = 0.5
+                                    }
+                                }
+                            })
+                            setInterval(function () {
                                 for (let i = 0; i < game.currentScene.terrainManager.terrains.length; i++) {
                                     game.currentScene.terrainManager.terrains[i].alpha = 0.5;
                                 }
@@ -982,6 +992,7 @@ const createWindow = () => {
                                     maxWidth: 1e7,
                                 })
                                 game.currentScene.terrainManager.shadow.setShadowSize(1000000)
+
 
                                 // TWEMOJI
                                 // for names
