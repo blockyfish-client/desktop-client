@@ -991,8 +991,6 @@ const createWindow = () => {
                                     minWidth: 0,
                                     maxWidth: 1e7,
                                 })
-                                game.currentScene.terrainManager.shadow.setShadowSize(1000000)
-
 
                                 // TWEMOJI
                                 // for names
@@ -1027,6 +1025,10 @@ const createWindow = () => {
 
                             //no flashbang/ink
                             game.currentScene.toggleFlash = function() {}
+                            game.currentScene.terrainManager.shadow.setShadowSize(1000000)
+                            game.currentScene.terrainManager.shadow.setShadowSize = function() {}
+
+                            //show ghosts
                             game.currentScene.viewingGhosts = true
 
                             //evo wheel
