@@ -967,6 +967,12 @@ const createWindow = () => {
                             sendKeybinding(win, 'enter')
                         }
 
+                        // slash commands
+                        if (matches(msg, "handle_slash_command")) {
+                            sendKeybinding(win, 'enter')
+                            sendKeybinding(win, '/')
+                        }
+
                         //load custom settings
                         if (matches(msg, "Modal Added:[object HTMLDivElement]")) {
                             win.webContents.executeJavaScript(`buildCustomSettingsItems('` + qc1 + `', '` + qc2 + `', '` + qc3 + `', '` + qc4 + `')`)
@@ -1251,6 +1257,9 @@ const createWindow = () => {
                                 }
                                 else {
                                     chat_value = document.querySelector('#app > div.overlay > div.chat-input.horizontal-center > input').value
+                                }
+                                if (e.key == '/' && document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
+                                    console.log('handle_slash_command')
                                 }
                             })
                             `)
