@@ -1,6 +1,6 @@
 const createWindowsInstaller = require('electron-winstaller').createWindowsInstaller
 const path = require('path')
-const version = '1.3.4'
+const version = '1.3.5'
 
 getInstallerConfig()
   .then(createWindowsInstaller)
