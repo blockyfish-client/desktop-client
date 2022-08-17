@@ -46,7 +46,7 @@ let downloadPath = app.getPath('downloads')
 if (fs.existsSync(downloadPath + "\\blockyfishclient-update-download.exe")) {
     fs.unlink(downloadPath + "\\blockyfishclient-update-download.exe", (err) => {
         if (err) {
-            alert("An error ocurred updating the file" + err.message);
+            alert("Could not delete update package, please manually delete it from the Downloads folder. ");
             console.log(err);
             return;
         }
