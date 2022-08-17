@@ -17,12 +17,13 @@ function getInstallerConfig () {
   return Promise.resolve({
     appDirectory: path.join(outPath, 'Blockyfish-win32-ia32/'),
     authors: 'Pi',
+    productName: 'Blockyfish Client',
     noMsi: true,
     outputDirectory: path.join(outPath, 'windows-installer'),
     exe: 'Blockyfish.exe',
     setupExe: 'Pi-blockyfishclient-setup-v' + version + '.exe',
     setupIcon: path.join(rootPath, 'img', 'icons', 'win', 'icon.ico'),
-    iconUrl: "https://raw.githubusercontent.com/ThePiGuy3141/Deeeep.io-v4-Desktop-Client/master/build/icon.ico",
+    iconUrl: "https://raw.githubusercontent.com/blockyfish-client/Desktop-Client/master/img/icons/win/icon.ico",
     loadingGif: path.join(rootPath, 'img', 'loading.gif')
   })
 }

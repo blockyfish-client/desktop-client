@@ -1,5 +1,6 @@
 {
   "name": "blockyfish",
+  "productName": "Blockyfish Client",
   "version": "1.3.5",
   "description": "A custom desktop client for deeeep.io v4 with some improvements. Made by pi. ",
   "main": "index.js",
