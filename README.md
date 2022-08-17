@@ -59,6 +59,15 @@ Message `.pi#3141` if you want to contribute
 
 ## 📝 Changelogs  
 
+### v1.3.5 Slash commands and anti-hiding
+- See all hiding animals, their name, and their stats. 
+- Press "/" to quickly use a slash command. Totally did not copy a certain 3D block building game. 
+- /mute and /unmute are back!! When you see someone saying things you don't like, use /mute <id> to mute them. If you muted someone by accident, just use /unmute <id>. 
+
+### v1.3.4 Ban implementation
+- Added functionality to ban selected users. Banned users can only use versions prior to this. 
+- Control-Shift-Click boosting now lets you shoot fast projectiles with beaked whale and beluga
+
 ### v1.3.3 Hotfix for bug
 - Fixed a bug where if you put an apostrophe ( ' ) in the quick chat message, the settings will not load again after that.
 
