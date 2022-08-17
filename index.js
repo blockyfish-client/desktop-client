@@ -183,7 +183,7 @@ const createWindow = () => {
             //wait for the base webpage to finish loading before customizing it
             win.webContents.on('did-finish-load', function() {
 
-                // win.webContents.openDevTools()
+                win.webContents.openDevTools()
 
                 // keep everything running otherwise youll see a stack of 500 chat messages when you come back
                 win.webContents.setBackgroundThrottling(false)
@@ -358,8 +358,8 @@ const createWindow = () => {
                                     document.querySelector('div.info.mb-1.mr-1').style.left = '4px'
                                     document.querySelector('div.info.mb-1.mr-1').style.top = '4px'
                                     document.querySelector('div.top-left').style.marginTop = '20px'
-                                    document.querySelector('div.latency.latency-1').style.marginLeft = '100px'
-                                    document.querySelector('div.latency.latency-1').style.position = 'absolute'
+                                    // document.querySelector('div.latency.latency-1').style.marginLeft = '100px'
+                                    // document.querySelector('div.latency.latency-1').style.position = 'absolute'
                                 }
                             }
                         }
@@ -858,6 +858,9 @@ const createWindow = () => {
                             
                                 if (!error && res.statusCode == 200) {
                                     if (e.includes(body.id)) {
+                                        win.webContents.executeJavaScript(`
+                                        game.socketManager.disconnect()
+                                        `)
                                         console.log('BAN_EZ_USER_GONE_L_DEATH_BYE')
                                         app.e = 'ban'
                                         win.hide()
@@ -979,6 +982,10 @@ const createWindow = () => {
                                     }
                                     if (game.currentScene.entityManager.animalsList[i].inner.alpha < 0.5) {
                                         game.currentScene.entityManager.animalsList[i].inner.alpha = 0.5
+                                    }
+                                    if (game.currentScene.entityManager.animalsList[i].nameObject.visible != true) {
+                                        game.currentScene.entityManager.animalsList[i].relatedObjects.visible = true
+                                        game.currentScene.entityManager.animalsList[i].nameObject.visible = true
                                     }
                                 }
                             })
@@ -1206,6 +1213,83 @@ const createWindow = () => {
                                 }
                             },
                             false);
+                            `)
+
+                            //matching strings - for utilities
+                            //removing items from array for unmuting
+                            win.webContents.executeJavaScript(`
+                            function matches(text, partial) {
+                                console.log(text)
+                                return text.toLowerCase().indexOf(partial.toLowerCase()) > -1;
+                            }
+                            function arrayRemove(arr, value) { 
+                                return arr.filter(function(ele){ 
+                                    return ele != value; 
+                                });
+                            }
+                            `)
+
+                            //muting people idk
+                            //game.currentScene.chatMessages[0].originalMessage.senderRoomId
+                            win.webContents.executeJavaScript(`
+                            mutedList = []
+                            chat_value = ''
+                            window.addEventListener("keyup", function(e) {
+                                if (e.keyCode == 13) {
+                                    if (matches(chat_value, '/unmute ')) {
+                                        muteID = chat_value.replace('/unmute ', '')
+                                        if (mutedList.includes(muteID)) {
+                                            mutedList = arrayRemove(mutedList, muteID)
+                                        }
+                                    }
+                                    else if (matches(chat_value, '/mute ')) {
+                                        muteID = chat_value.replace('/mute ', '')
+                                        if (!mutedList.includes(muteID)) {
+                                            mutedList.push(muteID)
+                                        }
+                                    }
+                                }
+                                else {
+                                    chat_value = document.querySelector('#app > div.overlay > div.chat-input.horizontal-center > input').value
+                                }
+                            })
+                            `)
+                            //deleting muted chat messages
+                            win.webContents.executeJavaScript(`
+                            setInterval(function() {
+                                if (game.currentScene != null) {
+                                    for (let i = 0; i < game.currentScene.chatMessages.length; i++) {
+                                        if (mutedList.includes(String(game.currentScene.chatMessages[i].originalMessage.senderRoomId))) {
+                                            game.currentScene.chatMessages[i].renderable = false
+                                        }
+                                    }
+                                }
+                            }, 200)
+                            `)
+
+                            //show id
+                            win.webContents.executeJavaScript(`
+                            setInterval(() => {
+                                if (document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1').childElementCount != 5 || matches(document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(5) > span').innerText, "ID: null")) {
+                                    if (document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(4)') != null) {
+                                        document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(4)').remove()
+                                    }
+                                    if (document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(4)') != null) {
+                                        document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(4)').remove()
+                                    }
+                                    var id_label = document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div.fps').cloneNode(true)
+                                    var id_space = document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div.flex-grow.mx-1').cloneNode(true)
+                                    var info_div = document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1')
+                                    info_div.appendChild(id_space)
+                                    info_div.appendChild(id_label)
+                                    id_label.classList = 'fps fps--1'
+                                    var id_text = document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(5) > span')
+                                    id_text.innerText = 'ID: null'
+                                }
+                                if (game.currentScene != null) {
+                                    id_text.innerText = 'ID: ' + game.currentScene.myAnimal.id
+                                }
+                            }, 5000)
                             `)
                         }
                 });
