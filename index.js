@@ -468,6 +468,7 @@ const createWindow = () => {
                     const github_logo = document.querySelector('div.github-div > button > span > svg')
                     const website_logo = document.querySelector('div.website-div > button > span > svg')
                     github_logo.outerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-circle-fill" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.496 6.033h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286a.237.237 0 0 0 .241.247zm2.325 6.443c.61 0 1.029-.394 1.029-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94 0 .533.425.927 1.01.927z"/></svg>'
+                    website_logo.outerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-globe" viewBox="0 0 16 16"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm7.5-6.923c-.67.204-1.335.82-1.887 1.855A7.97 7.97 0 0 0 5.145 4H7.5V1.077zM4.09 4a9.267 9.267 0 0 1 .64-1.539 6.7 6.7 0 0 1 .597-.933A7.025 7.025 0 0 0 2.255 4H4.09zm-.582 3.5c.03-.877.138-1.718.312-2.5H1.674a6.958 6.958 0 0 0-.656 2.5h2.49zM4.847 5a12.5 12.5 0 0 0-.338 2.5H7.5V5H4.847zM8.5 5v2.5h2.99a12.495 12.495 0 0 0-.337-2.5H8.5zM4.51 8.5a12.5 12.5 0 0 0 .337 2.5H7.5V8.5H4.51zm3.99 0V11h2.653c.187-.765.306-1.608.338-2.5H8.5zM5.145 12c.138.386.295.744.468 1.068.552 1.035 1.218 1.65 1.887 1.855V12H5.145zm.182 2.472a6.696 6.696 0 0 1-.597-.933A9.268 9.268 0 0 1 4.09 12H2.255a7.024 7.024 0 0 0 3.072 2.472zM3.82 11a13.652 13.652 0 0 1-.312-2.5h-2.49c.062.89.291 1.733.656 2.5H3.82zm6.853 3.472A7.024 7.024 0 0 0 13.745 12H11.91a9.27 9.27 0 0 1-.64 1.539 6.688 6.688 0 0 1-.597.933zM8.5 12v2.923c.67-.204 1.335-.82 1.887-1.855.173-.324.33-.682.468-1.068H8.5zm3.68-1h2.146c.365-.767.594-1.61.656-2.5h-2.49a13.65 13.65 0 0 1-.312 2.5zm2.802-3.5a6.959 6.959 0 0 0-.656-2.5H12.18c.174.782.282 1.623.312 2.5h2.49zM11.27 2.461c.247.464.462.98.64 1.539h1.835a7.024 7.024 0 0 0-3.072-2.472c.218.284.418.598.597.933zM10.855 4a7.966 7.966 0 0 0-.468-1.068C9.835 1.897 9.17 1.282 8.5 1.077V4h2.355z"/></svg>'
                     github.addEventListener("click", () => {
                         window.open('https://docs-blockyfish.netlify.app')
                     })
@@ -977,6 +978,29 @@ const createWindow = () => {
                             win.webContents.executeJavaScript(`buildCustomSettingsItems('` + qc1 + `', '` + qc2 + `', '` + qc3 + `', '` + qc4 + `')`)
                         }
 
+                        if (matches(msg, "RUN_TARGET_LOCK_SCRIPT")) {
+                            win.webContents.executeJavaScript(`
+                            mapeditor = document.querySelector('#canvas-container > canvas')
+                            click0 = game.currentScene.entityManager.getEntity(targetID).relatedObjects.children[2].speedMultiplierDisplay.visible;
+                            setInterval(function () {
+                                if (targetID != null && game.currentScene.entityManager.getEntity(targetID) != null) {
+                                    click1 = game.currentScene.entityManager.getEntity(targetID).relatedObjects.children[2].speedMultiplierDisplay.visible;
+                                    c = {"x": innerWidth/2 + game.currentScene.entityManager.getEntity(targetID).position.x - game.currentScene.myAnimal.position._x, "y": innerHeight/2 + game.currentScene.entityManager.getEntity(targetID).position.y - game.currentScene.myAnimal.position._y}
+                                    mapeditor.dispatchEvent(new MouseEvent("pointermove", {clientX:c.x, clientY:c.y}))
+                                    if (click0 != click1) {
+                                        click0 = click1
+                                        if (click1) {
+                                            game.inputManager.spaceKeyDown()
+                                        }
+                                        else {
+                                            game.inputManager.spaceKeyUp()
+                                        }
+                                    }
+                                }
+                            });
+                            `)
+                        }
+
                         // if game has loaded, inject the hacks xd
                         if (matches(msg, "Common.playLoadProgress (old, new),100,0")) {
                             win.webContents.executeJavaScript(`
@@ -1234,11 +1258,13 @@ const createWindow = () => {
                             }
                             `)
 
-                            //muting people idk
+                            //muting people idk and slash commands
                             //game.currentScene.chatMessages[0].originalMessage.senderRoomId
                             win.webContents.executeJavaScript(`
                             mutedList = []
                             chat_value = ''
+                            targetLockScriptRan = 0
+                            targetID = 0
                             window.addEventListener("keyup", function(e) {
                                 if (e.keyCode == 13) {
                                     if (matches(chat_value, '/unmute ')) {
@@ -1252,6 +1278,17 @@ const createWindow = () => {
                                         if (!mutedList.includes(muteID)) {
                                             mutedList.push(muteID)
                                         }
+                                    }
+                                    else if (matches(chat_value, '/settarget')) {
+                                        targetID = parseInt(chat_value.replace('/settarget ', '').replace('/settarget', ''))
+                                        console.log(targetID)
+                                        game.currentScene.uiManager.setTargetId(0)
+                                        game.currentScene.uiManager.setTargetId(targetID)
+                                        if (game.currentScene.myAnimal != null && targetLockScriptRan == 0) {
+                                            targetLockScriptRan = 1
+                                            console.log('RUN_TARGET_LOCK_SCRIPT')
+                                        }
+
                                     }
                                 }
                                 else {
@@ -1278,7 +1315,7 @@ const createWindow = () => {
                             //show id
                             win.webContents.executeJavaScript(`
                             setInterval(() => {
-                                if (document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1').childElementCount != 5 || matches(document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(5) > span').innerText, "ID: null")) {
+                                if (document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1').childElementCount != 5 || document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(5) > span').innerText != "ID: " + game.currentScene.myAnimal.id) {
                                     if (document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(4)') != null) {
                                         document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(4)').remove()
                                     }
@@ -1368,7 +1405,11 @@ const createWindow = () => {
                 // update discord rpc
                 function setGameMode(mode, menu) {
                     //greb url and eats it (jk)
-                    var currentUrl = win.webContents.getURL()
+                    try {
+                        var currentUrl = win.webContents.getURL()
+                    } catch (e) {
+                        console.log('oops')
+                    }
                     // console.log(currentUrl)
                     
                     // viewing <user>'s profile
