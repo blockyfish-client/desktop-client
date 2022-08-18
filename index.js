@@ -20,7 +20,7 @@ const request = require('request');
 app.setAsDefaultProtocolClient("deeeepio")
 
 //extension one-time load
-var extensionsLoaded = false
+var extensionsNotLoaded = true
 
 // version info
 const version_code = 'v1.4.1'
@@ -119,7 +119,7 @@ const createWindow = () => {
     })
 
     // set extension paths
-    if (!extensionsLoaded) {
+    if (extensionsNotLoaded) {
         const extensions = new ElectronChromeExtensions()
         extensions.addTab(win.webContents, win)
         if (docassets == true) {
@@ -1508,10 +1508,10 @@ const createWindow = () => {
             }
         });
         });
-        extensionsLoaded = true
+        extensionsNotLoaded = false
     }
     // load the extensions in
-    if (!extensionsLoaded) {
+    if (extensionsNotLoaded) {
         win.webContents.session.loadExtension(ublockPath).then(() => {
             win.webContents.session.loadExtension(docassetsPath).then(() => {
                 makeNewWindow()
