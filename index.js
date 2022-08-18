@@ -965,6 +965,7 @@ const createWindow = () => {
                                 sendKeybinding(win, msg[i])
                             }
                             sendKeybinding(win, 'enter')
+                            win.webContents.executeJavaScript(`quickChatTyping = false`)
                         }
 
                         // slash commands
@@ -1139,6 +1140,7 @@ const createWindow = () => {
 
                             //quick chat UI
                             win.webContents.executeJavaScript(`
+                            quickChatTyping = false
                             var qc_div = document.createElement('div')
                             document.querySelector('div.game').insertBefore(qc_div, document.querySelector('div.game').children[0])
                             qc_div.outerHTML = '<div id=quick-chat-container style=display:none><div class="quick-chat row one"><div><p>` + qc1 + `</div></div><div class="quick-chat row two"><div><p>` + qc4 + `</div><div><p>` + qc2 + `</div></div><div class="quick-chat row one"><div><p>` + qc3 + `</div></div></div>'
@@ -1160,12 +1162,18 @@ const createWindow = () => {
                                 }
                             })
                             document.body.addEventListener("keyup", (e) => {
-                                if (e.key.toLowerCase() == "c") {
-                                    if (document.querySelector('#quick-chat-container > div > div:hover') != null) {
-                                        console.log("send_chat_msg: " + document.querySelector('#quick-chat-container > div > div:hover').innerText)
+                                if (quickChatTyping == false) {
+                                    if (e.key.toLowerCase() == "c") {
+                                        quickChatTyping = true
+                                        if (document.querySelector('#quick-chat-container > div > div:hover') != null) {
+                                            console.log("send_chat_msg: " + document.querySelector('#quick-chat-container > div > div:hover').innerText)
+                                        }
+                                        else {
+                                            quickChatTyping = false
+                                        }
+                                        quickChatDiv.style.display = "none"
+                                        window.posSet = false
                                     }
-                                    quickChatDiv.style.display = "none"
-                                    window.posSet = false
                                 }
                             })
                             `)
