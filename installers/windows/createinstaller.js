@@ -17,7 +17,6 @@ function getInstallerConfig () {
   return Promise.resolve({
     appDirectory: path.join(outPath, 'Blockyfish-win32-ia32/'),
     authors: 'Pi',
-    productName: 'Blockyfish Client',
     noMsi: true,
     outputDirectory: path.join(outPath, 'windows-installer'),
     exe: 'Blockyfish.exe',
