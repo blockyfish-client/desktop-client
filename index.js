@@ -20,8 +20,8 @@ const request = require('request');
 app.setAsDefaultProtocolClient("deeeepio")
 
 // version info
-const version_code = 'v1.3.5'
-const version_num = '135'
+const version_code = 'v1.4.0'
+const version_num = '140'
 
 // custom function for later
 function matches(text, partial) {
