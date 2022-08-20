@@ -433,6 +433,7 @@ const createWindow = () => {
                 aswpModal.classList.toggle("aswp-hidden")
                 function toggleAswp() {
                     aswpModal.classList.toggle("aswp-hidden")
+                    game.currentScene.myAnimal.setSkin(document.getElementById('aswp-input').value)
                 }
                 document.getElementById('aswp-input').addEventListener("input", () => {
                     game.currentScene.myAnimal.setSkin(document.getElementById('aswp-input').value)
