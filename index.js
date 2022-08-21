@@ -64,9 +64,21 @@ if (fs.existsSync(downloadPath + "\\blockyfishclient-update-download.exe")) {
 // import settings for stuff
 const store = new Store();
 var docassets = store.get('docassets')
+if (docassets != true || docassets != false) {
+    var docassets = false
+}
 var ublock = store.get('ublock')
+if (ublock != true || ublock != false) {
+    var ublock = true
+}
 var twemoji = store.get('twemoji')
+if (twemoji != true || twemoji != false) {
+    var twemoji = true
+}
 var theme = store.get('theme')
+if (theme != true || theme != false) {
+    var theme = true
+}
 var qc1 = store.get('quick_chat.1')
 var qc2 = store.get('quick_chat.2')
 var qc3 = store.get('quick_chat.3')
