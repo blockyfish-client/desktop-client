@@ -194,6 +194,13 @@ const createWindow = () => {
     
             // keep everything running otherwise youll see a stack of 500 chat messages when you come back
             win.webContents.setBackgroundThrottling(false)
+            //custom theme
+            win.webContents.executeJavaScript(`
+            const custom_css = document.createElement('style')
+            document.querySelector('head').appendChild(custom_css)
+            custom_css.outerHTML = '<link rel="stylesheet" href="https://blockyfish.netlify.app/assets/customtheme.css">'
+            `)
+            
             //twemoji
             if (twemoji) {
                 win.webContents.executeJavaScript(`
