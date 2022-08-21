@@ -66,6 +66,7 @@ const store = new Store();
 var docassets = store.get('docassets')
 var ublock = store.get('ublock')
 var twemoji = store.get('twemoji')
+var theme = store.get('theme')
 var qc1 = store.get('quick_chat.1')
 var qc2 = store.get('quick_chat.2')
 var qc3 = store.get('quick_chat.3')
@@ -195,11 +196,13 @@ const createWindow = () => {
             // keep everything running otherwise youll see a stack of 500 chat messages when you come back
             win.webContents.setBackgroundThrottling(false)
             //custom theme
-            win.webContents.executeJavaScript(`
-            const custom_css = document.createElement('style')
-            document.querySelector('head').appendChild(custom_css)
-            custom_css.outerHTML = '<link rel="stylesheet" href="https://blockyfish.netlify.app/assets/customtheme.css">'
-            `)
+            if (theme) {
+                win.webContents.executeJavaScript(`
+                const custom_css = document.createElement('style')
+                document.querySelector('head').appendChild(custom_css)
+                custom_css.outerHTML = '<link rel="stylesheet" href="https://blockyfish.netlify.app/assets/customtheme.css">'
+                `)
+            }
             
             //twemoji
             if (twemoji) {
@@ -525,6 +528,7 @@ const createWindow = () => {
                 win.webContents.executeJavaScript(`docassets_on = ` + docassets)
                 win.webContents.executeJavaScript(`ublock_on = ` + ublock)
                 win.webContents.executeJavaScript(`twemoji_on = ` + twemoji)
+                win.webContents.executeJavaScript(`theme_on = ` + theme)
                 
                 //build custom settings item
                 win.webContents.executeJavaScript(`
@@ -610,6 +614,33 @@ const createWindow = () => {
                                 document.querySelector('#pane-0 > form > div:nth-child(5) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
                                 console.log('store_settings: twemoji1')
                                 twemoji_on = true
+                            }
+                        })
+
+                        //custom theme
+                        var theme_div = document.querySelector('#pane-0 > form > div:nth-child(3)').cloneNode(true)
+                        document.querySelector('#pane-0 > form').appendChild(theme_div)
+                        const theme_text = document.querySelector('#pane-0 > form > div:nth-child(6) > div.el-form-item__label')
+                        theme_text.innerText = 'Theme'
+                        const theme_desc = document.querySelector('#pane-0 > form > div:nth-child(6) > div.el-form-item__content > span')
+                        theme_desc.innerHTML = "Custom theme"
+                        if (theme_on == false) {
+                            document.querySelector('#pane-0 > form > div:nth-child(6) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
+                        }
+                        else {document.querySelector('#pane-0 > form > div:nth-child(6) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
+    
+                        }
+                        document.querySelector('#pane-0 > form > div:nth-child(6) > div.el-form-item__content > label > span.el-checkbox__input > input').addEventListener("click", () => {
+                            restart_tooltip.style.display = 'block'
+                            if (theme_on == true) {
+                                document.querySelector('#pane-0 > form > div:nth-child(6) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
+                                console.log('store_settings: theme0')
+                                theme_on = false
+                            }
+                            else {
+                                document.querySelector('#pane-0 > form > div:nth-child(6) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
+                                console.log('store_settings: theme1')
+                                theme_on = true
                             }
                         })
                         
