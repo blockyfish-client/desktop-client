@@ -1261,7 +1261,7 @@ const createWindow = () => {
                         ctrl_overlay.outerHTML = '<div id="ctrl-overlay" style="width: 100%;height: 100%;position: absolute;display: block;z-index:10000;pointer-events:none;"></div>'
                         var aim_overlay = document.createElement('hr')
                         document.querySelector('div.game').insertBefore(aim_overlay, document.querySelector('div.game').children[1])
-                        aim_overlay.outerHTML = '<hr id="aim-overlay" style="border: 2px #fff dotted;border-image: linear-gradient(to right, #ffff, #fff0) 1;transform-origin: left;position: absolute;top: 50%;left: 50%;width: 40vw;display:none;pointer-events:none;">'
+                        aim_overlay.outerHTML = '<hr id="aim-overlay" style="border: 2px #fff dotted;border-image: linear-gradient(to right, #fff8, #fff0) 1;transform-origin: left;position: absolute;top: 50%;left: 50%;width: 40vw;display:none;pointer-events:none;">'
                         `)
     
                         //fish levels:
