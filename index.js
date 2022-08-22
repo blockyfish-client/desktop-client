@@ -288,6 +288,9 @@ const createWindow = () => {
                     if (document.querySelector('div.home-page').style.display == 'none') {
                         rpc_state = document.querySelector('.selected').innerText + "2"
                     }
+                    else if (document.querySelector('div.home-page.playing') != null) {
+                        rpc_state = document.querySelector('.selected').innerText + "1"
+                    }
                     else {
                         rpc_state = document.querySelector('.selected').innerText + "0"
                     }
@@ -1526,15 +1529,16 @@ const createWindow = () => {
                     var detailText = 'In the menus'
                     var labelText = ''
                 }
-                
-                // if url is just "https://beta.deeeep.io", it means you are playing
-                else {
-                    var detailText = "Playing " + mode
+                else if (menu == '1') {
+                    var detailText = 'AFK in ' + mode
+                    var labelText = 'Join game'
+                }
+                else if (menu == '2') {
+                    var detailText = 'Playing ' + mode
                     var labelText = 'Join game'
                 }
                 
                 // if the gamemode buttons exist, use them to update the status
-                // otherwise it will use the fallback set previously and show "idle"
                 if (labelText != '') {
                     rpc.setActivity({
                         details: detailText,
@@ -1547,7 +1551,6 @@ const createWindow = () => {
                     })
                 }
                 
-                // sike! this is the real fallback
                 else {
                     rpc.setActivity({
                         details: detailText,
