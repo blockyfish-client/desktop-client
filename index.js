@@ -203,7 +203,7 @@ const createWindow = () => {
         //wait for the base webpage to finish loading before customizing it
         win.webContents.on('did-finish-load', function() {
     
-            // win.webContents.openDevTools()
+            win.webContents.openDevTools()
     
             // keep everything running otherwise youll see a stack of 500 chat messages when you come back
             win.webContents.setBackgroundThrottling(false)
@@ -1254,18 +1254,31 @@ const createWindow = () => {
                         })
                         `)
     
-                        // control click listener
+                        // overlays
                         win.webContents.executeJavaScript(`
                         var ctrl_overlay = document.createElement('div')
                         document.querySelector('div.game').insertBefore(ctrl_overlay, document.querySelector('div.game').children[0])
                         ctrl_overlay.outerHTML = '<div id="ctrl-overlay" style="width: 100%;height: 100%;position: absolute;display: block;z-index:10000;pointer-events:none;"></div>'
+                        var aim_overlay = document.createElement('hr')
+                        document.querySelector('div.game').insertBefore(aim_overlay, document.querySelector('div.game').children[1])
+                        aim_overlay.outerHTML = '<hr id="aim-overlay" style="border: 2px #fff dotted;border-image: linear-gradient(to right, #ffff, #fff0) 1;transform-origin: left;position: absolute;top: 50%;left: 50%;width: 40vw;display:none;pointer-events:none;">'
                         `)
     
                         //fish levels:
+                        // 61: goblin shark
+                        // 93: archerfish
+                        // 94: sea otter
                         // 101: thresher shark
                         // 107: beaked whale
                         // 109: beluga
                         win.webContents.executeJavaScript(`
+                        listForAnimalsWithAimOverlay = [61, 93, 94]
+                        listForGamemodesWithAimOverlay = [1, 2, 6]
+                        setInterval(function() {
+                            if (game.currentScene != null) {
+                                document.getElementById('aim-overlay').style.transform = 'rotate(' + (game.currentScene.myAnimal.inner.rotation*180/Math.PI - 90) + 'deg)'
+                            }
+                        }, 10)
                         function showCtrlOverlay(e) {
                             if (e.ctrlKey || e.altKey) {
                                 if (game.currentScene.myAnimal._visibleFishLevel != 101) {
@@ -1296,11 +1309,15 @@ const createWindow = () => {
                             }, 200)
                         }
                         window.addEventListener("keydown",
-                        function(e) {
+                            function(e) {
                                 showCtrlOverlay(e)
+                                if (e.ctrlKey && listForAnimalsWithAimOverlay.includes(game.currentScene.myAnimal._visibleFishLevel) && listForGamemodesWithAimOverlay.includes(game.gameMode)) {
+                                    document.getElementById('aim-overlay').style.display = 'block'
+                                    document.getElementById('aim-overlay').style.transform = 'rotate(' + (game.currentScene.myAnimal.inner.rotation*180/Math.PI - 90) + 'deg)'
+                                }
                             },
-                            false);
-                            window.addEventListener("click",
+                        false);
+                        window.addEventListener("click",
                             function(e) {
                                 if (e.ctrlKey) {
                                     if (e.shiftKey && (game.currentScene.myAnimal._visibleFishLevel == 109 || game.currentScene.myAnimal._visibleFishLevel == 107)) {
@@ -1318,13 +1335,16 @@ const createWindow = () => {
                                     game.inputManager.handleLongPress(350)
                                 }
                             },
-                            false);
-                            window.addEventListener("keyup",
+                        false);
+                        window.addEventListener("keyup",
                             function(e) {
                                 if (!e.ctrlKey && !e.altKey) {
-                                document.getElementById('ctrl-overlay').style.pointerEvents = 'none'
-                            }
-                        },
+                                    document.getElementById('ctrl-overlay').style.pointerEvents = 'none'
+                                }
+                                if (!e.ctrlKey) {
+                                    document.getElementById('aim-overlay').style.display = 'none'
+                                }
+                            },
                         false);
                         `)
     
