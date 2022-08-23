@@ -23,8 +23,8 @@ app.setAsDefaultProtocolClient("deeeepio")
 var extensionsLoaded = false
 
 // version info
-const version_code = 'v1.5.1'
-const version_num = '151'
+const version_code = 'v1.5.2'
+const version_num = '152'
 
 // custom function for later
 function matches(text, partial) {

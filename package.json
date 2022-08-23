@@ -1,6 +1,6 @@
 {
   "name": "blockyfish",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "A custom desktop client for deeeep.io v4 with some improvements. Made by pi. ",
   "main": "index.js",
   "scripts": {
