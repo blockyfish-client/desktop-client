@@ -1130,16 +1130,15 @@ const createWindow = () => {
                                 if (game.currentScene.entityManager.animalsList[i].inner.alpha < 0.5) {
                                     game.currentScene.entityManager.animalsList[i].inner.alpha = 0.5
                                 }
-                                if (game.currentScene.entityManager.animalsList[i].nameObject.visible != true) {
+                                if (game.currentScene.entityManager.animalsList[i].relatedObjects.visible != true) {
                                     game.currentScene.entityManager.animalsList[i].relatedObjects.visible = true
+                                }
+                                if (game.currentScene.entityManager.animalsList[i].nameObject.visible != true) {
                                     game.currentScene.entityManager.animalsList[i].nameObject.visible = true
                                 }
                             }
                         })
                         setInterval(function () {
-                            for (let i = 0; i < game.currentScene.terrainManager.terrains.length; i++) {
-                                game.currentScene.terrainManager.terrains[i].alpha = 0.5;
-                            }
                             game.currentScene.ceilingsContainer.alpha = 0.3
                             game.viewport.clampZoom({
                                 minWidth: 0,
@@ -1185,9 +1184,13 @@ const createWindow = () => {
                         //show ghosts
                         game.currentScene.viewingGhosts = true
 
-                        //animals over props
+                        //animals over props and terrain
+                        game.currentScene.foodGlowContainer.zOrder = 996
+                        game.currentScene.foodContainer.zOrder = 997
                         game.currentScene.namesLayer.zOrder = 998
                         game.currentScene.animalsContainer.zOrder = 999
+                        game.currentScene.barsLayer.zOrder = 1000
+                        game.currentScene.chatContainer.zOrder = 1001
     
                         //evo wheel
                         var evo_wheel = document.createElement('div')
@@ -1332,15 +1335,17 @@ const createWindow = () => {
                         }, 10)
                         function showCtrlOverlay(e) {
                             if (e.ctrlKey || e.altKey) {
-                                if (game.currentScene.myAnimal._visibleFishLevel != 101) {
-                                    document.getElementById('ctrl-overlay').style.pointerEvents = 'all'
-                                }
-                                else if (!e.shiftKey) {
-                                    if (game.currentScene.myAnimal._visibleFishLevel == 101)
-                                    document.getElementById('ctrl-overlay').style.pointerEvents = 'all'
-                                }
-                                else {
-                                    document.getElementById('ctrl-overlay').style.pointerEvents = 'none'
+                                if (game.currentScene != null) {
+                                    if (game.currentScene.myAnimal._visibleFishLevel != 101) {
+                                        document.getElementById('ctrl-overlay').style.pointerEvents = 'all'
+                                    }
+                                    else if (!e.shiftKey) {
+                                        if (game.currentScene.myAnimal._visibleFishLevel == 101)
+                                        document.getElementById('ctrl-overlay').style.pointerEvents = 'all'
+                                    }
+                                    else {
+                                        document.getElementById('ctrl-overlay').style.pointerEvents = 'none'
+                                    }
                                 }
                             }
                         }
@@ -1396,6 +1401,10 @@ const createWindow = () => {
                                 }
                             },
                         false);
+                        window.addEventListener("focus", () => {
+                            document.getElementById('ctrl-overlay').style.pointerEvents = 'none'
+                            document.getElementById('aim-overlay').style.display = 'none'
+                        })
                         `)
     
                         //matching strings - for utilities
