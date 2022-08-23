@@ -200,6 +200,10 @@ const createWindow = () => {
     
         // load the website
         win.loadURL('https://beta.deeeep.io')
+        win.webContents.on("did-fail-load", function() {
+            win.loadFile('offline.html')
+            win.show()
+        });
     
         // bye-bye stinky electron menu bar (no one likes you anyways)
         win.removeMenu();
@@ -1090,6 +1094,12 @@ const createWindow = () => {
                     //load custom settings
                     if (matches(msg, "Modal Added:[object HTMLDivElement]")) {
                         win.webContents.executeJavaScript(`buildCustomSettingsItems('` + qc1 + `', '` + qc2 + `', '` + qc3 + `', '` + qc4 + `')`)
+                    }
+
+                    if (matches(msg, "ERR_INTERNET_DISCONNECTED")) {
+                        setInterval(() => {
+                            console.log('sjfdhgkbsdf')
+                        })
                     }
     
                     if (matches(msg, "RUN_TARGET_LOCK_SCRIPT")) {
