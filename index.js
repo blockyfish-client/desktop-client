@@ -1335,26 +1335,30 @@ const createWindow = () => {
                         listForGamemodesWithAimOverlay = [1, 2, 6]
                         setInterval(function() {
                             if (game.currentScene != null) {
-                                if (game.currentScene.myAnimal._visibleFishLevel == 101) {
-                                    document.getElementById('aim-overlay').style.transform = 'rotate(' + (game.currentScene.myAnimal.inner.rotation*180/Math.PI + 90) + 'deg)'
-                                }
-                                else {
-                                    document.getElementById('aim-overlay').style.transform = 'rotate(' + (game.currentScene.myAnimal.inner.rotation*180/Math.PI - 90) + 'deg)'
+                                if (game.currentScene.myAnimal != null) {
+                                    if (game.currentScene.myAnimal._visibleFishLevel == 101) {
+                                        document.getElementById('aim-overlay').style.transform = 'rotate(' + (game.currentScene.myAnimal.inner.rotation*180/Math.PI + 90) + 'deg)'
+                                    }
+                                    else {
+                                        document.getElementById('aim-overlay').style.transform = 'rotate(' + (game.currentScene.myAnimal.inner.rotation*180/Math.PI - 90) + 'deg)'
+                                    }
                                 }
                             }
                         }, 10)
                         function showCtrlOverlay(e) {
                             if (e.ctrlKey || e.altKey) {
                                 if (game.currentScene != null) {
-                                    if (game.currentScene.myAnimal._visibleFishLevel != 101) {
-                                        document.getElementById('ctrl-overlay').style.pointerEvents = 'all'
-                                    }
-                                    else if (!e.shiftKey) {
-                                        if (game.currentScene.myAnimal._visibleFishLevel == 101)
-                                        document.getElementById('ctrl-overlay').style.pointerEvents = 'all'
-                                    }
-                                    else {
-                                        document.getElementById('ctrl-overlay').style.pointerEvents = 'none'
+                                    if (game.currentScene.myAnimal != null) {
+                                        if (game.currentScene.myAnimal._visibleFishLevel != 101) {
+                                            document.getElementById('ctrl-overlay').style.pointerEvents = 'all'
+                                        }
+                                        else if (!e.shiftKey) {
+                                            if (game.currentScene.myAnimal._visibleFishLevel == 101)
+                                            document.getElementById('ctrl-overlay').style.pointerEvents = 'all'
+                                        }
+                                        else {
+                                            document.getElementById('ctrl-overlay').style.pointerEvents = 'none'
+                                        }
                                     }
                                 }
                             }
