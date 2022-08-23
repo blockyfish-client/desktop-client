@@ -490,13 +490,22 @@ const createWindow = () => {
     
                 //website and github button on top right menu
                 win.webContents.executeJavaScript(`
-                const discord = document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(5) > button')
+                const discord_old_parent_clone = document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(5)').cloneNode(true)
+                const discord_old_parent = document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(5)')
                 const github_parent = document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(5)').cloneNode(true)
                 const website_parent = document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(5)').cloneNode(true)
                 const newtab_parent = document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(5)').cloneNode(true)
+                const social_class = document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div')
+                
+                social_class.insertBefore(discord_old_parent_clone, social_class.children[5])
+                discord_old_parent.remove()
+                const discord = document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(5) > button')
                 discord.classList.remove("black")
                 discord.classList.add("indigo")
-                const social_class = document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div')
+                discord.addEventListener("click", () => {
+                    window.open('https://discord.gg/8Amw32CrGR')
+                })
+
                 social_class.insertBefore(github_parent, social_class.children[5])
                 social_class.insertBefore(website_parent, social_class.children[6])
                 social_class.appendChild(newtab_parent)
