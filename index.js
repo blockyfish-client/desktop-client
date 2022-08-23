@@ -79,6 +79,10 @@ var theme = store.get('theme')
 if (theme != true && theme != false) {
     var theme = true
 }
+var aim_helper = store.get('aim_helper')
+if (aim_helper != true && aim_helper != false) {
+    var aim_helper = true
+}
 var qc1 = store.get('quick_chat.1')
 var qc2 = store.get('quick_chat.2')
 var qc3 = store.get('quick_chat.3')
@@ -544,6 +548,7 @@ const createWindow = () => {
                 win.webContents.executeJavaScript(`ublock_on = ` + ublock)
                 win.webContents.executeJavaScript(`twemoji_on = ` + twemoji)
                 win.webContents.executeJavaScript(`theme_on = ` + theme)
+                win.webContents.executeJavaScript(`aim_helper_on = ` + aim_helper)
                 
                 //build custom settings item
                 win.webContents.executeJavaScript(`
@@ -656,6 +661,33 @@ const createWindow = () => {
                                 document.querySelector('#pane-0 > form > div:nth-child(6) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
                                 console.log('store_settings: theme1')
                                 theme_on = true
+                            }
+                        })
+
+                        //aim helper
+                        var aim_helper_div = document.querySelector('#pane-0 > form > div:nth-child(3)').cloneNode(true)
+                        document.querySelector('#pane-0 > form').appendChild(aim_helper_div)
+                        const aim_helper_text = document.querySelector('#pane-0 > form > div:nth-child(7) > div.el-form-item__label')
+                        aim_helper_text.innerText = 'Aim shot helper'
+                        const aim_helper_desc = document.querySelector('#pane-0 > form > div:nth-child(7) > div.el-form-item__content > span')
+                        aim_helper_desc.innerHTML = "Shows a line that shows the trajectory of your projectile. Works on goblin shark, japanese spider crab, sea otter, and archerfish. "
+                        if (aim_helper_on == false) {
+                            document.querySelector('#pane-0 > form > div:nth-child(7) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
+                        }
+                        else {document.querySelector('#pane-0 > form > div:nth-child(7) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
+    
+                        }
+                        document.querySelector('#pane-0 > form > div:nth-child(7) > div.el-form-item__content > label > span.el-checkbox__input > input').addEventListener("click", () => {
+                            restart_tooltip.style.display = 'block'
+                            if (aim_helper_on == true) {
+                                document.querySelector('#pane-0 > form > div:nth-child(7) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
+                                console.log('store_settings: aim_helper0')
+                                aim_helper_on = false
+                            }
+                            else {
+                                document.querySelector('#pane-0 > form > div:nth-child(7) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
+                                console.log('store_settings: aim_helper1')
+                                aim_helper_on = true
                             }
                         })
                         
@@ -1271,12 +1303,18 @@ const createWindow = () => {
                         // 101: thresher shark
                         // 107: beaked whale
                         // 109: beluga
+                        // 113: japanese spider crab
                         win.webContents.executeJavaScript(`
-                        listForAnimalsWithAimOverlay = [61, 93, 94]
+                        listForAnimalsWithAimOverlay = [61, 93, 94, 113]
                         listForGamemodesWithAimOverlay = [1, 2, 6]
                         setInterval(function() {
                             if (game.currentScene != null) {
-                                document.getElementById('aim-overlay').style.transform = 'rotate(' + (game.currentScene.myAnimal.inner.rotation*180/Math.PI - 90) + 'deg)'
+                                if (game.currentScene.myAnimal._visibleFishLevel == 101) {
+                                    document.getElementById('aim-overlay').style.transform = 'rotate(' + (game.currentScene.myAnimal.inner.rotation*180/Math.PI + 90) + 'deg)'
+                                }
+                                else {
+                                    document.getElementById('aim-overlay').style.transform = 'rotate(' + (game.currentScene.myAnimal.inner.rotation*180/Math.PI - 90) + 'deg)'
+                                }
                             }
                         }, 10)
                         function showCtrlOverlay(e) {
@@ -1311,9 +1349,8 @@ const createWindow = () => {
                         window.addEventListener("keydown",
                             function(e) {
                                 showCtrlOverlay(e)
-                                if (e.ctrlKey && listForAnimalsWithAimOverlay.includes(game.currentScene.myAnimal._visibleFishLevel) && listForGamemodesWithAimOverlay.includes(game.gameMode)) {
+                                if (e.ctrlKey && listForAnimalsWithAimOverlay.includes(game.currentScene.myAnimal._visibleFishLevel) && listForGamemodesWithAimOverlay.includes(game.gameMode) && aim_helper_on) {
                                     document.getElementById('aim-overlay').style.display = 'block'
-                                    document.getElementById('aim-overlay').style.transform = 'rotate(' + (game.currentScene.myAnimal.inner.rotation*180/Math.PI - 90) + 'deg)'
                                 }
                             },
                         false);
@@ -1393,6 +1430,9 @@ const createWindow = () => {
                                         console.log('RUN_TARGET_LOCK_SCRIPT')
                                     }
     
+                                }
+                                else if (matches(chat_value, '/help')) {
+                                    game.currentScene.showMessagePopup('/mute <id> - mute a player\\n/unmute <id> - unmute a player\\n/settarget <entityid> - lock on to an animal', 5000, 0)
                                 }
                             }
                             else {
