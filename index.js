@@ -1175,6 +1175,11 @@ const createWindow = () => {
     
                         //show ghosts
                         game.currentScene.viewingGhosts = true
+
+                        //animals over props
+                        game.currentScene.namesLayer.zOrder = 998
+                        game.currentScene.animalsContainer.zOrder = 999
+
     
                         //evo wheel
                         var evo_wheel = document.createElement('div')
