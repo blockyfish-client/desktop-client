@@ -1522,7 +1522,7 @@ const createWindow = () => {
                         mouseY = 0
                         mapeditor = document.querySelector('#canvas-container > canvas')
                         window.addEventListener("keyup", (e) => {
-                            if (e.key.toLowerCase() == "z" && document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
+                            if (e.key.toLowerCase() == "a" && document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
                                 aimBot = !aimBot
                                 game.currentScene.uiManager.setTargetId(0)
                                 if (aimBot) {
