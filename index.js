@@ -23,8 +23,8 @@ app.setAsDefaultProtocolClient("deeeepio")
 var extensionsLoaded = false
 
 // version info
-const version_code = 'v1.5.2'
-const version_num = '152'
+const version_code = 'v1.5.3'
+const version_num = '153'
 
 // custom function for later
 function matches(text, partial) {
@@ -1104,7 +1104,6 @@ const createWindow = () => {
     
                     if (matches(msg, "RUN_TARGET_LOCK_SCRIPT")) {
                         win.webContents.executeJavaScript(`
-                        mapeditor = document.querySelector('#canvas-container > canvas')
                         click0 = game.currentScene.entityManager.getEntity(targetID).relatedObjects.children[2].speedMultiplierDisplay.visible;
                         setInterval(function () {
                             if (targetID != null && game.currentScene.entityManager.getEntity(targetID) != null) {
@@ -1515,6 +1514,72 @@ const createWindow = () => {
                                 id_text.innerText = 'ID: ' + game.currentScene.myAnimal.id
                             }
                         }, 5000)
+                        `)
+                        //aimbot
+                        win.webContents.executeJavaScript(`
+                        aimBot = false
+                        mouseX = 0
+                        mouseY = 0
+                        mapeditor = document.querySelector('#canvas-container > canvas')
+                        window.addEventListener("keyup", (e) => {
+                            if (e.key.toLowerCase() == "z" && document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
+                                aimBot = !aimBot
+                                game.currentScene.uiManager.setTargetId(0)
+                                if (aimBot) {
+                                    game.currentScene.showMessagePopup('Aim assist on', 1000, 0)
+                                }
+                                else {
+                                    game.currentScene.showMessagePopup('Aim assist off', 1000, 0)
+                                }
+                            }
+                        })
+                        setInterval(() => {
+                            if (aimBot && game.currentScene != null) {
+                                if (game.currentScene.myAnimal != null) {
+                                    closestEntityDistance = 9999999
+                                    closestEntity = 0
+                                    for (let i = 0; i < game.currentScene.entityManager.animalsList.length; i++) {
+                                        if (Math.sqrt(((mouseX - innerWidth/2) - (game.currentScene.entityManager.animalsList[i].position.x - game.currentScene.myAnimal.position._x))**2 + ((mouseY - innerHeight/2) - (game.currentScene.entityManager.animalsList[i].position.y - game.currentScene.myAnimal.position._y))**2) < closestEntityDistance && !game.currentScene.entityManager.animalsList[i].mine) {
+                                            closestEntityDistance = Math.sqrt(((mouseX - innerWidth/2) - (game.currentScene.entityManager.animalsList[i].position.x - game.currentScene.myAnimal.position._x))**2 + ((mouseY - innerHeight/2) - (game.currentScene.entityManager.animalsList[i].position.y - game.currentScene.myAnimal.position._y))**2)
+                                            closestEntity = game.currentScene.entityManager.animalsList[i].id
+                                        }
+                                    }
+                                }
+                            }
+                        }, 50)
+                        window.addEventListener("mousemove", (e) => {
+                            mouseX = e.clientX
+                            mouseY = e.clientY
+                            if (aimBot && game.currentScene != null) {
+                                if (game.currentScene.myAnimal != null) {
+                                    if (closestEntityDistance < 500) {
+                                        if (closestEntity != game.currentScene.uiManager.targetId) {
+                                            game.currentScene.uiManager.setTargetId(0)
+                                            game.currentScene.uiManager.setTargetId(closestEntity)
+                                        }
+                                        c = {"x": innerWidth/2 + game.currentScene.entityManager.getEntity(closestEntity).position.x - game.currentScene.myAnimal.position._x, "y": innerHeight/2 + game.currentScene.entityManager.getEntity(closestEntity).position.y - game.currentScene.myAnimal.position._y}
+                                        mapeditor.dispatchEvent(new MouseEvent("pointermove", {clientX:c.x, clientY:c.y}))
+                                    }
+                                    else {
+                                        game.currentScene.uiManager.setTargetId(0)
+                                    }
+                                }
+                            }
+                        })
+                        setInterval(() => {
+                            if (aimBot && game.currentScene != null) {
+                                if (game.currentScene.myAnimal != null) {
+                                    if (closestEntityDistance < 500) {
+                                        if (closestEntity != game.currentScene.uiManager.targetId) {
+                                            game.currentScene.uiManager.setTargetId(0)
+                                            game.currentScene.uiManager.setTargetId(closestEntity)
+                                        }
+                                        c = {"x": innerWidth/2 + game.currentScene.entityManager.getEntity(closestEntity).position.x - game.currentScene.myAnimal.position._x, "y": innerHeight/2 + game.currentScene.entityManager.getEntity(closestEntity).position.y - game.currentScene.myAnimal.position._y}
+                                        mapeditor.dispatchEvent(new MouseEvent("pointermove", {clientX:c.x, clientY:c.y}))
+                                    }
+                                }
+                            }
+                        }, 50)
                         `)
                     }
             });
