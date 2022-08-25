@@ -885,17 +885,25 @@ const createWindow = () => {
                 `)
     
                 //pink badge for me!!
-                async function insertClientOwnerBadge() {
-                    // setTimeout(function() {
-                        win.webContents.executeJavaScript(`
-                        if (document.querySelector('#app > div.vfm.vfm--inset.vfm--fixed.modal > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div > div > div > div.el-row.header > div.el-col.el-col-24.auto-col.fill > div > div:nth-child(2) > img') == null) {
-                            badgeParentDiv = document.querySelector('#app > div.vfm.vfm--inset.vfm--fixed.modal > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div > div > div > div.el-row.header > div.el-col.el-col-24.auto-col.fill > div')
-                            clientOwnerBadge = document.createElement('div')
-                            badgeParentDiv.insertBefore(clientOwnerBadge, badgeParentDiv.children[1])
-                            clientOwnerBadge.outerHTML = '<div class="el-image verified-icon el-tooltip__trigger el-tooltip__trigger" style="height: 1rem;margin-right: 0.25rem;width: 1rem;"><img src="/img/verified.png" class="el-image__inner" style="filter: hue-rotate(90deg);"></div>'
-                        }
-                        `)
-                    // }, 100)
+                function insertClientOwnerBadge() {
+                    win.webContents.executeJavaScript(`
+                    if (document.querySelector('#app > div.vfm.vfm--inset.vfm--fixed.modal > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div > div > div > div.el-row.header > div.el-col.el-col-24.auto-col.fill > div > div:nth-child(2) > img') == null) {
+                        badgeParentDiv = document.querySelector('#app > div.vfm.vfm--inset.vfm--fixed.modal > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div > div > div > div.el-row.header > div.el-col.el-col-24.auto-col.fill > div')
+                        clientOwnerBadge = document.createElement('div')
+                        badgeParentDiv.insertBefore(clientOwnerBadge, badgeParentDiv.children[1])
+                        clientOwnerBadge.outerHTML = '<div class="el-image verified-icon el-tooltip__trigger el-tooltip__trigger" style="height: 1rem;margin-right: 0.25rem;width: 1rem;"><img src="/img/verified.png" class="el-image__inner" style="filter: hue-rotate(90deg);"></div>'
+                    }
+                    `)
+                }
+                function insertClientVerifiedBadge() {
+                    win.webContents.executeJavaScript(`
+                    if (document.querySelector('#app > div.vfm.vfm--inset.vfm--fixed.modal > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div > div > div > div.el-row.header > div.el-col.el-col-24.auto-col.fill > div > div:nth-child(2) > img') == null) {
+                        badgeParentDiv = document.querySelector('#app > div.vfm.vfm--inset.vfm--fixed.modal > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div > div > div > div.el-row.header > div.el-col.el-col-24.auto-col.fill > div')
+                        clientOwnerBadge = document.createElement('div')
+                        badgeParentDiv.insertBefore(clientOwnerBadge, badgeParentDiv.children[1])
+                        clientOwnerBadge.outerHTML = '<div class="el-image verified-icon el-tooltip__trigger el-tooltip__trigger" style="height: 1rem;margin-right: 0.25rem;width: 1rem;"><img src="/img/verified.png" class="el-image__inner" style="filter: hue-rotate(165deg);"></div>'
+                    }
+                    `)
                 }
     
                 //make progress bar and track download progress to keep people sane
@@ -951,6 +959,7 @@ const createWindow = () => {
                 if (!error && res.statusCode == 200) {
                     var e = body.ban
                     var v = body.verified
+                    var t = body.verified2
                     // console.log(e)
                     win.webContents.executeJavaScript(`
                     setInterval(async function() {
@@ -1663,7 +1672,6 @@ const createWindow = () => {
                 } catch (e) {
                     console.log('oops')
                 }
-                // console.log(currentUrl)
                 
                 // viewing <user>'s profile
                 if (matches(currentUrl, "/u/")) {
@@ -1676,6 +1684,9 @@ const createWindow = () => {
                         if (!error && res.statusCode == 200) {
                             if (v.includes(body.id)) {
                                 insertClientOwnerBadge()
+                            }
+                            else if (t.includes(body.id)) {
+                                insertClientVerifiedBadge()
                             }
                         };
                     });
