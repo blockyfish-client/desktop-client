@@ -211,7 +211,7 @@ const createWindow = () => {
         //wait for the base webpage to finish loading before customizing it
         win.webContents.on('did-finish-load', function() {
     
-            // win.webContents.openDevTools()
+            win.webContents.openDevTools()
     
             // keep everything running otherwise youll see a stack of 500 chat messages when you come back
             win.webContents.setBackgroundThrottling(false)
@@ -878,6 +878,11 @@ const createWindow = () => {
                     })
                 })
                 `)
+                
+                // make sure aimbot script isnt run twice
+                win.webContents.executeJavaScript(`
+                aimBotRan = false
+                `)
     
                 //pink badge for me!!
                 async function insertClientOwnerBadge() {
@@ -1521,65 +1526,68 @@ const createWindow = () => {
                         mouseX = 0
                         mouseY = 0
                         mapeditor = document.querySelector('#canvas-container > canvas')
-                        window.addEventListener("keyup", (e) => {
-                            if (e.key.toLowerCase() == "a" && document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
-                                aimBot = !aimBot
-                                game.currentScene.uiManager.setTargetId(0)
-                                if (aimBot) {
-                                    game.currentScene.showMessagePopup('Aim assist on', 1000, 0)
-                                }
-                                else {
-                                    game.currentScene.showMessagePopup('Aim assist off', 1000, 0)
-                                }
-                            }
-                        })
-                        setInterval(() => {
-                            if (aimBot && game.currentScene != null) {
-                                if (game.currentScene.myAnimal != null) {
-                                    closestEntityDistance = 9999999
-                                    closestEntity = 0
-                                    for (let i = 0; i < game.currentScene.entityManager.animalsList.length; i++) {
-                                        if (Math.sqrt(((mouseX - innerWidth/2) - (game.currentScene.entityManager.animalsList[i].position.x - game.currentScene.myAnimal.position._x))**2 + ((mouseY - innerHeight/2) - (game.currentScene.entityManager.animalsList[i].position.y - game.currentScene.myAnimal.position._y))**2) < closestEntityDistance && !game.currentScene.entityManager.animalsList[i].mine) {
-                                            closestEntityDistance = Math.sqrt(((mouseX - innerWidth/2) - (game.currentScene.entityManager.animalsList[i].position.x - game.currentScene.myAnimal.position._x))**2 + ((mouseY - innerHeight/2) - (game.currentScene.entityManager.animalsList[i].position.y - game.currentScene.myAnimal.position._y))**2)
-                                            closestEntity = game.currentScene.entityManager.animalsList[i].id
-                                        }
-                                    }
-                                }
-                            }
-                        }, 50)
-                        window.addEventListener("mousemove", (e) => {
-                            mouseX = e.clientX
-                            mouseY = e.clientY
-                            if (aimBot && game.currentScene != null) {
-                                if (game.currentScene.myAnimal != null) {
-                                    if (closestEntityDistance < 500) {
-                                        if (closestEntity != game.currentScene.uiManager.targetId) {
-                                            game.currentScene.uiManager.setTargetId(0)
-                                            game.currentScene.uiManager.setTargetId(closestEntity)
-                                        }
-                                        c = {"x": innerWidth/2 + game.currentScene.entityManager.getEntity(closestEntity).position.x - game.currentScene.myAnimal.position._x, "y": innerHeight/2 + game.currentScene.entityManager.getEntity(closestEntity).position.y - game.currentScene.myAnimal.position._y}
-                                        mapeditor.dispatchEvent(new MouseEvent("pointermove", {clientX:c.x, clientY:c.y}))
+                        if (!aimBotRan) {
+                            aimBotRan = true
+                            window.addEventListener("keyup", (e) => {
+                                if (e.key.toLowerCase() == "a" && document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
+                                    aimBot = !aimBot
+                                    game.currentScene.uiManager.setTargetId(0)
+                                    if (aimBot) {
+                                        game.currentScene.showMessagePopup('Aim assist on', 1000, 0)
                                     }
                                     else {
-                                        game.currentScene.uiManager.setTargetId(0)
+                                        game.currentScene.showMessagePopup('Aim assist off', 1000, 0)
                                     }
                                 }
-                            }
-                        })
-                        setInterval(() => {
-                            if (aimBot && game.currentScene != null) {
-                                if (game.currentScene.myAnimal != null) {
-                                    if (closestEntityDistance < 500) {
-                                        if (closestEntity != game.currentScene.uiManager.targetId) {
-                                            game.currentScene.uiManager.setTargetId(0)
-                                            game.currentScene.uiManager.setTargetId(closestEntity)
+                            })
+                            setInterval(() => {
+                                if (aimBot && game.currentScene != null) {
+                                    if (game.currentScene.myAnimal != null) {
+                                        closestEntityDistance = 9999999
+                                        closestEntity = 0
+                                        for (let i = 0; i < game.currentScene.entityManager.animalsList.length; i++) {
+                                            if (Math.sqrt(((mouseX - innerWidth/2) - (game.currentScene.entityManager.animalsList[i].position.x - game.currentScene.myAnimal.position._x))**2 + ((mouseY - innerHeight/2) - (game.currentScene.entityManager.animalsList[i].position.y - game.currentScene.myAnimal.position._y))**2) < closestEntityDistance && !game.currentScene.entityManager.animalsList[i].mine) {
+                                                closestEntityDistance = Math.sqrt(((mouseX - innerWidth/2) - (game.currentScene.entityManager.animalsList[i].position.x - game.currentScene.myAnimal.position._x))**2 + ((mouseY - innerHeight/2) - (game.currentScene.entityManager.animalsList[i].position.y - game.currentScene.myAnimal.position._y))**2)
+                                                closestEntity = game.currentScene.entityManager.animalsList[i].id
+                                            }
                                         }
-                                        c = {"x": innerWidth/2 + game.currentScene.entityManager.getEntity(closestEntity).position.x - game.currentScene.myAnimal.position._x, "y": innerHeight/2 + game.currentScene.entityManager.getEntity(closestEntity).position.y - game.currentScene.myAnimal.position._y}
-                                        mapeditor.dispatchEvent(new MouseEvent("pointermove", {clientX:c.x, clientY:c.y}))
                                     }
                                 }
-                            }
-                        }, 50)
+                            }, 50)
+                            window.addEventListener("mousemove", (e) => {
+                                mouseX = e.clientX
+                                mouseY = e.clientY
+                                if (aimBot && game.currentScene != null) {
+                                    if (game.currentScene.myAnimal != null) {
+                                        if (closestEntityDistance < 500) {
+                                            if (closestEntity != game.currentScene.uiManager.targetId) {
+                                                game.currentScene.uiManager.setTargetId(0)
+                                                game.currentScene.uiManager.setTargetId(closestEntity)
+                                            }
+                                            c = {"x": innerWidth/2 + game.currentScene.entityManager.getEntity(closestEntity).position.x - game.currentScene.myAnimal.position._x, "y": innerHeight/2 + game.currentScene.entityManager.getEntity(closestEntity).position.y - game.currentScene.myAnimal.position._y}
+                                            mapeditor.dispatchEvent(new MouseEvent("pointermove", {clientX:c.x, clientY:c.y}))
+                                        }
+                                        else {
+                                            game.currentScene.uiManager.setTargetId(0)
+                                        }
+                                    }
+                                }
+                            })
+                            setInterval(() => {
+                                if (aimBot && game.currentScene != null) {
+                                    if (game.currentScene.myAnimal != null) {
+                                        if (closestEntityDistance < 200) {
+                                            if (closestEntity != game.currentScene.uiManager.targetId) {
+                                                game.currentScene.uiManager.setTargetId(0)
+                                                game.currentScene.uiManager.setTargetId(closestEntity)
+                                            }
+                                            c = {"x": innerWidth/2 + game.currentScene.entityManager.getEntity(closestEntity).position.x - game.currentScene.myAnimal.position._x, "y": innerHeight/2 + game.currentScene.entityManager.getEntity(closestEntity).position.y - game.currentScene.myAnimal.position._y}
+                                            mapeditor.dispatchEvent(new MouseEvent("pointermove", {clientX:c.x, clientY:c.y}))
+                                        }
+                                    }
+                                }
+                            }, 50)
+                        }
                         `)
                     }
             });
