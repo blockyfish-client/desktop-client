@@ -59,6 +59,11 @@ Message `.pi#3141` if you want to contribute
 
 ## 📝 Changelogs  
 
+### v1.5.4 Aimbot improvements
+- Aimbot will no longer target teammates in TFFA and PD
+- Aimbot will not target AIs and ghosts
+- Added orange verified badge
+
 ### v1.5.3 Aim assist
 - Aim assist. Press Z to toggle. 
 
