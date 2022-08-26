@@ -1535,6 +1535,7 @@ const createWindow = () => {
                         mouseX = 0
                         mouseY = 0
                         mapeditor = document.querySelector('#canvas-container > canvas')
+                        whitelistedAimbotAnimalId = [18, 29, 33, 44, 47, 52, 67, 77, 88]
                         if (!aimBotRan) {
                             aimBotRan = true
                             window.addEventListener("keyup", (e) => {
@@ -1555,7 +1556,7 @@ const createWindow = () => {
                                         closestEntityDistance = 9999999
                                         closestEntity = 0
                                         for (let i = 0; i < game.currentScene.entityManager.animalsList.length; i++) {
-                                            if (Math.sqrt(((mouseX - innerWidth/2) - (game.currentScene.entityManager.animalsList[i].position.x - game.currentScene.myAnimal.position._x))**2 + ((mouseY - innerHeight/2) - (game.currentScene.entityManager.animalsList[i].position.y - game.currentScene.myAnimal.position._y))**2) < closestEntityDistance && !game.currentScene.entityManager.animalsList[i].mine && (game.currentScene.myAnimal.tribeId == null || game.currentScene.myAnimal.tribeId != game.currentScene.entityManager.animalsList[i].tribeId) && !(game.gameMode == 2 && game.currentScene.entityManager.animalsList[i].nameObject._text.includes(game.currentScene.myAnimal.nameObject._text.slice(0, 10)))) {
+                                            if (Math.sqrt(((mouseX - innerWidth/2) - (game.currentScene.entityManager.animalsList[i].position.x - game.currentScene.myAnimal.position._x))**2 + ((mouseY - innerHeight/2) - (game.currentScene.entityManager.animalsList[i].position.y - game.currentScene.myAnimal.position._y))**2) < closestEntityDistance && !game.currentScene.entityManager.animalsList[i].mine && (game.currentScene.myAnimal.tribeId == null || game.currentScene.myAnimal.tribeId != game.currentScene.entityManager.animalsList[i].tribeId) && !(game.gameMode == 2 && game.currentScene.entityManager.animalsList[i].nameObject._text.includes(game.currentScene.myAnimal.nameObject._text.slice(0, 10))) && !whitelistedAimbotAnimalId.includes(game.currentScene.entityManager.animalsList[i].fishLevelData.fishLevel)) {
                                                 closestEntityDistance = Math.sqrt(((mouseX - innerWidth/2) - (game.currentScene.entityManager.animalsList[i].position.x - game.currentScene.myAnimal.position._x))**2 + ((mouseY - innerHeight/2) - (game.currentScene.entityManager.animalsList[i].position.y - game.currentScene.myAnimal.position._y))**2)
                                                 closestEntity = game.currentScene.entityManager.animalsList[i].id
                                             }
