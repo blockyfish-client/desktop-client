@@ -6,10 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
-    "make-win": "npx electron-packager . Blockyfish --afterPack=./removeLocales.js --overwrite --platform=win32 --arch=ia32 --icon=img/icons/win/icon.ico --prune=true --electron-version=13.6.9 --app-copyright=\"Pi 2022\" --out=release-builds --version-string.CompanyName=Pi --version-string.ProductName=\"Blockyfish Client\"",
+    "make-win": "npx electron-packager . Blockyfish --overwrite --platform=win32 --arch=ia32 --icon=img/icons/win/icon.ico --prune=true --electron-version=13.6.9 --app-copyright=\"Pi 2022\" --out=release-builds --version-string.CompanyName=Pi --version-string.ProductName=\"Blockyfish Client\"",
     "pack-win": "node installers/windows/createinstaller.js"
   },
-  "build": { "afterPack": "./removeLocales.js" },
   "author": "Pi",
   "license": "MIT",
   "protocols": {
