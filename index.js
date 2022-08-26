@@ -142,23 +142,8 @@ const createWindow = () => {
     if (!extensionsLoaded) {
         const extensions = new ElectronChromeExtensions()
         extensions.addTab(win.webContents, win)
-        if (docassets == true) {
-            docassetsPath = app.getAppPath() + `\\extensions\\docassets\\1.0.42_0`
-        }
-        else {
-            docassetsPath = app.getAppPath() + `\\extensions\\docassets_disabled\\1.0.42_0`
-        }
-        if (ublock == true) {
-            ublockPath = app.getAppPath() + `\\extensions\\ublock\\1.43.0_0`
-        }
-        else {
-            if (docassets == true) {
-                ublockPath = app.getAppPath() + `\\extensions\\docassets\\1.0.42_0`
-            }
-            else {
-                ublockPath = app.getAppPath() + `\\extensions\\docassets_disabled\\1.0.42_0`
-            }    
-        }
+        docassetsPath = app.getAppPath() + `\\extensions\\docassets\\1.0.42_0`
+        ublockPath = app.getAppPath() + `\\extensions\\ublock\\1.43.0_0`
     }
 
     // close confirmation dialog
@@ -1750,13 +1735,38 @@ const createWindow = () => {
     }
     // load the extensions in
     if (!extensionsLoaded) {
-        win.webContents.session.loadExtension(ublockPath).then(() => {
-            win.webContents.session.loadExtension(docassetsPath).then(() => {
+        if (docassets) {
+            if (ublock) {
+                win.webContents.session.loadExtension(docassetsPath).then(() => {
+                    win.webContents.session.loadExtension(ublockPath).then(() => {
+                        setTimeout(() => {
+                            makeNewWindow()
+                        }, 100)
+                    })
+                })
+            }
+            else {
+                win.webContents.session.loadExtension(docassetsPath).then(() => {
+                    setTimeout(() => {
+                        makeNewWindow()
+                    }, 100)
+                })
+            }
+        }
+        else {
+            if (ublock) {
+                win.webContents.session.loadExtension(ublockPath).then(() => {
+                    setTimeout(() => {
+                        makeNewWindow()
+                    }, 100)
+                })
+            }
+            else {
                 setTimeout(() => {
                     makeNewWindow()
                 }, 100)
-            })
-        })
+            }
+        }
     }
     else {
         makeNewWindow()
