@@ -16,6 +16,9 @@ const { ElectronChromeExtensions } = require('electron-chrome-extensions')
 const Store = require('electron-store');
 const request = require('request');
 
+// force english
+app.commandLine.appendSwitch('lang', 'en-US')
+
 // for the future, secret for now :)
 app.setAsDefaultProtocolClient("deeeepio")
 
