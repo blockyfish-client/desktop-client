@@ -24,6 +24,5 @@ function getInstallerConfig () {
     setupIcon: path.join(rootPath, 'img', 'icons', 'win', 'icon.ico'),
     iconUrl: "https://raw.githubusercontent.com/blockyfish-client/Desktop-Client/master/img/icons/win/icon.ico",
     loadingGif: path.join(rootPath, 'img', 'loading.gif'),
-    afterPack: "./removeLocales.js"
   })
 }
