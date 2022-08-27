@@ -495,7 +495,7 @@ const createWindow = () => {
                 discord.classList.remove("black")
                 discord.classList.add("indigo")
                 discord.addEventListener("click", () => {
-                    window.open('https://discord.gg/8Amw32CrGR')
+                    window.open('https://discord.gg/vQnrUVxAvT')
                 })
 
                 social_class.insertBefore(github_parent, social_class.children[5])
