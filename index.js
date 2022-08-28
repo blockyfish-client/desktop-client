@@ -15,6 +15,7 @@ const fs = require('fs') // Load the File System to execute our common tasks (CR
 const { ElectronChromeExtensions } = require('electron-chrome-extensions')
 const Store = require('electron-store');
 const request = require('request');
+const { error } = require('console');
 
 // force english
 app.commandLine.appendSwitch('lang', 'en-US')
@@ -188,9 +189,14 @@ const createWindow = () => {
     
         // load the website
         win.loadURL('https://beta.deeeep.io')
-        win.webContents.on("did-fail-load", function() {
-            win.loadFile('offline.html')
-            win.show()
+        win.webContents.on("did-fail-load", (_event, _errorCode, errorDescription) => {
+            if (errorDescription == "ERR_INTERNET_DISCONNECTED") {
+                win.loadFile('offline.html')
+                win.show()
+                setTimeout(() => {
+                    win.loadURL('https://beta.deeeep.io')
+                }, 5000);
+            }
         });
     
         // bye-bye stinky electron menu bar (no one likes you anyways)
