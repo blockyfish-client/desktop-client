@@ -1582,7 +1582,7 @@ const createWindow = () => {
                         mouseX = 0
                         mouseY = 0
                         mapeditor = document.querySelector('#canvas-container > canvas')
-                        whitelistedAimbotAnimalId = [18, 29, 33, 44, 47, 52, 67, 77, 88]
+                        whitelistedAimbotAnimalId = [18, 26, 29, 33, 44, 47, 52, 67, 77, 88]
                         if (!aimBotRan) {
                             aimBotRan = true
                             window.addEventListener("keyup", (e) => {
