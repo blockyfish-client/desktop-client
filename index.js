@@ -83,6 +83,10 @@ var theme = store.get('theme')
 if (theme != true && theme != false) {
     var theme = true
 }
+var v3ui = store.get('v3ui')
+if (v3ui != true && v3ui != false) {
+    var v3ui = false
+}
 var aim_helper = store.get('aim_helper')
 if (aim_helper != true && aim_helper != false) {
     var aim_helper = true
@@ -143,7 +147,13 @@ const createWindow = () => {
     if (!extensionsLoaded) {
         const extensions = new ElectronChromeExtensions()
         extensions.addTab(win.webContents, win)
-        docassetsPath = app.getAppPath() + `\\extensions\\docassets\\1.0.42_0`
+        if (docassets) {
+            docassetsPath = app.getAppPath() + `\\extensions\\docassets\\1.0.42_0`
+        }
+        else {
+
+            docassetsPath = app.getAppPath() + `\\extensions\\nodocassets\\1.0.42_0`
+        }
         ublockPath = app.getAppPath() + `\\extensions\\ublock\\1.43.0_0`
     }
 
@@ -209,12 +219,27 @@ const createWindow = () => {
     
             // keep everything running otherwise youll see a stack of 500 chat messages when you come back
             win.webContents.setBackgroundThrottling(false)
+            // blockyfish logo
+            win.webContents.executeJavaScript(`
+            const brand_css = document.createElement('style')
+            document.querySelector('head').appendChild(brand_css)
+            brand_css.outerHTML = '<link rel="stylesheet" href="https://blockyfish.netlify.app/themes/branding.css">'
+            `)
+
             //custom theme
             if (theme) {
                 win.webContents.executeJavaScript(`
                 const custom_css = document.createElement('style')
                 document.querySelector('head').appendChild(custom_css)
-                custom_css.outerHTML = '<link rel="stylesheet" href="https://blockyfish.netlify.app/assets/customtheme.css">'
+                custom_css.outerHTML = '<link rel="stylesheet" href="https://blockyfish.netlify.app/themes/reefpenguin/theme.css">'
+                `)
+            }
+
+            if (v3ui) {
+                win.webContents.executeJavaScript(`
+                const v3ui_css = document.createElement('style')
+                document.querySelector('head').appendChild(v3ui_css)
+                v3ui_css.outerHTML = '<link rel="stylesheet" href="https://blockyfish.netlify.app/themes/addon/v3ui.css">'
                 `)
             }
             
@@ -555,6 +580,7 @@ const createWindow = () => {
                 win.webContents.executeJavaScript(`ublock_on = ` + ublock)
                 win.webContents.executeJavaScript(`twemoji_on = ` + twemoji)
                 win.webContents.executeJavaScript(`theme_on = ` + theme)
+                win.webContents.executeJavaScript(`v3ui_on = ` + v3ui)
                 win.webContents.executeJavaScript(`aim_helper_on = ` + aim_helper)
                 
                 //build custom settings item
@@ -671,14 +697,14 @@ const createWindow = () => {
                             }
                         })
 
-                        //aim helper
-                        var aim_helper_div = document.querySelector('#pane-0 > form > div:nth-child(3)').cloneNode(true)
-                        document.querySelector('#pane-0 > form').appendChild(aim_helper_div)
-                        const aim_helper_text = document.querySelector('#pane-0 > form > div:nth-child(7) > div.el-form-item__label')
-                        aim_helper_text.innerText = 'Aim shot helper'
-                        const aim_helper_desc = document.querySelector('#pane-0 > form > div:nth-child(7) > div.el-form-item__content > span')
-                        aim_helper_desc.innerHTML = "Shows a line that shows the trajectory of your projectile. Works on goblin shark, japanese spider crab, sea otter, and archerfish. "
-                        if (aim_helper_on == false) {
+                        //v3 UI
+                        var v3ui_div = document.querySelector('#pane-0 > form > div:nth-child(3)').cloneNode(true)
+                        document.querySelector('#pane-0 > form').appendChild(v3ui_div)
+                        const v3ui_text = document.querySelector('#pane-0 > form > div:nth-child(7) > div.el-form-item__label')
+                        v3ui_text.innerText = 'Legacy UI'
+                        const v3ui_desc = document.querySelector('#pane-0 > form > div:nth-child(7) > div.el-form-item__content > span')
+                        v3ui_desc.innerHTML = "Brings the old v3 UI back to v4. XP bar and boost bars are restored to their old v3 positions. "
+                        if (v3ui_on == false) {
                             document.querySelector('#pane-0 > form > div:nth-child(7) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
                         }
                         else {document.querySelector('#pane-0 > form > div:nth-child(7) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
@@ -686,13 +712,40 @@ const createWindow = () => {
                         }
                         document.querySelector('#pane-0 > form > div:nth-child(7) > div.el-form-item__content > label > span.el-checkbox__input > input').addEventListener("click", () => {
                             restart_tooltip.style.display = 'block'
-                            if (aim_helper_on == true) {
+                            if (v3ui_on == true) {
                                 document.querySelector('#pane-0 > form > div:nth-child(7) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
+                                console.log('store_settings: v3ui0')
+                                v3ui_on = false
+                            }
+                            else {
+                                document.querySelector('#pane-0 > form > div:nth-child(7) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
+                                console.log('store_settings: v3ui1')
+                                v3ui_on = true
+                            }
+                        })
+
+                        //aim helper
+                        var aim_helper_div = document.querySelector('#pane-0 > form > div:nth-child(3)').cloneNode(true)
+                        document.querySelector('#pane-0 > form').appendChild(aim_helper_div)
+                        const aim_helper_text = document.querySelector('#pane-0 > form > div:nth-child(8) > div.el-form-item__label')
+                        aim_helper_text.innerText = 'Aim shot helper'
+                        const aim_helper_desc = document.querySelector('#pane-0 > form > div:nth-child(8) > div.el-form-item__content > span')
+                        aim_helper_desc.innerHTML = "Shows a line that shows the trajectory of your projectile. Works on goblin shark, japanese spider crab, sea otter, and archerfish. "
+                        if (aim_helper_on == false) {
+                            document.querySelector('#pane-0 > form > div:nth-child(8) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
+                        }
+                        else {document.querySelector('#pane-0 > form > div:nth-child(8) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
+    
+                        }
+                        document.querySelector('#pane-0 > form > div:nth-child(8) > div.el-form-item__content > label > span.el-checkbox__input > input').addEventListener("click", () => {
+                            restart_tooltip.style.display = 'block'
+                            if (aim_helper_on == true) {
+                                document.querySelector('#pane-0 > form > div:nth-child(8) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
                                 console.log('store_settings: aim_helper0')
                                 aim_helper_on = false
                             }
                             else {
-                                document.querySelector('#pane-0 > form > div:nth-child(7) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
+                                document.querySelector('#pane-0 > form > div:nth-child(8) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
                                 console.log('store_settings: aim_helper1')
                                 aim_helper_on = true
                             }
@@ -1741,37 +1794,21 @@ const createWindow = () => {
     }
     // load the extensions in
     if (!extensionsLoaded) {
-        if (docassets) {
-            if (ublock) {
-                win.webContents.session.loadExtension(docassetsPath).then(() => {
-                    win.webContents.session.loadExtension(ublockPath).then(() => {
-                        setTimeout(() => {
-                            makeNewWindow()
-                        }, 100)
-                    })
-                })
-            }
-            else {
-                win.webContents.session.loadExtension(docassetsPath).then(() => {
-                    setTimeout(() => {
-                        makeNewWindow()
-                    }, 100)
-                })
-            }
-        }
-        else {
-            if (ublock) {
+        if (ublock) {
+            win.webContents.session.loadExtension(docassetsPath).then(() => {
                 win.webContents.session.loadExtension(ublockPath).then(() => {
                     setTimeout(() => {
                         makeNewWindow()
                     }, 100)
                 })
-            }
-            else {
+            })
+        }
+        else {
+            win.webContents.session.loadExtension(docassetsPath).then(() => {
                 setTimeout(() => {
                     makeNewWindow()
                 }, 100)
-            }
+            })
         }
     }
     else {
