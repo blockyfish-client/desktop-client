@@ -1393,7 +1393,7 @@ const createWindow = () => {
                         if (chatSpamLoop == false) {
                             spamOn = false
                             window.addEventListener("keyup", (e) => {
-                                if (e.key.toLowerCase() == "q" && document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
+                                if (e.key.toLowerCase() == "f" && document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
                                     spamOn = !spamOn
                                     if (spamOn) {
                                         game.currentScene.showMessagePopup('Chat auto spam on', 1000, 0)
