@@ -59,6 +59,9 @@ Message `.pi#3141` if you want to contribute
 
 ## 📝 Changelogs  
 
+### v1.5.6 Chat spam bot
+- Added a feature to spam the chat. Press Q to toggle. Message to be spammed can be set in settings > chat > chat spam message. 
+
 ### v1.5.5 v3 UI
 - Add option to go back to old v3 UI
 - Aimbot no longer targets lampreys
