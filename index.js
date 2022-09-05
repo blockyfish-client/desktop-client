@@ -95,6 +95,7 @@ var qc1 = store.get('quick_chat.1')
 var qc2 = store.get('quick_chat.2')
 var qc3 = store.get('quick_chat.3')
 var qc4 = store.get('quick_chat.4')
+var spam_chat = store.get('quick_chat.spam')
 if (qc1 == undefined) {
     store.set("quick_chat.1", "gg")
     qc1 = "gg"
@@ -110,6 +111,10 @@ if (qc3 == undefined) {
 if (qc4 == undefined) {
     store.set("quick_chat.4", "ow!")
     qc4 = "ow!"
+}
+if (spam_chat == undefined) {
+    store.set("quick_chat.spam", "௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸")
+    spam_chat = "௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸"
 }
 
 //main window
@@ -188,6 +193,7 @@ const createWindow = () => {
                     store.set("quick_chat.2", qc2)
                     store.set("quick_chat.3", qc3)
                     store.set("quick_chat.4", qc4)
+                    store.set("quick_chat.spam", spam_chat)
                 }
             }
         });
@@ -295,6 +301,7 @@ const createWindow = () => {
     
             //state checks and UI adjustments
             win.webContents.executeJavaScript(`
+                chatSpamLoop = false
                 // document.querySelector('head > link[href*="/assets/index"][rel="stylesheet"]').href = "https://thepiguy3141.github.io/doc-assets/images/misc/index.8b74f9b3.css"
                 notif_count_old = 0
                 console.log("state: FFA0")
@@ -605,7 +612,7 @@ const createWindow = () => {
                 });
     
                 //define function for building custom items
-                function buildCustomSettingsItems(qc1, qc2, qc3, qc4) {
+                function buildCustomSettingsItems(qc1, qc2, qc3, qc4, spam_chat) {
                     if (document.getElementById('pane-0') != null) {
                         //restart tooltip
                         var modal_parent = document.querySelector('#app > div.modals-container > div > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div')
@@ -794,7 +801,7 @@ const createWindow = () => {
                         // quick chat messages
                         var qc_settings_main = document.createElement('div')
                         document.querySelector('#pane-1 > form').appendChild(qc_settings_main)
-                        qc_settings_main.outerHTML = '<div class="el-form-item"><label class="el-form-item__label">Quick chat #1</label><input maxlength="60" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-1" value="' + qc1 + '"></div><div class="el-form-item"><label class="el-form-item__label">Quick chat #2</label><input maxlength="60" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-2"value="' + qc2 + '"></div><div class="el-form-item"><label class="el-form-item__label">Quick chat #3</label><input maxlength="60" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-3"value="' + qc3 + '"></div><div class="el-form-item"><label class="el-form-item__label">Quick chat #4</label><input maxlength="60" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-4" value="' + qc4 + '"></div>'
+                        qc_settings_main.outerHTML = '<div class="el-form-item"><label class="el-form-item__label">Quick chat #1</label><input maxlength="100" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-1" value="' + qc1 + '"></div><div class="el-form-item"><label class="el-form-item__label">Quick chat #2</label><input maxlength="100" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-2"value="' + qc2 + '"></div><div class="el-form-item"><label class="el-form-item__label">Quick chat #3</label><input maxlength="100" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-3"value="' + qc3 + '"></div><div class="el-form-item"><label class="el-form-item__label">Quick chat #4</label><input maxlength="100" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-4" value="' + qc4 + '"></div><div class="el-form-item"><label class="el-form-item__label">Chat spam message</label><input maxlength="100" class="el-input__wrapper" autocomplete="off" tabindex="0" placeholder="Enter a message" id="qc-msg-spam" value="' + spam_chat + '"></div>'
                         document.getElementById('qc-msg-1').addEventListener("change", () => {
                             console.log("qc_ms_1: " + document.getElementById('qc-msg-1').value)
                         })
@@ -809,6 +816,10 @@ const createWindow = () => {
                         document.getElementById('qc-msg-4').addEventListener("change", () => {
                             restart_tooltip.style.display = 'block'
                             console.log("qc_ms_4: " + document.getElementById('qc-msg-4').value)
+                        })
+                        document.getElementById('qc-msg-spam').addEventListener("change", () => {
+                            restart_tooltip.style.display = 'block'
+                            console.log("qc_ms_spam: " + document.getElementById('qc-msg-spam').value)
                         })
                     }
                 }
@@ -1134,6 +1145,11 @@ const createWindow = () => {
                         msg = addslashes(msg)
                         qc4 = msg
                     }
+                    if (matches(msg, "qc_ms_spam: ")) {
+                        var msg = msg.replace("qc_ms_spam: ", "")
+                        msg = addslashes(msg)
+                        spam_chat = msg
+                    }
     
                     // send quick-chat message
                     if (matches(msg, "send_chat_msg:")) {
@@ -1154,7 +1170,7 @@ const createWindow = () => {
     
                     //load custom settings
                     if (matches(msg, "Modal Added:[object HTMLDivElement]")) {
-                        win.webContents.executeJavaScript(`buildCustomSettingsItems('` + qc1 + `', '` + qc2 + `', '` + qc3 + `', '` + qc4 + `')`)
+                        win.webContents.executeJavaScript(`buildCustomSettingsItems('` + qc1 + `', '` + qc2 + `', '` + qc3 + `', '` + qc4 + `', '` + spam_chat + `')`)
                     }
 
                     if (matches(msg, "ERR_INTERNET_DISCONNECTED")) {
@@ -1370,6 +1386,30 @@ const createWindow = () => {
                                 }
                             }
                         })
+                        `)
+
+                        //spam chat
+                        win.webContents.executeJavaScript(`
+                        if (chatSpamLoop == false) {
+                            spamOn = false
+                            window.addEventListener("keyup", (e) => {
+                                if (e.key.toLowerCase() == "q" && document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
+                                    spamOn = !spamOn
+                                    if (spamOn) {
+                                        game.currentScene.showMessagePopup('Chat auto spam on', 1000, 0)
+                                    }
+                                    else {
+                                        game.currentScene.showMessagePopup('Chat auto spam off', 1000, 0)
+                                    }
+                                }
+                            })
+                            setInterval(() => {
+                                if (document.querySelector('div.home-page').style.display == 'none' && spamOn) {
+                                    console.log("send_chat_msg: " + "` + spam_chat + `")
+                                }
+                            }, 10000)
+                            chatSpamLoop = true
+                        }
                         `)
     
                         // overlays
