@@ -5,7 +5,7 @@ const setupEvents = require('./installers/setupEvents')
 }
 
 // import stuff that makes client go brrrr
-const { app, BrowserWindow, globalShortcut } = require('electron')
+const { app, BrowserWindow } = require('electron')
 const electronDl = require('electron-dl')
 const path = require('path')
 const { shell } = require("electron")
@@ -15,7 +15,6 @@ const fs = require('fs') // Load the File System to execute our common tasks (CR
 const { ElectronChromeExtensions } = require('electron-chrome-extensions')
 const Store = require('electron-store');
 const request = require('request');
-const { error } = require('console');
 
 // force english
 app.commandLine.appendSwitch('lang', 'en-US')
