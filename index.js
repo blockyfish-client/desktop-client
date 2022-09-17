@@ -140,7 +140,7 @@ const createWindow = () => {
         // the overlay you see on top-right
         titleBarStyle: 'hidden',
         titleBarOverlay: {
-            color: '#1f2937',
+            color: '#125767',
             symbolColor: '#ffffff',
         },
 
@@ -436,6 +436,18 @@ const createWindow = () => {
                         }
                     }
                 }, 1000)
+                `)
+
+                //url input textfield
+                win.webContents.executeJavaScript(`
+                const top_corner_section = document.querySelector('#app > div.ui > div > div.el-row.header > div.el-col.el-col-24.auto-col.left')
+                const url_div = document.createElement('div')
+                top_corner_section.appendChild(url_div)
+                setTimeout(() => {
+                    url_input_type = document.querySelector('#url-input-box')
+                }, 100)
+                const go_to_url = 'NAVIGATE_TO_THIS_URL: '
+                url_div.outerHTML = '<div style=" margin: 10px; padding: 5px 10px; background-color: #0003; border: solid #374151 1px; border-radius: 7px;"><input type="text" style=" background-color: #1f293700; outline: none;" placeholder="Enter a URL..." id="url-input-box"><button style="padding: 0 0 0 5px;outline:none;" id="url-input-confirm" onclick="console.log(go_to_url + url_input_type.value)">Go</button></div>'
                 `)
     
                 //build evo button
@@ -1122,6 +1134,13 @@ const createWindow = () => {
                             var setting_value_bool = true
                         }
                         store.set(setting_key, setting_value_bool)
+                    }
+
+                    if (matches(msg, "NAVIGATE_TO_THIS_URL:")) {
+                        var msg = msg.replace("NAVIGATE_TO_THIS_URL: ", "").toLowerCase().replace("https://", "").replace("http://", "")
+                        if (msg.match(/^beta\.deeeep\.io(\/|\?)/)) {
+                            win.webContents.loadURL("https://" + msg)
+                        }
                     }
     
                     // store quick chat messages
