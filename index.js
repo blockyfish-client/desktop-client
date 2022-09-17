@@ -445,6 +445,12 @@ const createWindow = () => {
                 top_corner_section.appendChild(url_div)
                 setTimeout(() => {
                     url_input_type = document.querySelector('#url-input-box')
+                    url_input_type.addEventListener("keypress", function(event) {
+                        if (event.key === "Enter") {
+                            event.preventDefault()
+                            console.log(go_to_url + url_input_type.value)
+                        }
+                    });
                 }, 100)
                 const go_to_url = 'NAVIGATE_TO_THIS_URL: '
                 url_div.outerHTML = '<div style=" margin: 10px; padding: 5px 10px; background-color: #0003; border: solid #374151 1px; border-radius: 7px;"><input type="text" style=" background-color: #1f293700; outline: none;" placeholder="Enter a URL..." id="url-input-box"><button style="padding: 0 0 0 5px;outline:none;" id="url-input-confirm" onclick="console.log(go_to_url + url_input_type.value)">Go</button></div>'
