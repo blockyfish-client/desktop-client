@@ -217,6 +217,8 @@ const createWindow = () => {
     
         // bye-bye stinky electron menu bar (no one likes you anyways)
         win.removeMenu();
+
+        global.consoleLogScriptRunning = false
     
         //wait for the base webpage to finish loading before customizing it
         win.webContents.on('did-finish-load', function() {
@@ -1052,667 +1054,673 @@ const createWindow = () => {
                 var old_url = 'https://beta.deeeep.io'
                 
                 // intercept every console log 😈🔥
-                win.webContents.on("console-message", (ev, level, message, line, file) => {
-                    var msg = `${message}`
-                    console.log(msg);
-                    
-                    if (matches(msg, "user: ")) {
-                        msg = msg.replace("user: ", "")
-                        request('https://apibeta.deeeep.io/users/u/' + msg, {json: true}, (error, res, body) => {
-                            if (error) {
-                                return  console.log(error)
-                            };
+                if (!global.consoleLogScriptRunning) {
+                    win.webContents.on("console-message", (ev, level, message, line, file) => {
+                        var msg = `${message}`
+                        console.log(msg);
                         
-                            if (!error && res.statusCode == 200) {
-                                if (e.includes(body.id)) {
-                                    win.webContents.executeJavaScript(`
-                                    game.socketManager.disconnect()
-                                    `)
-                                    console.log('BAN_EZ_USER_GONE_L_DEATH_BYE')
-                                    app.e = 'ban'
-                                    win.hide()
-                                    require('electron').dialog.showMessageBoxSync(win,
-                                        {
-                                            type: 'question',
-                                            buttons: ['Close'],
-                                            title: 'Banned!',
-                                            message: 'You are banned from Blockyfish Client\nGoodbye!',
-                                            icon: path.join(__dirname, 'img/icon.png'),
-                                    });
-                                    app.quit()
-                                }
-                            };
-                        });
-                    }
-    
-                    //find notification updates
-                    if (matches(msg, "notifs:")) {
-                        if (msg.length < 10) {
-                            const msg_num = msg.charAt(msg.length - 1);
-                            if (msg_num != 0) {
-                                win.setOverlayIcon(path.join(__dirname, 'img/' + msg_num + '.png'), 'Over ' + msg_num + ' notifications')
-                            }
-                            else {
-                                win.setOverlayIcon(null, '')
-                            }
-                        }
-                        else {
-                            win.setOverlayIcon(path.join(__dirname, 'img/9_plus.png'), 'Over 9 notifications')
-                        }
-                    }
-    
-                    //find rpc update events
-                    if (matches(msg, "state:")) {
-                        var msg = msg.replace("state: ", "")
-                        var mode = msg.slice(0,-1)
-                        var menu = msg.slice(-1)
-                        try {
-                            var url = win.webContents.getURL()
-                        } catch (e) {
-                            console.log('oops')
-                        }
-                        if (mode != old_mode || menu != old_menu || url != old_url) {
-                            setGameMode(mode, menu)
-                            old_mode = mode
-                            old_menu = menu
-                            old_url = url
-                        }
-                    }
-    
-                    // download the file
-                    // yes, this is actually what starts the download
-                    // not that stupid bs 140 lines above
-                    if (matches(msg, "request_download:")) {
-                        var url = msg.replace("request_download: ", "")
-                        electronDl.download(BrowserWindow.getFocusedWindow(), url, {directory:downloadPath, filename:"blockyfishclient-update-download.exe", onProgress: function(progress) {setUpdateDownloadBar(Math.floor(progress.percent * 100))}, onCompleted: function(file) {runUpdateInstaller(file.path)}})
-                    }
-    
-                    // store extension related settings so they can be loaded later
-                    // also saves your window size and location so you dont have to adjust it everytime
-                    if (matches(msg, "store_settings:")) {
-                        var msg = msg.replace("store_settings: ", "")
-                        var setting_key = msg.slice(0,-1)
-                        var setting_value = msg.slice(-1)
-                        if (setting_value == 0) {
-                            var setting_value_bool = false
-                        }
-                        else if (setting_value == 1) {
-                            var setting_value_bool = true
-                        }
-                        store.set(setting_key, setting_value_bool)
-                    }
-
-                    if (matches(msg, "NAVIGATE_TO_THIS_URL:")) {
-                        var msg = msg.replace("NAVIGATE_TO_THIS_URL: ", "").toLowerCase().replace("https://", "").replace("http://", "")
-                        if (msg.match(/^beta\.deeeep\.io(\/|\?)/)) {
-                            win.webContents.loadURL("https://" + msg)
-                        }
-                    }
-    
-                    // store quick chat messages
-                    if (matches(msg, "qc_ms_1: ")) {
-                        var msg = msg.replace("qc_ms_1: ", "")
-                        msg = addslashes(msg)
-                        qc1 = msg
-                    }
-                    if (matches(msg, "qc_ms_2: ")) {
-                        var msg = msg.replace("qc_ms_2: ", "")
-                        msg = addslashes(msg)
-                        qc2 = msg
-                    }
-                    if (matches(msg, "qc_ms_3: ")) {
-                        var msg = msg.replace("qc_ms_3: ", "")
-                        msg = addslashes(msg)
-                        qc3 = msg
-                    }
-                    if (matches(msg, "qc_ms_4: ")) {
-                        var msg = msg.replace("qc_ms_4: ", "")
-                        msg = addslashes(msg)
-                        qc4 = msg
-                    }
-                    if (matches(msg, "qc_ms_spam: ")) {
-                        var msg = msg.replace("qc_ms_spam: ", "")
-                        msg = addslashes(msg)
-                        spam_chat = msg
-                    }
-    
-                    // send quick-chat message
-                    if (matches(msg, "send_chat_msg:")) {
-                        var msg = msg.replace("send_chat_msg: ", "")
-                        sendKeybinding(win, 'enter')
-                        for (var i = 0; i < msg.length; i++) {
-                            sendKeybinding(win, msg[i])
-                        }
-                        sendKeybinding(win, 'enter')
-                        win.webContents.executeJavaScript(`quickChatTyping = false`)
-                    }
-    
-                    // slash commands
-                    if (matches(msg, "handle_slash_command")) {
-                        sendKeybinding(win, 'enter')
-                        sendKeybinding(win, '/')
-                    }
-    
-                    //load custom settings
-                    if (matches(msg, "Modal Added:[object HTMLDivElement]")) {
-                        win.webContents.executeJavaScript(`buildCustomSettingsItems('` + qc1 + `', '` + qc2 + `', '` + qc3 + `', '` + qc4 + `', '` + spam_chat + `')`)
-                    }
-
-                    if (matches(msg, "ERR_INTERNET_DISCONNECTED")) {
-                        setInterval(() => {
-                            console.log('sjfdhgkbsdf')
-                        })
-                    }
-    
-                    if (matches(msg, "RUN_TARGET_LOCK_SCRIPT")) {
-                        win.webContents.executeJavaScript(`
-                        click0 = game.currentScene.entityManager.getEntity(targetID).relatedObjects.children[2].speedMultiplierDisplay.visible;
-                        setInterval(function () {
-                            if (targetID != null && game.currentScene.entityManager.getEntity(targetID) != null) {
-                                click1 = game.currentScene.entityManager.getEntity(targetID).relatedObjects.children[2].speedMultiplierDisplay.visible;
-                                c = {"x": innerWidth/2 + game.currentScene.entityManager.getEntity(targetID).position.x - game.currentScene.myAnimal.position._x, "y": innerHeight/2 + game.currentScene.entityManager.getEntity(targetID).position.y - game.currentScene.myAnimal.position._y}
-                                mapeditor.dispatchEvent(new MouseEvent("pointermove", {clientX:c.x, clientY:c.y}))
-                                if (click0 != click1) {
-                                    click0 = click1
-                                    if (click1) {
-                                        game.inputManager.spaceKeyDown()
+                        if (matches(msg, "user: ")) {
+                            msg = msg.replace("user: ", "")
+                            request('https://apibeta.deeeep.io/users/u/' + msg, {json: true}, (error, res, body) => {
+                                if (error) {
+                                    return  console.log(error)
+                                };
+                            
+                                if (!error && res.statusCode == 200) {
+                                    if (e.includes(body.id)) {
+                                        win.webContents.executeJavaScript(`
+                                        game.socketManager.disconnect()
+                                        `)
+                                        console.log('BAN_EZ_USER_GONE_L_DEATH_BYE')
+                                        app.e = 'ban'
+                                        win.hide()
+                                        require('electron').dialog.showMessageBoxSync(win,
+                                            {
+                                                type: 'question',
+                                                buttons: ['Close'],
+                                                title: 'Banned!',
+                                                message: 'You are banned from Blockyfish Client\nGoodbye!',
+                                                icon: path.join(__dirname, 'img/icon.png'),
+                                        });
+                                        app.quit()
                                     }
-                                    else {
-                                        game.inputManager.spaceKeyUp()
-                                    }
-                                }
-                            }
-                        });
-                        `)
-                    }
-    
-                    if (matches(msg, "CREATE_A_NEW_WINDOW")) {
-                        createWindow()
-                    }
-    
-                    // if game has loaded, inject the hacks xd
-                    if (matches(msg, "Common.playLoadProgress (old, new),100,0")) {
-                        win.webContents.executeJavaScript(`
-                        setInterval(function () {
-                            for (let i = 0; i < game.currentScene.entityManager.animalsList.length; i++) {
-                                if (game.currentScene.entityManager.animalsList[i].alpha < 0.5) {
-                                    game.currentScene.entityManager.animalsList[i].alpha = 0.5
-                                }
-                                if (game.currentScene.entityManager.animalsList[i].inner.alpha < 0.5) {
-                                    game.currentScene.entityManager.animalsList[i].inner.alpha = 0.5
-                                }
-                                if (game.currentScene.entityManager.animalsList[i].relatedObjects.visible != true) {
-                                    game.currentScene.entityManager.animalsList[i].relatedObjects.visible = true
-                                }
-                                if (game.currentScene.entityManager.animalsList[i].nameObject.visible != true) {
-                                    game.currentScene.entityManager.animalsList[i].nameObject.visible = true
-                                }
-                            }
-                        })
-                        setInterval(function () {
-                            game.currentScene.ceilingsContainer.alpha = 0.3
-                            game.viewport.clampZoom({
-                                minWidth: 0,
-                                maxWidth: 1e7,
-                            })
-    
-                            // TWEMOJI
-                            // for names
-                            if (game.currentScene.myAnimal != null) {
-                                var ownerName = game.currentScene.myAnimal.entityName
-                                if (ownerName == '') {
-                                    var ownerName = 'Unnamed'
-                                }
-                                game.currentScene.myAnimal.nameObject.textStyles.default.fontFamily = "Quicksand, 'emoji'"
-                                game.currentScene.myAnimal.updateName('')
-                                game.currentScene.myAnimal.updateName(ownerName)
-                            }
-                            for (let i = 0; i < game.currentScene.entityManager.animalsList.length; i++) {
-                                var name = game.currentScene.entityManager.animalsList[i].entityName
-                                if (name == '') {
-                                    var name = 'Unnamed'
-                                }
-                                game.currentScene.entityManager.animalsList[i].nameObject.textStyles.default.fontFamily = "Quicksand, 'emoji'"
-                                game.currentScene.entityManager.animalsList[i].updateName('')
-                                game.currentScene.entityManager.animalsList[i].updateName(name)
-                            }
-    
-                            // for chat messages
-                            for (let i = 0; i < game.currentScene.chatMessages.length; i++) {
-                                var chatMsg = game.currentScene.chatMessages[i].text._text
-    
-                                game.currentScene.chatMessages[i].text.textStyles.default.fontFamily = "Quicksand, 'emoji'"
-                                game.currentScene.chatMessages[i].setText('')
-                                game.currentScene.chatMessages[i].setText(chatMsg)
-                            }
-                        }, 200);
-    
-                        //no flashbang/ink
-                        game.currentScene.toggleFlash = function() {}
-                        game.currentScene.terrainManager.shadow.setShadowSize(1000000)
-                        game.currentScene.terrainManager.shadow.setShadowSize = function() {}
-    
-                        //show ghosts
-                        game.currentScene.viewingGhosts = true
-
-                        //animals over props and terrain
-                        game.currentScene.foodGlowContainer.zOrder = 996
-                        game.currentScene.foodContainer.zOrder = 997
-                        game.currentScene.namesLayer.zOrder = 998
-                        game.currentScene.animalsContainer.zOrder = 999
-                        game.currentScene.barsLayer.zOrder = 1000
-                        game.currentScene.chatContainer.zOrder = 1001
-    
-                        //evo wheel
-                        var evo_wheel = document.createElement('div')
-                        document.querySelector('div.game').insertBefore(evo_wheel, document.querySelector('div.game').children[0])
-                        evo_wheel.outerHTML = '<div style="width: 100%;height: 100%;position: absolute;pointer-events: none;display: flex;"><img id="evo-wheel" draggable="false" src="https://raw.githubusercontent.com/blockyfish-client/Assets/main/evo_circle.png" style="z-index: -9999;max-width: 80vw;max-height: 80vh;align-self: center;margin: auto;transition: 0.1s all;transform: scale(0);opacity: 0;"></div>'        
-                        evo_wheel = document.getElementById('evo-wheel')
-    
-                        evo_wheel.style.transform = 'scale(1) rotate(0deg)'
-                        evo_wheel.style.transform = 'scale(0) rotate(-90deg)'
-                        evo_wheel.style.transition = '.3s all'
-    
-                        async function preloadEvoWheel() {
-                            evo_wheel.style.transform = 'scale(1) rotate(0deg)'
-                            evo_wheel.style.opacity = 1
-                            setTimeout(() => {
-                                evo_wheel.style.transform = 'scale(0) rotate(-90deg)'
-                                evo_wheel.style.opacity = 0
-                            }, 1000)
-                            setTimeout(() => {
-                                evo_wheel.style.zIndex = 9999
-                            }, 1500)
-                        }
-    
-                        preloadEvoWheel()
-    
-                        //Y shortcut key
-                        document.body.addEventListener('keydown', function(e) {
-                            if (e.isComposing || e.keyCode === 229) {
-                                return;
-                            }
-                            if (e.key.toLowerCase() == "y" && document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
-                                rot = evo_wheel_rot
-                                evo_wheel.style.transform = 'scale(1) rotate(' + rot + 'deg)'
-                                evo_wheel.style.opacity = 1
-                            }
-                        });
-                        document.body.addEventListener('keyup', function(e) {
-                            if (e.key.toLowerCase() == "y") {
-                                rot = evo_wheel_rot - 90
-                                evo_wheel.style.transform = 'scale(0) rotate(' + rot + 'deg)'
-                                evo_wheel.style.opacity = 0
-                            }
-                        });
-                        `)
-    
-                        // asset swapper
-                        win.webContents.executeJavaScript(`
-                        async function createAssetSwapButton() {
-                            setInterval(function() {
-                                if (document.querySelector('div.top-right') != null) {
-                                    if (!document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1) > span > svg').classList.contains('bi') && !document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(2) > span > svg').classList.contains('bi')) {
-                                        var aswp_button = document.querySelector('div.top-right > div.buttons.button-bar > div > button > span > div').parentElement.parentElement.cloneNode(true)
-                                        var aswp_parent_div = document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div')
-                                        aswp_parent_div.insertBefore(aswp_button, aswp_parent_div.children[0])
-                                        var aswp_svg = document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1) > span > svg')
-                                        aswp_svg.outerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-layers-fill" viewBox="0 0 16 16"><path d="M7.765 1.559a.5.5 0 0 1 .47 0l7.5 4a.5.5 0 0 1 0 .882l-7.5 4a.5.5 0 0 1-.47 0l-7.5-4a.5.5 0 0 1 0-.882l7.5-4z"/><path d="m2.125 8.567-1.86.992a.5.5 0 0 0 0 .882l7.5 4a.5.5 0 0 0 .47 0l7.5-4a.5.5 0 0 0 0-.882l-1.86-.992-5.17 2.756a1.5 1.5 0 0 1-1.41 0l-5.17-2.756z"/></svg>'
-                                        var aswp_key = document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1) > span > div')
-                                        aswp_key.innerText = 'K'
-                                        document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1)').addEventListener("mousedown", () => {
-                                            if (document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none') {
-                                                toggleAswp()
-                                            }
-                                        })
-                                    }
-                                }
-    
-                            }, 500)
-                        }
-                        createAssetSwapButton()
-                        `)
-    
-                        //quick chat UI
-                        win.webContents.executeJavaScript(`
-                        quickChatTyping = false
-                        var qc_div = document.createElement('div')
-                        document.querySelector('div.game').insertBefore(qc_div, document.querySelector('div.game').children[0])
-                        qc_div.outerHTML = '<div id=quick-chat-container style=display:none><div class="quick-chat row one"><div><p>` + qc1 + `</div></div><div class="quick-chat row two"><div><p>` + qc4 + `</div><div><p>` + qc2 + `</div></div><div class="quick-chat row one"><div><p>` + qc3 + `</div></div></div>'
-                        var quickChatDiv = document.getElementById('quick-chat-container')
-                        document.body.addEventListener("mousemove", (e) => {
-                            window.mouseX = e.clientX
-                            window.mouseY = e.clientY 
-                        })
-                        window.posSet = false
-                        document.body.addEventListener("keydown", (e) => {
-                            if (e.key.toLowerCase() == "c" && document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
-                                if (!posSet) {
-                                    quickChatDiv.style.display = "block"
-                                    let x = mouseX - 300
-                                    let y = mouseY - 150
-                                    quickChatDiv.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
-                                    window.posSet = true
-                                }
-                            }
-                        })
-                        document.body.addEventListener("keyup", (e) => {
-                            if (quickChatTyping == false) {
-                                if (e.key.toLowerCase() == "c") {
-                                    quickChatTyping = true
-                                    if (document.querySelector('#quick-chat-container > div > div:hover') != null) {
-                                        console.log("send_chat_msg: " + document.querySelector('#quick-chat-container > div > div:hover').innerText)
-                                    }
-                                    else {
-                                        quickChatTyping = false
-                                    }
-                                    quickChatDiv.style.display = "none"
-                                    window.posSet = false
-                                }
-                            }
-                        })
-                        `)
-
-                        //spam chat
-                        win.webContents.executeJavaScript(`
-                        if (chatSpamLoop == false) {
-                            spamOn = false
-                            window.addEventListener("keyup", (e) => {
-                                if (e.key.toLowerCase() == "f" && document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
-                                    spamOn = !spamOn
-                                    if (spamOn) {
-                                        game.currentScene.showMessagePopup('Chat auto spam on', 1000, 0)
-                                    }
-                                    else {
-                                        game.currentScene.showMessagePopup('Chat auto spam off', 1000, 0)
-                                    }
-                                }
-                            })
-                            setInterval(() => {
-                                if (document.querySelector('div.home-page').style.display == 'none' && spamOn) {
-                                    console.log("send_chat_msg: " + "` + spam_chat + `")
-                                }
-                            }, 10000)
-                            chatSpamLoop = true
-                        }
-                        `)
-    
-                        // overlays
-                        win.webContents.executeJavaScript(`
-                        var ctrl_overlay = document.createElement('div')
-                        document.querySelector('div.game').insertBefore(ctrl_overlay, document.querySelector('div.game').children[0])
-                        ctrl_overlay.outerHTML = '<div id="ctrl-overlay" style="width: 100%;height: 100%;position: absolute;display: block;z-index:10000;pointer-events:none;"></div>'
-                        var aim_overlay = document.createElement('hr')
-                        document.querySelector('div.game').insertBefore(aim_overlay, document.querySelector('div.game').children[1])
-                        aim_overlay.outerHTML = '<hr id="aim-overlay" style="border: 2px #fff dotted;border-image: linear-gradient(to right, #fff8, #fff0) 1;transform-origin: left;position: absolute;top: 50%;left: 50%;width: 40vw;display:none;pointer-events:none;">'
-                        `)
-    
-                        //fish levels:
-                        // 61: goblin shark
-                        // 93: archerfish
-                        // 94: sea otter
-                        // 101: thresher shark
-                        // 107: beaked whale
-                        // 109: beluga
-                        // 113: japanese spider crab
-                        win.webContents.executeJavaScript(`
-                        listForAnimalsWithAimOverlay = [61, 93, 94, 113]
-                        listForGamemodesWithAimOverlay = [1, 2, 6]
-                        setInterval(function() {
-                            if (game.currentScene != null) {
-                                if (game.currentScene.myAnimal != null) {
-                                    if (game.currentScene.myAnimal._visibleFishLevel == 101) {
-                                        document.getElementById('aim-overlay').style.transform = 'rotate(' + (game.currentScene.myAnimal.inner.rotation*180/Math.PI + 90) + 'deg)'
-                                    }
-                                    else {
-                                        document.getElementById('aim-overlay').style.transform = 'rotate(' + (game.currentScene.myAnimal.inner.rotation*180/Math.PI - 90) + 'deg)'
-                                    }
-                                }
-                            }
-                        }, 10)
-                        function showCtrlOverlay(e) {
-                            if (e.ctrlKey || e.altKey) {
-                                if (game.currentScene != null) {
-                                    if (game.currentScene.myAnimal != null) {
-                                        if (game.currentScene.myAnimal._visibleFishLevel != 101) {
-                                            document.getElementById('ctrl-overlay').style.pointerEvents = 'all'
-                                        }
-                                        else if (!e.shiftKey) {
-                                            if (game.currentScene.myAnimal._visibleFishLevel == 101)
-                                            document.getElementById('ctrl-overlay').style.pointerEvents = 'all'
-                                        }
-                                        else {
-                                            document.getElementById('ctrl-overlay').style.pointerEvents = 'none'
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        async function superShot() {
-                            game.inputManager.handleLongPress(1)
-                            setTimeout(() => {
-                                game.inputManager.handleLongPress(5000)
-                            }, 50)
-                            setTimeout(() => {
-                                game.inputManager.handleLongPress(5000)
-                            }, 100)
-                            setTimeout(() => {
-                                game.inputManager.handleLongPress(5000)
-                            }, 150)
-                            setTimeout(() => {
-                                game.inputManager.handleLongPress(5000)
-                            }, 200)
-                        }
-                        window.addEventListener("keydown",
-                            function(e) {
-                                showCtrlOverlay(e)
-                                if (e.ctrlKey && listForAnimalsWithAimOverlay.includes(game.currentScene.myAnimal._visibleFishLevel) && listForGamemodesWithAimOverlay.includes(game.gameMode) && aim_helper_on) {
-                                    document.getElementById('aim-overlay').style.display = 'block'
-                                }
-                            },
-                        false);
-                        window.addEventListener("click",
-                            function(e) {
-                                if (e.ctrlKey) {
-                                    if (e.shiftKey && (game.currentScene.myAnimal._visibleFishLevel == 109 || game.currentScene.myAnimal._visibleFishLevel == 107)) {
-                                        console.log('hi')
-                                        superShot()
-                                    }
-                                    else if (e.shiftKey && game.currentScene.myAnimal._visibleFishLevel != 101) {
-                                        game.inputManager.handleLongPress(-5)
-                                    }
-                                    else {
-                                        game.inputManager.handleLongPress(5000)
-                                    }
-                                }
-                                if (e.altKey) {
-                                    game.inputManager.handleLongPress(350)
-                                }
-                            },
-                        false);
-                        window.addEventListener("keyup",
-                            function(e) {
-                                if (!e.ctrlKey && !e.altKey) {
-                                    document.getElementById('ctrl-overlay').style.pointerEvents = 'none'
-                                }
-                                if (!e.ctrlKey) {
-                                    document.getElementById('aim-overlay').style.display = 'none'
-                                }
-                            },
-                        false);
-                        window.addEventListener("focus", () => {
-                            document.getElementById('ctrl-overlay').style.pointerEvents = 'none'
-                            document.getElementById('aim-overlay').style.display = 'none'
-                        })
-                        `)
-    
-                        //matching strings - for utilities
-                        //removing items from array for unmuting
-                        win.webContents.executeJavaScript(`
-                        function matches(text, partial) {
-                            console.log(text)
-                            return text.toLowerCase().indexOf(partial.toLowerCase()) > -1;
-                        }
-                        function arrayRemove(arr, value) { 
-                            return arr.filter(function(ele){ 
-                                return ele != value; 
+                                };
                             });
                         }
-                        `)
-    
-                        //muting people idk and slash commands
-                        //game.currentScene.chatMessages[0].originalMessage.senderRoomId
-                        win.webContents.executeJavaScript(`
-                        mutedList = []
-                        chat_value = ''
-                        targetLockScriptRan = 0
-                        targetID = 0
-                        window.addEventListener("keyup", function(e) {
-                            if (e.keyCode == 13) {
-                                if (matches(chat_value, '/unmute ')) {
-                                    muteID = chat_value.replace('/unmute ', '')
-                                    if (mutedList.includes(muteID)) {
-                                        mutedList = arrayRemove(mutedList, muteID)
-                                    }
+        
+                        //find notification updates
+                        if (matches(msg, "notifs:")) {
+                            if (msg.length < 10) {
+                                const msg_num = msg.charAt(msg.length - 1);
+                                if (msg_num != 0) {
+                                    win.setOverlayIcon(path.join(__dirname, 'img/' + msg_num + '.png'), 'Over ' + msg_num + ' notifications')
                                 }
-                                else if (matches(chat_value, '/mute ')) {
-                                    muteID = chat_value.replace('/mute ', '')
-                                    if (!mutedList.includes(muteID)) {
-                                        mutedList.push(muteID)
-                                    }
-                                }
-                                else if (matches(chat_value, '/settarget')) {
-                                    targetID = parseInt(chat_value.replace('/settarget ', '').replace('/settarget', ''))
-                                    console.log(targetID)
-                                    game.currentScene.uiManager.setTargetId(0)
-                                    game.currentScene.uiManager.setTargetId(targetID)
-                                    if (game.currentScene.myAnimal != null && targetLockScriptRan == 0) {
-                                        targetLockScriptRan = 1
-                                        console.log('RUN_TARGET_LOCK_SCRIPT')
-                                    }
-    
-                                }
-                                else if (matches(chat_value, '/help')) {
-                                    game.currentScene.showMessagePopup('/mute <id> - mute a player\\n/unmute <id> - unmute a player\\n/settarget <entityid> - lock on to an animal', 5000, 0)
+                                else {
+                                    win.setOverlayIcon(null, '')
                                 }
                             }
                             else {
-                                chat_value = document.querySelector('#app > div.overlay > div.chat-input.horizontal-center > input').value
+                                win.setOverlayIcon(path.join(__dirname, 'img/9_plus.png'), 'Over 9 notifications')
                             }
-                            if (e.key == '/' && document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
-                                console.log('handle_slash_command')
+                        }
+        
+                        //find rpc update events
+                        if (matches(msg, "state:")) {
+                            var msg = msg.replace("state: ", "")
+                            var mode = msg.slice(0,-1)
+                            var menu = msg.slice(-1)
+                            try {
+                                var url = win.webContents.getURL()
+                            } catch (e) {
+                                console.log('oops')
                             }
-                        })
-                        `)
-                        //deleting muted chat messages
-                        win.webContents.executeJavaScript(`
-                        setInterval(function() {
-                            if (game.currentScene != null) {
-                                for (let i = 0; i < game.currentScene.chatMessages.length; i++) {
-                                    if (mutedList.includes(String(game.currentScene.chatMessages[i].originalMessage.senderRoomId))) {
-                                        game.currentScene.chatMessages[i].renderable = false
-                                    }
-                                }
+                            // if (mode != old_mode || menu != old_menu || url != old_url) {
+                                setGameMode(mode, menu)
+                                old_mode = mode
+                                old_menu = menu
+                                old_url = url
+                            // }
+                        }
+        
+                        // download the file
+                        // yes, this is actually what starts the download
+                        // not that stupid bs 140 lines above
+                        if (matches(msg, "request_download:")) {
+                            var url = msg.replace("request_download: ", "")
+                            electronDl.download(BrowserWindow.getFocusedWindow(), url, {directory:downloadPath, filename:"blockyfishclient-update-download.exe", onProgress: function(progress) {setUpdateDownloadBar(Math.floor(progress.percent * 100))}, onCompleted: function(file) {runUpdateInstaller(file.path)}})
+                        }
+        
+                        // store extension related settings so they can be loaded later
+                        // also saves your window size and location so you dont have to adjust it everytime
+                        if (matches(msg, "store_settings:")) {
+                            var msg = msg.replace("store_settings: ", "")
+                            var setting_key = msg.slice(0,-1)
+                            var setting_value = msg.slice(-1)
+                            if (setting_value == 0) {
+                                var setting_value_bool = false
                             }
-                        }, 200)
-                        `)
+                            else if (setting_value == 1) {
+                                var setting_value_bool = true
+                            }
+                            store.set(setting_key, setting_value_bool)
+                        }
     
-                        //show id
-                        win.webContents.executeJavaScript(`
-                        setInterval(() => {
-                            if (document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1').childElementCount != 5 || document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(5) > span').innerText != "ID: " + game.currentScene.myAnimal.id) {
-                                if (document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(4)') != null) {
-                                    document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(4)').remove()
-                                }
-                                if (document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(4)') != null) {
-                                    document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(4)').remove()
-                                }
-                                var id_label = document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div.fps').cloneNode(true)
-                                var id_space = document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div.flex-grow.mx-1').cloneNode(true)
-                                var info_div = document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1')
-                                info_div.appendChild(id_space)
-                                info_div.appendChild(id_label)
-                                id_label.classList = 'fps fps--1'
-                                var id_text = document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(5) > span')
-                                id_text.innerText = 'ID: null'
+                        if (matches(msg, "NAVIGATE_TO_THIS_URL:")) {
+                            var msg = msg.replace("NAVIGATE_TO_THIS_URL: ", "").toLowerCase().replace("https://", "").replace("http://", "")
+                            if (msg.match(/^beta\.deeeep\.io(\/|\?)/)) {
+                                // win.webContents.loadURL("https://" + msg)
+                                win.webContents.executeJavaScript(`
+                                window.location.href = "https://` + msg + `"
+                                `)
                             }
-                            if (game.currentScene != null) {
-                                id_text.innerText = 'ID: ' + game.currentScene.myAnimal.id
+                        }
+        
+                        // store quick chat messages
+                        if (matches(msg, "qc_ms_1: ")) {
+                            var msg = msg.replace("qc_ms_1: ", "")
+                            msg = addslashes(msg)
+                            qc1 = msg
+                        }
+                        if (matches(msg, "qc_ms_2: ")) {
+                            var msg = msg.replace("qc_ms_2: ", "")
+                            msg = addslashes(msg)
+                            qc2 = msg
+                        }
+                        if (matches(msg, "qc_ms_3: ")) {
+                            var msg = msg.replace("qc_ms_3: ", "")
+                            msg = addslashes(msg)
+                            qc3 = msg
+                        }
+                        if (matches(msg, "qc_ms_4: ")) {
+                            var msg = msg.replace("qc_ms_4: ", "")
+                            msg = addslashes(msg)
+                            qc4 = msg
+                        }
+                        if (matches(msg, "qc_ms_spam: ")) {
+                            var msg = msg.replace("qc_ms_spam: ", "")
+                            msg = addslashes(msg)
+                            spam_chat = msg
+                        }
+        
+                        // send quick-chat message
+                        if (matches(msg, "send_chat_msg:")) {
+                            var msg = msg.replace("send_chat_msg: ", "")
+                            sendKeybinding(win, 'enter')
+                            for (var i = 0; i < msg.length; i++) {
+                                sendKeybinding(win, msg[i])
                             }
-                        }, 5000)
-                        `)
-                        //aimbot
-                        win.webContents.executeJavaScript(`
-                        aimBot = false
-                        mouseX = 0
-                        mouseY = 0
-                        mapeditor = document.querySelector('#canvas-container > canvas')
-                        whitelistedAimbotAnimalId = [18, 26, 29, 33, 44, 47, 52, 67, 77, 88]
-                        if (!aimBotRan) {
-                            aimBotRan = true
-                            window.addEventListener("keyup", (e) => {
-                                if (e.key.toLowerCase() == "a" && document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
-                                    aimBot = !aimBot
-                                    game.currentScene.uiManager.setTargetId(0)
-                                    if (aimBot) {
-                                        game.currentScene.showMessagePopup('Aim assist on', 1000, 0)
-                                    }
-                                    else {
-                                        game.currentScene.showMessagePopup('Aim assist off', 1000, 0)
-                                    }
-                                }
-                            })
+                            sendKeybinding(win, 'enter')
+                            win.webContents.executeJavaScript(`quickChatTyping = false`)
+                        }
+        
+                        // slash commands
+                        if (matches(msg, "handle_slash_command")) {
+                            sendKeybinding(win, 'enter')
+                            sendKeybinding(win, '/')
+                        }
+        
+                        //load custom settings
+                        if (matches(msg, "Modal Added:[object HTMLDivElement]")) {
+                            win.webContents.executeJavaScript(`buildCustomSettingsItems('` + qc1 + `', '` + qc2 + `', '` + qc3 + `', '` + qc4 + `', '` + spam_chat + `')`)
+                        }
+    
+                        if (matches(msg, "ERR_INTERNET_DISCONNECTED")) {
                             setInterval(() => {
-                                if (aimBot && game.currentScene != null) {
-                                    if (game.currentScene.myAnimal != null) {
-                                        closestEntityDistance = 9999999
-                                        closestEntity = 0
-                                        for (let i = 0; i < game.currentScene.entityManager.animalsList.length; i++) {
-                                            if (Math.sqrt(((mouseX - innerWidth/2) - (game.currentScene.entityManager.animalsList[i].position.x - game.currentScene.myAnimal.position._x))**2 + ((mouseY - innerHeight/2) - (game.currentScene.entityManager.animalsList[i].position.y - game.currentScene.myAnimal.position._y))**2) < closestEntityDistance && !game.currentScene.entityManager.animalsList[i].mine && (game.currentScene.myAnimal.tribeId == null || game.currentScene.myAnimal.tribeId != game.currentScene.entityManager.animalsList[i].tribeId) && !(game.gameMode == 2 && game.currentScene.entityManager.animalsList[i].nameObject._text.includes(game.currentScene.myAnimal.nameObject._text.slice(0, 10))) && !whitelistedAimbotAnimalId.includes(game.currentScene.entityManager.animalsList[i].fishLevelData.fishLevel)) {
-                                                closestEntityDistance = Math.sqrt(((mouseX - innerWidth/2) - (game.currentScene.entityManager.animalsList[i].position.x - game.currentScene.myAnimal.position._x))**2 + ((mouseY - innerHeight/2) - (game.currentScene.entityManager.animalsList[i].position.y - game.currentScene.myAnimal.position._y))**2)
-                                                closestEntity = game.currentScene.entityManager.animalsList[i].id
-                                            }
-                                        }
-                                    }
-                                }
-                            }, 50)
-                            window.addEventListener("mousemove", (e) => {
-                                mouseX = e.clientX
-                                mouseY = e.clientY
-                                if (aimBot && game.currentScene != null) {
-                                    if (game.currentScene.myAnimal != null) {
-                                        if (closestEntityDistance < 500) {
-                                            if (closestEntity != game.currentScene.uiManager.targetId) {
-                                                game.currentScene.uiManager.setTargetId(0)
-                                                game.currentScene.uiManager.setTargetId(closestEntity)
-                                            }
-                                            c = {"x": innerWidth/2 + game.currentScene.entityManager.getEntity(closestEntity).position.x - game.currentScene.myAnimal.position._x, "y": innerHeight/2 + game.currentScene.entityManager.getEntity(closestEntity).position.y - game.currentScene.myAnimal.position._y}
-                                            mapeditor.dispatchEvent(new MouseEvent("pointermove", {clientX:c.x, clientY:c.y}))
+                                console.log('sjfdhgkbsdf')
+                            })
+                        }
+        
+                        if (matches(msg, "RUN_TARGET_LOCK_SCRIPT")) {
+                            win.webContents.executeJavaScript(`
+                            click0 = game.currentScene.entityManager.getEntity(targetID).relatedObjects.children[2].speedMultiplierDisplay.visible;
+                            setInterval(function () {
+                                if (targetID != null && game.currentScene.entityManager.getEntity(targetID) != null) {
+                                    click1 = game.currentScene.entityManager.getEntity(targetID).relatedObjects.children[2].speedMultiplierDisplay.visible;
+                                    c = {"x": innerWidth/2 + game.currentScene.entityManager.getEntity(targetID).position.x - game.currentScene.myAnimal.position._x, "y": innerHeight/2 + game.currentScene.entityManager.getEntity(targetID).position.y - game.currentScene.myAnimal.position._y}
+                                    mapeditor.dispatchEvent(new MouseEvent("pointermove", {clientX:c.x, clientY:c.y}))
+                                    if (click0 != click1) {
+                                        click0 = click1
+                                        if (click1) {
+                                            game.inputManager.spaceKeyDown()
                                         }
                                         else {
-                                            game.currentScene.uiManager.setTargetId(0)
+                                            game.inputManager.spaceKeyUp()
                                         }
+                                    }
+                                }
+                            });
+                            `)
+                        }
+        
+                        if (matches(msg, "CREATE_A_NEW_WINDOW")) {
+                            createWindow()
+                        }
+        
+                        // if game has loaded, inject the hacks xd
+                        if (matches(msg, "Common.playLoadProgress (old, new),100,0")) {
+                            win.webContents.executeJavaScript(`
+                            setInterval(function () {
+                                for (let i = 0; i < game.currentScene.entityManager.animalsList.length; i++) {
+                                    if (game.currentScene.entityManager.animalsList[i].alpha < 0.5) {
+                                        game.currentScene.entityManager.animalsList[i].alpha = 0.5
+                                    }
+                                    if (game.currentScene.entityManager.animalsList[i].inner.alpha < 0.5) {
+                                        game.currentScene.entityManager.animalsList[i].inner.alpha = 0.5
+                                    }
+                                    if (game.currentScene.entityManager.animalsList[i].relatedObjects.visible != true) {
+                                        game.currentScene.entityManager.animalsList[i].relatedObjects.visible = true
+                                    }
+                                    if (game.currentScene.entityManager.animalsList[i].nameObject.visible != true) {
+                                        game.currentScene.entityManager.animalsList[i].nameObject.visible = true
                                     }
                                 }
                             })
-                            setInterval(() => {
-                                if (aimBot && game.currentScene != null) {
+                            setInterval(function () {
+                                game.currentScene.ceilingsContainer.alpha = 0.3
+                                game.viewport.clampZoom({
+                                    minWidth: 0,
+                                    maxWidth: 1e7,
+                                })
+        
+                                // TWEMOJI
+                                // for names
+                                if (game.currentScene.myAnimal != null) {
+                                    var ownerName = game.currentScene.myAnimal.entityName
+                                    if (ownerName == '') {
+                                        var ownerName = 'Unnamed'
+                                    }
+                                    game.currentScene.myAnimal.nameObject.textStyles.default.fontFamily = "Quicksand, 'emoji'"
+                                    game.currentScene.myAnimal.updateName('')
+                                    game.currentScene.myAnimal.updateName(ownerName)
+                                }
+                                for (let i = 0; i < game.currentScene.entityManager.animalsList.length; i++) {
+                                    var name = game.currentScene.entityManager.animalsList[i].entityName
+                                    if (name == '') {
+                                        var name = 'Unnamed'
+                                    }
+                                    game.currentScene.entityManager.animalsList[i].nameObject.textStyles.default.fontFamily = "Quicksand, 'emoji'"
+                                    game.currentScene.entityManager.animalsList[i].updateName('')
+                                    game.currentScene.entityManager.animalsList[i].updateName(name)
+                                }
+        
+                                // for chat messages
+                                for (let i = 0; i < game.currentScene.chatMessages.length; i++) {
+                                    var chatMsg = game.currentScene.chatMessages[i].text._text
+        
+                                    game.currentScene.chatMessages[i].text.textStyles.default.fontFamily = "Quicksand, 'emoji'"
+                                    game.currentScene.chatMessages[i].setText('')
+                                    game.currentScene.chatMessages[i].setText(chatMsg)
+                                }
+                            }, 200);
+        
+                            //no flashbang/ink
+                            game.currentScene.toggleFlash = function() {}
+                            game.currentScene.terrainManager.shadow.setShadowSize(1000000)
+                            game.currentScene.terrainManager.shadow.setShadowSize = function() {}
+        
+                            //show ghosts
+                            game.currentScene.viewingGhosts = true
+    
+                            //animals over props and terrain
+                            game.currentScene.foodGlowContainer.zOrder = 996
+                            game.currentScene.foodContainer.zOrder = 997
+                            game.currentScene.namesLayer.zOrder = 998
+                            game.currentScene.animalsContainer.zOrder = 999
+                            game.currentScene.barsLayer.zOrder = 1000
+                            game.currentScene.chatContainer.zOrder = 1001
+        
+                            //evo wheel
+                            var evo_wheel = document.createElement('div')
+                            document.querySelector('div.game').insertBefore(evo_wheel, document.querySelector('div.game').children[0])
+                            evo_wheel.outerHTML = '<div style="width: 100%;height: 100%;position: absolute;pointer-events: none;display: flex;"><img id="evo-wheel" draggable="false" src="https://raw.githubusercontent.com/blockyfish-client/Assets/main/evo_circle.png" style="z-index: -9999;max-width: 80vw;max-height: 80vh;align-self: center;margin: auto;transition: 0.1s all;transform: scale(0);opacity: 0;"></div>'        
+                            evo_wheel = document.getElementById('evo-wheel')
+        
+                            evo_wheel.style.transform = 'scale(1) rotate(0deg)'
+                            evo_wheel.style.transform = 'scale(0) rotate(-90deg)'
+                            evo_wheel.style.transition = '.3s all'
+        
+                            async function preloadEvoWheel() {
+                                evo_wheel.style.transform = 'scale(1) rotate(0deg)'
+                                evo_wheel.style.opacity = 1
+                                setTimeout(() => {
+                                    evo_wheel.style.transform = 'scale(0) rotate(-90deg)'
+                                    evo_wheel.style.opacity = 0
+                                }, 1000)
+                                setTimeout(() => {
+                                    evo_wheel.style.zIndex = 9999
+                                }, 1500)
+                            }
+        
+                            preloadEvoWheel()
+        
+                            //Y shortcut key
+                            document.body.addEventListener('keydown', function(e) {
+                                if (e.isComposing || e.keyCode === 229) {
+                                    return;
+                                }
+                                if (e.key.toLowerCase() == "y" && document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
+                                    rot = evo_wheel_rot
+                                    evo_wheel.style.transform = 'scale(1) rotate(' + rot + 'deg)'
+                                    evo_wheel.style.opacity = 1
+                                }
+                            });
+                            document.body.addEventListener('keyup', function(e) {
+                                if (e.key.toLowerCase() == "y") {
+                                    rot = evo_wheel_rot - 90
+                                    evo_wheel.style.transform = 'scale(0) rotate(' + rot + 'deg)'
+                                    evo_wheel.style.opacity = 0
+                                }
+                            });
+                            `)
+        
+                            // asset swapper
+                            win.webContents.executeJavaScript(`
+                            async function createAssetSwapButton() {
+                                setInterval(function() {
+                                    if (document.querySelector('div.top-right') != null) {
+                                        if (!document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1) > span > svg').classList.contains('bi') && !document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(2) > span > svg').classList.contains('bi')) {
+                                            var aswp_button = document.querySelector('div.top-right > div.buttons.button-bar > div > button > span > div').parentElement.parentElement.cloneNode(true)
+                                            var aswp_parent_div = document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div')
+                                            aswp_parent_div.insertBefore(aswp_button, aswp_parent_div.children[0])
+                                            var aswp_svg = document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1) > span > svg')
+                                            aswp_svg.outerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-layers-fill" viewBox="0 0 16 16"><path d="M7.765 1.559a.5.5 0 0 1 .47 0l7.5 4a.5.5 0 0 1 0 .882l-7.5 4a.5.5 0 0 1-.47 0l-7.5-4a.5.5 0 0 1 0-.882l7.5-4z"/><path d="m2.125 8.567-1.86.992a.5.5 0 0 0 0 .882l7.5 4a.5.5 0 0 0 .47 0l7.5-4a.5.5 0 0 0 0-.882l-1.86-.992-5.17 2.756a1.5 1.5 0 0 1-1.41 0l-5.17-2.756z"/></svg>'
+                                            var aswp_key = document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1) > span > div')
+                                            aswp_key.innerText = 'K'
+                                            document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(1)').addEventListener("mousedown", () => {
+                                                if (document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none') {
+                                                    toggleAswp()
+                                                }
+                                            })
+                                        }
+                                    }
+        
+                                }, 500)
+                            }
+                            createAssetSwapButton()
+                            `)
+        
+                            //quick chat UI
+                            win.webContents.executeJavaScript(`
+                            quickChatTyping = false
+                            var qc_div = document.createElement('div')
+                            document.querySelector('div.game').insertBefore(qc_div, document.querySelector('div.game').children[0])
+                            qc_div.outerHTML = '<div id=quick-chat-container style=display:none><div class="quick-chat row one"><div><p>` + qc1 + `</div></div><div class="quick-chat row two"><div><p>` + qc4 + `</div><div><p>` + qc2 + `</div></div><div class="quick-chat row one"><div><p>` + qc3 + `</div></div></div>'
+                            var quickChatDiv = document.getElementById('quick-chat-container')
+                            document.body.addEventListener("mousemove", (e) => {
+                                window.mouseX = e.clientX
+                                window.mouseY = e.clientY 
+                            })
+                            window.posSet = false
+                            document.body.addEventListener("keydown", (e) => {
+                                if (e.key.toLowerCase() == "c" && document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
+                                    if (!posSet) {
+                                        quickChatDiv.style.display = "block"
+                                        let x = mouseX - 300
+                                        let y = mouseY - 150
+                                        quickChatDiv.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
+                                        window.posSet = true
+                                    }
+                                }
+                            })
+                            document.body.addEventListener("keyup", (e) => {
+                                if (quickChatTyping == false) {
+                                    if (e.key.toLowerCase() == "c") {
+                                        quickChatTyping = true
+                                        if (document.querySelector('#quick-chat-container > div > div:hover') != null) {
+                                            console.log("send_chat_msg: " + document.querySelector('#quick-chat-container > div > div:hover').innerText)
+                                        }
+                                        else {
+                                            quickChatTyping = false
+                                        }
+                                        quickChatDiv.style.display = "none"
+                                        window.posSet = false
+                                    }
+                                }
+                            })
+                            `)
+    
+                            //spam chat
+                            win.webContents.executeJavaScript(`
+                            if (chatSpamLoop == false) {
+                                spamOn = false
+                                window.addEventListener("keyup", (e) => {
+                                    if (e.key.toLowerCase() == "f" && document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
+                                        spamOn = !spamOn
+                                        if (spamOn) {
+                                            game.currentScene.showMessagePopup('Chat auto spam on', 1000, 0)
+                                        }
+                                        else {
+                                            game.currentScene.showMessagePopup('Chat auto spam off', 1000, 0)
+                                        }
+                                    }
+                                })
+                                setInterval(() => {
+                                    if (document.querySelector('div.home-page').style.display == 'none' && spamOn) {
+                                        console.log("send_chat_msg: " + "` + spam_chat + `")
+                                    }
+                                }, 10000)
+                                chatSpamLoop = true
+                            }
+                            `)
+        
+                            // overlays
+                            win.webContents.executeJavaScript(`
+                            var ctrl_overlay = document.createElement('div')
+                            document.querySelector('div.game').insertBefore(ctrl_overlay, document.querySelector('div.game').children[0])
+                            ctrl_overlay.outerHTML = '<div id="ctrl-overlay" style="width: 100%;height: 100%;position: absolute;display: block;z-index:10000;pointer-events:none;"></div>'
+                            var aim_overlay = document.createElement('hr')
+                            document.querySelector('div.game').insertBefore(aim_overlay, document.querySelector('div.game').children[1])
+                            aim_overlay.outerHTML = '<hr id="aim-overlay" style="border: 2px #fff dotted;border-image: linear-gradient(to right, #fff8, #fff0) 1;transform-origin: left;position: absolute;top: 50%;left: 50%;width: 40vw;display:none;pointer-events:none;">'
+                            `)
+        
+                            //fish levels:
+                            // 61: goblin shark
+                            // 93: archerfish
+                            // 94: sea otter
+                            // 101: thresher shark
+                            // 107: beaked whale
+                            // 109: beluga
+                            // 113: japanese spider crab
+                            win.webContents.executeJavaScript(`
+                            listForAnimalsWithAimOverlay = [61, 93, 94, 113]
+                            listForGamemodesWithAimOverlay = [1, 2, 6]
+                            setInterval(function() {
+                                if (game.currentScene != null) {
                                     if (game.currentScene.myAnimal != null) {
-                                        if (closestEntityDistance < 200) {
-                                            if (closestEntity != game.currentScene.uiManager.targetId) {
-                                                game.currentScene.uiManager.setTargetId(0)
-                                                game.currentScene.uiManager.setTargetId(closestEntity)
-                                            }
-                                            c = {"x": innerWidth/2 + game.currentScene.entityManager.getEntity(closestEntity).position.x - game.currentScene.myAnimal.position._x, "y": innerHeight/2 + game.currentScene.entityManager.getEntity(closestEntity).position.y - game.currentScene.myAnimal.position._y}
-                                            mapeditor.dispatchEvent(new MouseEvent("pointermove", {clientX:c.x, clientY:c.y}))
+                                        if (game.currentScene.myAnimal._visibleFishLevel == 101) {
+                                            document.getElementById('aim-overlay').style.transform = 'rotate(' + (game.currentScene.myAnimal.inner.rotation*180/Math.PI + 90) + 'deg)'
+                                        }
+                                        else {
+                                            document.getElementById('aim-overlay').style.transform = 'rotate(' + (game.currentScene.myAnimal.inner.rotation*180/Math.PI - 90) + 'deg)'
                                         }
                                     }
                                 }
-                            }, 50)
+                            }, 10)
+                            function showCtrlOverlay(e) {
+                                if (e.ctrlKey || e.altKey) {
+                                    if (game.currentScene != null) {
+                                        if (game.currentScene.myAnimal != null) {
+                                            if (game.currentScene.myAnimal._visibleFishLevel != 101) {
+                                                document.getElementById('ctrl-overlay').style.pointerEvents = 'all'
+                                            }
+                                            else if (!e.shiftKey) {
+                                                if (game.currentScene.myAnimal._visibleFishLevel == 101)
+                                                document.getElementById('ctrl-overlay').style.pointerEvents = 'all'
+                                            }
+                                            else {
+                                                document.getElementById('ctrl-overlay').style.pointerEvents = 'none'
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            async function superShot() {
+                                game.inputManager.handleLongPress(1)
+                                setTimeout(() => {
+                                    game.inputManager.handleLongPress(5000)
+                                }, 50)
+                                setTimeout(() => {
+                                    game.inputManager.handleLongPress(5000)
+                                }, 100)
+                                setTimeout(() => {
+                                    game.inputManager.handleLongPress(5000)
+                                }, 150)
+                                setTimeout(() => {
+                                    game.inputManager.handleLongPress(5000)
+                                }, 200)
+                            }
+                            window.addEventListener("keydown",
+                                function(e) {
+                                    showCtrlOverlay(e)
+                                    if (e.ctrlKey && listForAnimalsWithAimOverlay.includes(game.currentScene.myAnimal._visibleFishLevel) && listForGamemodesWithAimOverlay.includes(game.gameMode) && aim_helper_on) {
+                                        document.getElementById('aim-overlay').style.display = 'block'
+                                    }
+                                },
+                            false);
+                            window.addEventListener("click",
+                                function(e) {
+                                    if (e.ctrlKey) {
+                                        if (e.shiftKey && (game.currentScene.myAnimal._visibleFishLevel == 109 || game.currentScene.myAnimal._visibleFishLevel == 107)) {
+                                            console.log('hi')
+                                            superShot()
+                                        }
+                                        else if (e.shiftKey && game.currentScene.myAnimal._visibleFishLevel != 101) {
+                                            game.inputManager.handleLongPress(-5)
+                                        }
+                                        else {
+                                            game.inputManager.handleLongPress(5000)
+                                        }
+                                    }
+                                    if (e.altKey) {
+                                        game.inputManager.handleLongPress(350)
+                                    }
+                                },
+                            false);
+                            window.addEventListener("keyup",
+                                function(e) {
+                                    if (!e.ctrlKey && !e.altKey) {
+                                        document.getElementById('ctrl-overlay').style.pointerEvents = 'none'
+                                    }
+                                    if (!e.ctrlKey) {
+                                        document.getElementById('aim-overlay').style.display = 'none'
+                                    }
+                                },
+                            false);
+                            window.addEventListener("focus", () => {
+                                document.getElementById('ctrl-overlay').style.pointerEvents = 'none'
+                                document.getElementById('aim-overlay').style.display = 'none'
+                            })
+                            `)
+        
+                            //matching strings - for utilities
+                            //removing items from array for unmuting
+                            win.webContents.executeJavaScript(`
+                            function matches(text, partial) {
+                                console.log(text)
+                                return text.toLowerCase().indexOf(partial.toLowerCase()) > -1;
+                            }
+                            function arrayRemove(arr, value) { 
+                                return arr.filter(function(ele){ 
+                                    return ele != value; 
+                                });
+                            }
+                            `)
+        
+                            //muting people idk and slash commands
+                            //game.currentScene.chatMessages[0].originalMessage.senderRoomId
+                            win.webContents.executeJavaScript(`
+                            mutedList = []
+                            chat_value = ''
+                            targetLockScriptRan = 0
+                            targetID = 0
+                            window.addEventListener("keyup", function(e) {
+                                if (e.keyCode == 13) {
+                                    if (matches(chat_value, '/unmute ')) {
+                                        muteID = chat_value.replace('/unmute ', '')
+                                        if (mutedList.includes(muteID)) {
+                                            mutedList = arrayRemove(mutedList, muteID)
+                                        }
+                                    }
+                                    else if (matches(chat_value, '/mute ')) {
+                                        muteID = chat_value.replace('/mute ', '')
+                                        if (!mutedList.includes(muteID)) {
+                                            mutedList.push(muteID)
+                                        }
+                                    }
+                                    else if (matches(chat_value, '/settarget')) {
+                                        targetID = parseInt(chat_value.replace('/settarget ', '').replace('/settarget', ''))
+                                        console.log(targetID)
+                                        game.currentScene.uiManager.setTargetId(0)
+                                        game.currentScene.uiManager.setTargetId(targetID)
+                                        if (game.currentScene.myAnimal != null && targetLockScriptRan == 0) {
+                                            targetLockScriptRan = 1
+                                            console.log('RUN_TARGET_LOCK_SCRIPT')
+                                        }
+        
+                                    }
+                                    else if (matches(chat_value, '/help')) {
+                                        game.currentScene.showMessagePopup('/mute <id> - mute a player\\n/unmute <id> - unmute a player\\n/settarget <entityid> - lock on to an animal', 5000, 0)
+                                    }
+                                }
+                                else {
+                                    chat_value = document.querySelector('#app > div.overlay > div.chat-input.horizontal-center > input').value
+                                }
+                                if (e.key == '/' && document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
+                                    console.log('handle_slash_command')
+                                }
+                            })
+                            `)
+                            //deleting muted chat messages
+                            win.webContents.executeJavaScript(`
+                            setInterval(function() {
+                                if (game.currentScene != null) {
+                                    for (let i = 0; i < game.currentScene.chatMessages.length; i++) {
+                                        if (mutedList.includes(String(game.currentScene.chatMessages[i].originalMessage.senderRoomId))) {
+                                            game.currentScene.chatMessages[i].renderable = false
+                                        }
+                                    }
+                                }
+                            }, 200)
+                            `)
+        
+                            //show id
+                            win.webContents.executeJavaScript(`
+                            setInterval(() => {
+                                if (document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1').childElementCount != 5 || document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(5) > span').innerText != "ID: " + game.currentScene.myAnimal.id) {
+                                    if (document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(4)') != null) {
+                                        document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(4)').remove()
+                                    }
+                                    if (document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(4)') != null) {
+                                        document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(4)').remove()
+                                    }
+                                    var id_label = document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div.fps').cloneNode(true)
+                                    var id_space = document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div.flex-grow.mx-1').cloneNode(true)
+                                    var info_div = document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1')
+                                    info_div.appendChild(id_space)
+                                    info_div.appendChild(id_label)
+                                    id_label.classList = 'fps fps--1'
+                                    var id_text = document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(5) > span')
+                                    id_text.innerText = 'ID: null'
+                                }
+                                if (game.currentScene != null) {
+                                    id_text.innerText = 'ID: ' + game.currentScene.myAnimal.id
+                                }
+                            }, 5000)
+                            `)
+                            //aimbot
+                            win.webContents.executeJavaScript(`
+                            aimBot = false
+                            mouseX = 0
+                            mouseY = 0
+                            mapeditor = document.querySelector('#canvas-container > canvas')
+                            whitelistedAimbotAnimalId = [18, 26, 29, 33, 44, 47, 52, 67, 77, 88]
+                            if (!aimBotRan) {
+                                aimBotRan = true
+                                window.addEventListener("keyup", (e) => {
+                                    if (e.key.toLowerCase() == "a" && document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
+                                        aimBot = !aimBot
+                                        game.currentScene.uiManager.setTargetId(0)
+                                        if (aimBot) {
+                                            game.currentScene.showMessagePopup('Aim assist on', 1000, 0)
+                                        }
+                                        else {
+                                            game.currentScene.showMessagePopup('Aim assist off', 1000, 0)
+                                        }
+                                    }
+                                })
+                                setInterval(() => {
+                                    if (aimBot && game.currentScene != null) {
+                                        if (game.currentScene.myAnimal != null) {
+                                            closestEntityDistance = 9999999
+                                            closestEntity = 0
+                                            for (let i = 0; i < game.currentScene.entityManager.animalsList.length; i++) {
+                                                if (Math.sqrt(((mouseX - innerWidth/2) - (game.currentScene.entityManager.animalsList[i].position.x - game.currentScene.myAnimal.position._x))**2 + ((mouseY - innerHeight/2) - (game.currentScene.entityManager.animalsList[i].position.y - game.currentScene.myAnimal.position._y))**2) < closestEntityDistance && !game.currentScene.entityManager.animalsList[i].mine && (game.currentScene.myAnimal.tribeId == null || game.currentScene.myAnimal.tribeId != game.currentScene.entityManager.animalsList[i].tribeId) && !(game.gameMode == 2 && game.currentScene.entityManager.animalsList[i].nameObject._text.includes(game.currentScene.myAnimal.nameObject._text.slice(0, 10))) && !whitelistedAimbotAnimalId.includes(game.currentScene.entityManager.animalsList[i].fishLevelData.fishLevel)) {
+                                                    closestEntityDistance = Math.sqrt(((mouseX - innerWidth/2) - (game.currentScene.entityManager.animalsList[i].position.x - game.currentScene.myAnimal.position._x))**2 + ((mouseY - innerHeight/2) - (game.currentScene.entityManager.animalsList[i].position.y - game.currentScene.myAnimal.position._y))**2)
+                                                    closestEntity = game.currentScene.entityManager.animalsList[i].id
+                                                }
+                                            }
+                                        }
+                                    }
+                                }, 50)
+                                window.addEventListener("mousemove", (e) => {
+                                    mouseX = e.clientX
+                                    mouseY = e.clientY
+                                    if (aimBot && game.currentScene != null) {
+                                        if (game.currentScene.myAnimal != null) {
+                                            if (closestEntityDistance < 500) {
+                                                if (closestEntity != game.currentScene.uiManager.targetId) {
+                                                    game.currentScene.uiManager.setTargetId(0)
+                                                    game.currentScene.uiManager.setTargetId(closestEntity)
+                                                }
+                                                c = {"x": innerWidth/2 + game.currentScene.entityManager.getEntity(closestEntity).position.x - game.currentScene.myAnimal.position._x, "y": innerHeight/2 + game.currentScene.entityManager.getEntity(closestEntity).position.y - game.currentScene.myAnimal.position._y}
+                                                mapeditor.dispatchEvent(new MouseEvent("pointermove", {clientX:c.x, clientY:c.y}))
+                                            }
+                                            else {
+                                                game.currentScene.uiManager.setTargetId(0)
+                                            }
+                                        }
+                                    }
+                                })
+                                setInterval(() => {
+                                    if (aimBot && game.currentScene != null) {
+                                        if (game.currentScene.myAnimal != null) {
+                                            if (closestEntityDistance < 200) {
+                                                if (closestEntity != game.currentScene.uiManager.targetId) {
+                                                    game.currentScene.uiManager.setTargetId(0)
+                                                    game.currentScene.uiManager.setTargetId(closestEntity)
+                                                }
+                                                c = {"x": innerWidth/2 + game.currentScene.entityManager.getEntity(closestEntity).position.x - game.currentScene.myAnimal.position._x, "y": innerHeight/2 + game.currentScene.entityManager.getEntity(closestEntity).position.y - game.currentScene.myAnimal.position._y}
+                                                mapeditor.dispatchEvent(new MouseEvent("pointermove", {clientX:c.x, clientY:c.y}))
+                                            }
+                                        }
+                                    }
+                                }, 50)
+                            }
+                            `)
                         }
-                        `)
-                    }
-            });
+                });
+            }
+            global.consoleLogScriptRunning = true
             
             //custom keybinds
             win.webContents.executeJavaScript(`
