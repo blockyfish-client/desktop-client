@@ -5,7 +5,7 @@ const setupEvents = require('./installers/setupEvents')
 }
 
 // import stuff that makes client go brrrr
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, globalShortcut } = require('electron')
 const electronDl = require('electron-dl')
 const path = require('path')
 const { shell } = require("electron")
@@ -201,6 +201,15 @@ const createWindow = () => {
         // globalShortcut.register('CommandOrControl+R', () => {
         //     win.reload()
         // })
+
+        // F2 to screenshot and save to download folder
+        globalShortcut.register('F2', () => {
+            win.webContents.capturePage().then(image => {
+                fs.writeFile(downloadPath + "\\" + new Date().getFullYear() + "-" + (new Date().getMonth() + 1) + "-" + new Date().getDate() + "-" + new Date().getHours() + "-" + new Date().getMinutes() + "-" + new Date().getSeconds() + "-" + new Date().getMilliseconds() +".png", image.toPNG(), (err) => {
+                    if (err) throw err
+                })
+            })
+        })
     
         // load the website
         win.loadURL('https://beta.deeeep.io')
@@ -226,6 +235,7 @@ const createWindow = () => {
     
             // keep everything running otherwise youll see a stack of 500 chat messages when you come back
             win.webContents.setBackgroundThrottling(false)
+
             // blockyfish logo
             win.webContents.executeJavaScript(`
             const brand_css = document.createElement('style')
