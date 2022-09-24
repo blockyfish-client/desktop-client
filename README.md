@@ -72,7 +72,7 @@ Message `.pi#3141` if you want to contribute
 - Added orange verified badge
 
 ### v1.5.3 Aim assist
-- Aim assist. Press Z to toggle. 
+- Aim assist. Press A to toggle. 
 
 ### v1.5.2 Performance Optimization
 - Less resource intensive
