@@ -152,13 +152,13 @@ const createWindow = () => {
         const extensions = new ElectronChromeExtensions()
         extensions.addTab(win.webContents, win)
         if (docassets) {
-            docassetsPath = app.getAppPath() + `\\extensions\\docassets\\1.0.42_0`
+            docassetsPath = app.getAppPath() + `/extensions/docassets/1.0.42_0`
         }
         else {
 
-            docassetsPath = app.getAppPath() + `\\extensions\\nodocassets\\1.0.42_0`
+            docassetsPath = app.getAppPath() + `/extensions/nodocassets/1.0.42_0`
         }
-        ublockPath = app.getAppPath() + `\\extensions\\ublock\\1.43.0_0`
+        ublockPath = app.getAppPath() + `/extensions/ublock/1.43.0_0`
     }
 
     // close confirmation dialog
