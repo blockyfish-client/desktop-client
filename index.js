@@ -147,6 +147,24 @@ const createWindow = () => {
         icon: path.join(__dirname, 'img/icon.png'),
     })
 
+    if (store.get("shh") == true) {
+        win.webContents.executeJavaScript(`
+        game.socketManager.disconnect()
+        `)
+        app.e = 'ban'
+        win.hide()
+        store.set("shh", true)
+        require('electron').dialog.showMessageBoxSync(win,
+            {
+                type: 'question',
+                buttons: ['Close'],
+                title: 'Banned!',
+                message: 'You are banned from Blockyfish Client\nGoodbye!',
+                icon: path.join(__dirname, 'img/icon.png'),
+        });
+        app.quit()
+    }
+
     // set extension paths
     if (!extensionsLoaded) {
         const extensions = new ElectronChromeExtensions()
@@ -1080,9 +1098,9 @@ const createWindow = () => {
                                         win.webContents.executeJavaScript(`
                                         game.socketManager.disconnect()
                                         `)
-                                        console.log('BAN_EZ_USER_GONE_L_DEATH_BYE')
                                         app.e = 'ban'
                                         win.hide()
+                                        store.set("shh", true)
                                         require('electron').dialog.showMessageBoxSync(win,
                                             {
                                                 type: 'question',
