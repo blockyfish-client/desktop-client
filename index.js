@@ -914,6 +914,13 @@ const createWindow = () => {
                 // also update checking and downloading
                 // and auto update check
                 win.webContents.executeJavaScript(`
+                function matches(text, partial) {
+                    try {
+                        return text.toLowerCase().indexOf(partial.toLowerCase()) > -1;
+                    } catch (e) {
+                        console.log('uh oh')
+                    }
+                }
                 async function spinUpdateIcon() {
                     setTimeout(function() {
                         updateImg.style.transition = '3s transform ease-in-out'
@@ -926,9 +933,17 @@ const createWindow = () => {
                 }
                 async function getUpdates() {
                     updateText.innerText = 'Checking for updates...'
+                    Name = "unknown"
+                    if (navigator.appVersion.indexOf("Win") != -1) Name = "win";
+                    if (navigator.appVersion.indexOf("Mac") != -1) Name = "mac";
+                    if (navigator.appVersion.indexOf("Linux") != -1) Name = "linux";
                     let url_json = await (await (fetch('https://api.github.com/repos/blockyfish-client/desktop-client/releases/latest'))).json();
-                    var download_url = url_json.assets[0].browser_download_url
-                    var download_ver = url_json.tag_name
+                    for (let i = 0; i < url_json.assets.length; i++) {
+                        if (matches(url_json.assets[i].name, Name)) {
+                            var download_url = url_json.assets[1].browser_download_url
+                            var download_ver = url_json.tag_name
+                        }
+                    }
                     var ver_num = download_ver.replace("v", "").replace(".", "").replace(".", "")
                     setTimeout(function() {
                         if (ver_num > ` + version_num + `) {
