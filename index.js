@@ -1169,7 +1169,20 @@ const createWindow = () => {
                         // not that stupid bs 140 lines above
                         if (matches(msg, "request_download:")) {
                             var url = msg.replace("request_download: ", "")
-                            electronDl.download(BrowserWindow.getFocusedWindow(), url, {directory:downloadPath, filename:"blockyfishclient-update-download.exe", onProgress: function(progress) {setUpdateDownloadBar(Math.floor(progress.percent * 100))}, onCompleted: function(file) {runUpdateInstaller(file.path)}})
+                            var extension = "zip"
+                            if (navigator.appVersion.indexOf("Win") != -1) extension = "exe";
+                            if (navigator.appVersion.indexOf("Mac") != -1) extension = "dmg";
+                            if (navigator.appVersion.indexOf("Linux") != -1) extension = "zip";
+                            electronDl.download(BrowserWindow.getFocusedWindow(), url, {
+                                directory:downloadPath, 
+                                filename:"blockyfishclient-update-download." + extension, 
+                                onProgress: function(progress) {
+                                    setUpdateDownloadBar(Math.floor(progress.percent * 100))
+                                }, 
+                                onCompleted: function(file) {
+                                    runUpdateInstaller(file.path)
+                                }
+                            })
                         }
         
                         // store extension related settings so they can be loaded later
