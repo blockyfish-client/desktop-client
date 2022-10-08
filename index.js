@@ -15,6 +15,7 @@ const fs = require('fs') // Load the File System to execute our common tasks (CR
 const { ElectronChromeExtensions } = require('electron-chrome-extensions')
 const Store = require('electron-store');
 const request = require('request');
+const os = require('os')
 
 // force english
 app.commandLine.appendSwitch('lang', 'en-US')
@@ -126,25 +127,15 @@ const createWindow = () => {
         height: store.get('window.height'),
         x: store.get('window.x'),
         y: store.get('window.y'),
-
-        // background
         backgroundColor: '#1f2937',
-
-        // dont show before webpage has loaded
         show: false,
         webPreferences: {
             nodeIntegration: true,
         },
-
-        // the overlay you see on top-right
         titleBarStyle: 'hidden',
-        titleBarOverlay: {
-            color: '#125767',
-            symbolColor: '#ffffff',
-        },
-
-        // icon lol
         icon: path.join(__dirname, 'img/icon.png'),
+        minWidth: 960,
+        minHeight: 540,
     })
 
     if (store.get("shh") == true) {
@@ -248,7 +239,7 @@ const createWindow = () => {
     
         //wait for the base webpage to finish loading before customizing it
         win.webContents.on('did-finish-load', function() {
-    
+
             // win.webContents.openDevTools()
     
             // keep everything running otherwise youll see a stack of 500 chat messages when you come back
@@ -260,6 +251,48 @@ const createWindow = () => {
             document.querySelector('head').appendChild(brand_css)
             brand_css.outerHTML = '<link rel="stylesheet" href="https://blockyfish.netlify.app/themes/branding.css">'
             `)
+
+            win.webContents.executeJavaScript(`
+            const titlebar_html = document.createElement('div')
+            document.body.appendChild(titlebar_html)
+            titlebar_html.outerHTML = '<div id="window-controls"> <div class="button" id="min-button"> <img class="icon" srcset="https://blockyfish.netlify.app/assets/titlebar/min-w-10.png 1x, https://blockyfish.netlify.app/assets/titlebar/min-w-12.png 1.25x, https://blockyfish.netlify.app/assets/titlebar/min-w-15.png 1.5x, https://blockyfish.netlify.app/assets/titlebar/min-w-15.png 1.75x, https://blockyfish.netlify.app/assets/titlebar/min-w-20.png 2x, https://blockyfish.netlify.app/assets/titlebar/min-w-20.png 2.25x, https://blockyfish.netlify.app/assets/titlebar/min-w-24.png 2.5x, https://blockyfish.netlify.app/assets/titlebar/min-w-30.png 3x, https://blockyfish.netlify.app/assets/titlebar/min-w-30.png 3.5x" draggable="false"/> </div><div class="button" id="max-button"> <img class="icon" srcset="https://blockyfish.netlify.app/assets/titlebar/max-w-10.png 1x, https://blockyfish.netlify.app/assets/titlebar/max-w-12.png 1.25x, https://blockyfish.netlify.app/assets/titlebar/max-w-15.png 1.5x, https://blockyfish.netlify.app/assets/titlebar/max-w-15.png 1.75x, https://blockyfish.netlify.app/assets/titlebar/max-w-20.png 2x, https://blockyfish.netlify.app/assets/titlebar/max-w-20.png 2.25x, https://blockyfish.netlify.app/assets/titlebar/max-w-24.png 2.5x, https://blockyfish.netlify.app/assets/titlebar/max-w-30.png 3x, https://blockyfish.netlify.app/assets/titlebar/max-w-30.png 3.5x" draggable="false"/> </div><div class="button" id="restore-button" style="display: none;"> <img class="icon" srcset="https://blockyfish.netlify.app/assets/titlebar/restore-w-10.png 1x, https://blockyfish.netlify.app/assets/titlebar/restore-w-12.png 1.25x, https://blockyfish.netlify.app/assets/titlebar/restore-w-15.png 1.5x, https://blockyfish.netlify.app/assets/titlebar/restore-w-15.png 1.75x, https://blockyfish.netlify.app/assets/titlebar/restore-w-20.png 2x, https://blockyfish.netlify.app/assets/titlebar/restore-w-20.png 2.25x, https://blockyfish.netlify.app/assets/titlebar/restore-w-24.png 2.5x, https://blockyfish.netlify.app/assets/titlebar/restore-w-30.png 3x, https://blockyfish.netlify.app/assets/titlebar/restore-w-30.png 3.5x" draggable="false"/> </div><div class="button" id="close-button"> <img class="icon" srcset="https://blockyfish.netlify.app/assets/titlebar/close-w-10.png 1x, https://blockyfish.netlify.app/assets/titlebar/close-w-12.png 1.25x, https://blockyfish.netlify.app/assets/titlebar/close-w-15.png 1.5x, https://blockyfish.netlify.app/assets/titlebar/close-w-15.png 1.75x, https://blockyfish.netlify.app/assets/titlebar/close-w-20.png 2x, https://blockyfish.netlify.app/assets/titlebar/close-w-20.png 2.25x, https://blockyfish.netlify.app/assets/titlebar/close-w-24.png 2.5x, https://blockyfish.netlify.app/assets/titlebar/close-w-30.png 3x, https://blockyfish.netlify.app/assets/titlebar/close-w-30.png 3.5x" draggable="false"/> </div></div>'
+    
+            const titlebar_style = document.createElement('style')
+            document.querySelector('head').appendChild(titlebar_style)
+            titlebar_style.innerHTML = '@media (-webkit-device-pixel-ratio:1.5),(device-pixel-ratio:1.5),(-webkit-device-pixel-ratio:2),(device-pixel-ratio:2),(-webkit-device-pixel-ratio:3),(device-pixel-ratio:3){#window-controls .icon{width:10px;height:10px}}#window-controls{z-index: 9999999999999999;color:#fff;display:grid;grid-template-columns:repeat(3,46px);position:absolute;top:0;right:0;height:32px;-webkit-app-region:no-drag}#window-controls .button{grid-row:1/span 1;display:flex;justify-content:center;align-items:center;width:50px;height:100%;user-select:none}#min-button{grid-column:1}#max-button,#restore-button{grid-column:2}#close-button{grid-column:3}#window-controls .button:hover{background:rgba(255,255,255,.1)}#window-controls .button:active{background:rgba(255,255,255,.2)}#close-button:hover{background:#e81123!important}#close-button:active{background:#bb111f!important}'
+    
+            document.getElementById("max-button").addEventListener("click", () => {
+                document.getElementById("max-button").style.display = "none"
+                document.getElementById("restore-button").style.display = ""
+                console.log('window_action: max')
+            })
+            document.getElementById("restore-button").addEventListener("click", () => {
+                document.getElementById("max-button").style.display = ""
+                document.getElementById("restore-button").style.display = "none"
+                console.log('window_action: res')
+            })
+            document.getElementById("min-button").addEventListener("click", () => {
+                console.log('window_action: min')
+            })
+            document.getElementById("close-button").addEventListener("click", () => {
+                console.log('window_action: cls')
+            })
+            `)
+
+            setInterval(() => {
+                if (win.isMaximized()) {
+                    win.webContents.executeJavaScript(`
+                    document.getElementById("max-button").style.display = "none"
+                    document.getElementById("restore-button").style.display = ""
+                    `)
+                }
+                else {
+                    win.webContents.executeJavaScript(`
+                    document.getElementById("max-button").style.display = ""
+                    document.getElementById("restore-button").style.display = "none"
+                    `)
+                }
+            }, 500);
 
             //custom theme
             if (theme) {
@@ -377,11 +410,13 @@ const createWindow = () => {
                         if (document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div').style.paddingRight != '') {
                             document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div').style.paddingRight = ''
                         }
+                        document.getElementById("window-controls").style.display = "none"
                     }
                     else {
                         if (document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div').style.paddingRight != '150px') {
                             document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div').style.paddingRight = '150px'
                         }
+                        document.getElementById("window-controls").style.display = ""
                     }
                     if (document.querySelector('div.el-button-group.nice-btn-group.block.mt-2').style.position != 'fixed') {
                         document.querySelector('div.el-button-group.nice-btn-group.block.mt-2').style.position = 'fixed'
@@ -464,7 +499,7 @@ const createWindow = () => {
                             document.querySelector('div.sidebar.right > div:nth-child(3) > button > span > span').style.whiteSpace = 'pre-wrap'
                         }
                     }
-                }, 1000)
+                }, 500)
                 `)
 
                 //url input textfield
@@ -1101,6 +1136,14 @@ const createWindow = () => {
                         var msg = `${message}`
                         console.log(msg);
                         
+                        if (matches(msg, "window_action:")) {
+                            msg = msg.replace("window_action: ", "")
+                            if (msg == "max") win.maximize()
+                            else if (msg == "res") win.unmaximize()
+                            else if (msg == "min") win.minimize()
+                            else if (msg == "cls") win.close()
+                        }
+
                         if (matches(msg, "user: ")) {
                             msg = msg.replace("user: ", "")
                             request('https://apibeta.deeeep.io/users/u/' + msg, {json: true}, (error, res, body) => {
@@ -1170,9 +1213,9 @@ const createWindow = () => {
                         if (matches(msg, "request_download:")) {
                             var url = msg.replace("request_download: ", "")
                             var extension = "zip"
-                            if (navigator.appVersion.indexOf("Win") != -1) extension = "exe";
-                            if (navigator.appVersion.indexOf("Mac") != -1) extension = "dmg";
-                            if (navigator.appVersion.indexOf("Linux") != -1) extension = "zip";
+                            if (os.platform().indexOf("Win") != -1) extension = "exe";
+                            if (os.platform().indexOf("Mac") != -1) extension = "dmg";
+                            if (os.platform().indexOf("Linux") != -1) extension = "zip";
                             electronDl.download(BrowserWindow.getFocusedWindow(), url, {
                                 directory:downloadPath, 
                                 filename:"blockyfishclient-update-download." + extension, 
