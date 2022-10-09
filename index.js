@@ -15,7 +15,8 @@ const fs = require('fs') // Load the File System to execute our common tasks (CR
 const { ElectronChromeExtensions } = require('electron-chrome-extensions')
 const Store = require('electron-store');
 const request = require('request');
-const os = require('os')
+const os = require('os');
+const { time } = require('console');
 
 process.on("uncaughtException", () => {
     console.log('something really bad happened!')
@@ -181,13 +182,13 @@ const createWindow = () => {
     // close confirmation dialog
     function makeNewWindow() {
         win.on('close', function(e) {
-            if (app.e != 'ban' && app.e != 'closing') {
+            if (app.e != 'ban') {
                 const choice = require('electron').dialog.showMessageBoxSync(this,
                 {
                     type: 'question',
                     buttons: ['Yes', 'No'],
                     title: 'Exit Deeeep.io',
-                    message: 'Are you sure you want to quit?',
+                    message: 'Are you sure you want to close?',
                     icon: path.join(__dirname, 'img/icon.png'),
                 });
     
@@ -198,8 +199,6 @@ const createWindow = () => {
     
                 // if user click "yes" 😢
                 else {
-                    e.preventDefault();
-                    app.e = "closing"
                     // dont save settings if window is maximized because we dont want the app to start back in full screen
                     if (win.isMaximized() == false) {
                         store.set("window.width", win.getSize()[0])
@@ -212,7 +211,6 @@ const createWindow = () => {
                     store.set("quick_chat.3", qc3)
                     store.set("quick_chat.4", qc4)
                     store.set("quick_chat.spam", spam_chat)
-                    window.close()
                 }
             }
         });
@@ -330,6 +328,18 @@ const createWindow = () => {
                 document.querySelector('head').appendChild(twe_style)
                 twe_style.innerHTML = '@font-face { font-family: emoji; font-weight: normal; src: url(//xem.github.io/unicode13/Twemoji.ttf) } html{font-family: Quicksand,emoji} @font-face { font-family: emoji; font-weight: bold; src: url(//xem.github.io/unicode13/Twemoji.ttf) } html{font-family: Quicksand,emoji}'
                 `)
+            }
+
+            // the month is december (11) and january (0)
+            if (new Date().getMonth() == 11 || new Date().getMonth() == 0) {
+                request('https://blockyfish.netlify.app/assets/seasonals/snow.json', {json: true}, (error, res, body) => {
+                    if (error) {
+                        return  console.log(error)
+                    };
+                    if (!error && res.statusCode == 200) {
+                        win.webContents.executeJavaScript(body.script)
+                    }
+                })
             }
     
             //custom cursor
