@@ -5,7 +5,7 @@ const setupEvents = require('./installers/setupEvents')
 }
 
 // import stuff that makes client go brrrr
-const { app, BrowserWindow, globalShortcut } = require('electron')
+const { app, BrowserWindow, globalShortcut, ipcMain } = require('electron')
 const electronDl = require('electron-dl')
 const path = require('path')
 const { shell } = require("electron")
@@ -16,6 +16,13 @@ const { ElectronChromeExtensions } = require('electron-chrome-extensions')
 const Store = require('electron-store');
 const request = require('request');
 const os = require('os')
+
+process.on("uncaughtException", () => {
+    console.log('something really bad happened!')
+})
+// process.on("unhandledRejection", () => {
+//     console.log('something kinda bad happened!')
+// })
 
 // force english
 app.commandLine.appendSwitch('lang', 'en-US')
@@ -133,6 +140,7 @@ const createWindow = () => {
             nodeIntegration: true,
         },
         titleBarStyle: 'hidden',
+        frame: false,
         icon: path.join(__dirname, 'img/icon.png'),
         minWidth: 960,
         minHeight: 540,
@@ -173,7 +181,7 @@ const createWindow = () => {
     // close confirmation dialog
     function makeNewWindow() {
         win.on('close', function(e) {
-            if (app.e != 'ban') {
+            if (app.e != 'ban' && app.e != 'closing') {
                 const choice = require('electron').dialog.showMessageBoxSync(this,
                 {
                     type: 'question',
@@ -190,6 +198,8 @@ const createWindow = () => {
     
                 // if user click "yes" 😢
                 else {
+                    e.preventDefault();
+                    app.e = "closing"
                     // dont save settings if window is maximized because we dont want the app to start back in full screen
                     if (win.isMaximized() == false) {
                         store.set("window.width", win.getSize()[0])
@@ -202,6 +212,9 @@ const createWindow = () => {
                     store.set("quick_chat.3", qc3)
                     store.set("quick_chat.4", qc4)
                     store.set("quick_chat.spam", spam_chat)
+                    setTimeout(() => {
+                        app.quit()
+                    }, 200);
                 }
             }
         });
@@ -1858,10 +1871,10 @@ const createWindow = () => {
             // no u electron xd
             // open all links in the default browser
             // instead of yucky electron windows
-            win.webContents.setWindowOpenHandler(({ url }) => {
-                shell.openExternal(url);
-                return { action: 'deny' };
-            });
+            win.webContents.on('new-window', function(e, url) {
+                e.preventDefault();
+                require('electron').shell.openExternal(url);
+              });
             
             // discord rpc stuff lol
             var rpc = new Client({

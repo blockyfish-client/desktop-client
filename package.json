@@ -6,9 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
-    "make-win": "npx electron-packager . Blockyfish --overwrite --platform=win32 --arch=x64 --icon=img/icons/win/icon.ico --prune=true --electron-version=13.6.9 --app-copyright=\"Pi 2022\" --out=release-builds --version-string.CompanyName=Pi --version-string.ProductName=\"Blockyfish Client\"",
+    "make-win": "npx electron-packager . Blockyfish --overwrite --platform=win32 --arch=x64 --icon=img/icons/win/icon.ico --prune=true --electron-version=10.4.7 --app-copyright=\"Pi 2022\" --out=release-builds --version-string.CompanyName=Pi --version-string.ProductName=\"Blockyfish Client\"",
     "pack-win": "node installers/windows/createinstaller.js",
-    "make-linux": "npx electron-packager . Blockyfish --overwrite --platform=linux --arch=x64 --icon=img/icons/win/icon.ico --prune=true --electron-version=13.6.9 --app-copyright=\"Pi 2022\" --out=release-builds --version-string.CompanyName=Pi --version-string.ProductName=\"Blockyfish Client\""
+    "make-linux": "npx electron-packager . Blockyfish --overwrite --platform=linux --arch=x64 --icon=img/icons/win/icon.ico --prune=true --electron-version=10.4.7 --app-copyright=\"Pi 2022\" --out=release-builds --version-string.CompanyName=Pi --version-string.ProductName=\"Blockyfish Client\""
   },
   "author": "Pi",
   "license": "MIT",
@@ -19,7 +19,7 @@
     ]
   },
   "devDependencies": {
-    "electron": "^13.6.9",
+    "electron": "^10.4.7",
     "electron-packager": "^15.5.1",
     "electron-winstaller": "^5.0.0"
   },

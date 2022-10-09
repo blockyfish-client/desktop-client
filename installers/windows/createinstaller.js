@@ -15,7 +15,7 @@ function getInstallerConfig () {
   const outPath = path.join(rootPath, 'release-builds')
 
   return Promise.resolve({
-    appDirectory: path.join(outPath, 'Blockyfish-win32-ia32/'),
+    appDirectory: path.join(outPath, 'Blockyfish-win32-x64/'),
     authors: 'Pi',
     noMsi: true,
     outputDirectory: path.join(outPath, 'windows-installer'),
