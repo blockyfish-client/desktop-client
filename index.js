@@ -212,9 +212,7 @@ const createWindow = () => {
                     store.set("quick_chat.3", qc3)
                     store.set("quick_chat.4", qc4)
                     store.set("quick_chat.spam", spam_chat)
-                    setTimeout(() => {
-                        app.quit()
-                    }, 200);
+                    window.close()
                 }
             }
         });
