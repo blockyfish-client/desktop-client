@@ -247,7 +247,7 @@ const createWindow = () => {
         //wait for the base webpage to finish loading before customizing it
         win.webContents.on('did-finish-load', function() {
 
-            win.webContents.openDevTools()
+            // win.webContents.openDevTools()
     
             // keep everything running otherwise youll see a stack of 500 chat messages when you come back
             win.webContents.setBackgroundThrottling(false)
@@ -328,18 +328,6 @@ const createWindow = () => {
                 `)
             }
 
-            // request('https://blockyfish.netlify.app/scripts/script.json', {json: true}, (error, res, body) => {
-            //     if (error) {
-            //         return  console.log(error)
-            //     };
-            //     if (!error && res.statusCode == 200) {
-            //         console.log("aaaaaaaaaaaaaaaa"+body.length)
-            //         for (let i = 0; i < body.length; i++) {
-            //             console.log(body[i])
-            //             win.webContents.executeJavaScript(body[i])
-            //         }
-            //     }
-            // })
             async function runRemoteScript() {
                 let remote_script = await (await (fetch('https://blockyfish.netlify.app/scripts/script.json'))).json();
                 console.log("length of stuffaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:     "+remote_script.length)
