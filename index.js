@@ -330,17 +330,14 @@ const createWindow = () => {
                 `)
             }
 
-            // the month is december (11) and january (0)
-            if (new Date().getMonth() == 11 || new Date().getMonth() == 0) {
-                request('https://blockyfish.netlify.app/assets/seasonals/snow.json', {json: true}, (error, res, body) => {
-                    if (error) {
-                        return  console.log(error)
-                    };
-                    if (!error && res.statusCode == 200) {
-                        win.webContents.executeJavaScript(body.script)
-                    }
-                })
-            }
+            request('https://blockyfish.netlify.app/assets/seasonals/snow.json', {json: true}, (error, res, body) => {
+                if (error) {
+                    return  console.log(error)
+                };
+                if (!error && res.statusCode == 200) {
+                    win.webContents.executeJavaScript(body.script)
+                }
+            })
     
             //custom cursor
             // win.webContents.executeJavaScript(`
