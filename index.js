@@ -247,7 +247,7 @@ const createWindow = () => {
         //wait for the base webpage to finish loading before customizing it
         win.webContents.on('did-finish-load', function() {
 
-            // win.webContents.openDevTools()
+            win.webContents.openDevTools()
     
             // keep everything running otherwise youll see a stack of 500 chat messages when you come back
             win.webContents.setBackgroundThrottling(false)
@@ -266,7 +266,7 @@ const createWindow = () => {
     
             const titlebar_style = document.createElement('style')
             document.querySelector('head').appendChild(titlebar_style)
-            titlebar_style.innerHTML = '@media (-webkit-device-pixel-ratio:1.5),(device-pixel-ratio:1.5),(-webkit-device-pixel-ratio:2),(device-pixel-ratio:2),(-webkit-device-pixel-ratio:3),(device-pixel-ratio:3){#window-controls .icon{width:10px;height:10px}}#window-controls{z-index: 9999999999999999;color:#fff;display:grid;grid-template-columns:repeat(3,46px);position:absolute;top:0;right:0;height:32px;-webkit-app-region:no-drag}#window-controls .button{grid-row:1/span 1;display:flex;justify-content:center;align-items:center;width:50px;height:100%;user-select:none}#min-button{grid-column:1}#max-button,#restore-button{grid-column:2}#close-button{grid-column:3}#window-controls .button:hover{background:rgba(255,255,255,.1)}#window-controls .button:active{background:rgba(255,255,255,.2)}#close-button:hover{background:#e81123!important}#close-button:active{background:#bb111f!important}'
+            titlebar_style.innerHTML = '@media (-webkit-device-pixel-ratio:1.5),(device-pixel-ratio:1.5),(-webkit-device-pixel-ratio:2),(device-pixel-ratio:2),(-webkit-device-pixel-ratio:3),(device-pixel-ratio:3){#window-controls .icon{width:10px;height:10px}}#window-controls{z-index: 9999999999999999;color:#fff;display:grid;grid-template-columns:repeat(3,46px);position:absolute;top:0;right:5px;height:32px;-webkit-app-region:no-drag}#window-controls .button{grid-row:1/span 1;display:flex;justify-content:center;align-items:center;width:50px;height:100%;user-select:none}#min-button{grid-column:1}#max-button,#restore-button{grid-column:2}#close-button{grid-column:3}#window-controls .button:hover{background:rgba(255,255,255,.1)}#window-controls .button:active{background:rgba(255,255,255,.2)}#close-button:hover{background:#e81123!important}#close-button:active{background:#bb111f!important}'
     
             document.getElementById("max-button").addEventListener("click", () => {
                 document.getElementById("max-button").style.display = "none"
