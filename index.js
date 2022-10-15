@@ -5,18 +5,16 @@ const setupEvents = require('./installers/setupEvents')
 }
 
 // import stuff that makes client go brrrr
-const { app, BrowserWindow, globalShortcut, ipcMain } = require('electron')
+const { app, BrowserWindow, globalShortcut } = require('electron')
 const electronDl = require('electron-dl')
 const path = require('path')
-const { shell } = require("electron")
 const { Client } = require("discord-rpc")
 const child = require('child_process').execFile
-const fs = require('fs') // Load the File System to execute our common tasks (CRUD)
+const fs = require('fs')
 const { ElectronChromeExtensions } = require('electron-chrome-extensions')
 const Store = require('electron-store');
 const request = require('request');
 const os = require('os');
-const { time } = require('console');
 const fetch = require('node-fetch');
 
 process.on("uncaughtException", () => {
