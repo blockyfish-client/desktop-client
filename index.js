@@ -5,7 +5,7 @@ const setupEvents = require('./installers/setupEvents')
 }
 
 // import stuff that makes client go brrrr
-const { app, BrowserWindow, globalShortcut } = require('electron')
+const { app, BrowserWindow, globalShortcut, shell } = require('electron')
 const electronDl = require('electron-dl')
 const path = require('path')
 const { Client } = require("discord-rpc")
@@ -303,16 +303,30 @@ const createWindow = () => {
             if (theme) {
                 win.webContents.executeJavaScript(`
                 const custom_css = document.createElement('style')
-                document.querySelector('head').appendChild(custom_css)
-                custom_css.outerHTML = '<link rel="stylesheet" href="https://blockyfish.netlify.app/themes/reefpenguin/theme.css">'
+                document.querySelector('body').appendChild(custom_css)
+                custom_css.outerHTML = '<link id="customcss" rel="stylesheet" href="https://blockyfish.netlify.app/themes/reefpenguin/theme.css">'
+                `)
+            }
+            else {
+                win.webContents.executeJavaScript(`
+                const custom_css = document.createElement('style')
+                document.querySelector('body').appendChild(custom_css)
+                custom_css.outerHTML = '<link id="customcss" rel="stylesheet" href="">'
                 `)
             }
 
             if (v3ui) {
                 win.webContents.executeJavaScript(`
                 const v3ui_css = document.createElement('style')
-                document.querySelector('head').appendChild(v3ui_css)
-                v3ui_css.outerHTML = '<link rel="stylesheet" href="https://blockyfish.netlify.app/themes/addon/v3ui.css">'
+                document.querySelector('body').appendChild(v3ui_css)
+                v3ui_css.outerHTML = '<link id="v3uicss" rel="stylesheet" href="https://blockyfish.netlify.app/themes/addon/v3ui.css">'
+                `)
+            }
+            else {
+                win.webContents.executeJavaScript(`
+                const v3ui_css = document.createElement('style')
+                document.querySelector('body').appendChild(v3ui_css)
+                v3ui_css.outerHTML = '<link id="v3uicss" rel="stylesheet" href="">'
                 `)
             }
             
@@ -328,9 +342,7 @@ const createWindow = () => {
 
             async function runRemoteScript() {
                 let remote_script = await (await (fetch('https://blockyfish.netlify.app/scripts/script.json'))).json();
-                console.log("length of stuffaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:     "+remote_script.length)
                 for (let i = 0; i < remote_script.length; i++) {
-                    console.log(remote_script[i].js)
                     win.webContents.executeJavaScript(remote_script[i].js)
                 }
             }
@@ -534,6 +546,13 @@ const createWindow = () => {
                 const go_to_url = 'NAVIGATE_TO_THIS_URL: '
                 url_div.outerHTML = '<div style=" margin: 10px; padding: 5px 10px; background-color: #0003; border: solid #374151 1px; border-radius: 7px;"><input type="text" style=" background-color: #1f293700; outline: none;" placeholder="Enter a URL..." id="url-input-box"><button style="padding: 0 0 0 5px;outline:none;" id="url-input-confirm" onclick="console.log(go_to_url + url_input_type.value)">Go</button></div>'
                 `)
+
+                //edit button layout
+                win.webContents.executeJavaScript(`
+                const button_container_css = document.createElement('style')
+                document.body.appendChild(button_container_css)
+                button_container_css.innerHTML = '@media only screen and (min-width: 768px) {.el-col-sm-8 {max-width: 25% !important;flex: 0 0 25% !important;}}'
+                `)
     
                 //build evo button
                 win.webContents.executeJavaScript(`
@@ -571,6 +590,88 @@ const createWindow = () => {
                   })
                 }
                 `)
+
+                //build plugins button
+                win.webContents.executeJavaScript(`
+                const plugin_button_clone = document.querySelector('div.p-2.sidebar.right.space-y-2 > div.container > div > div').cloneNode(true);
+                document.querySelector('div.p-2.sidebar.right.space-y-2 > div.container > div').appendChild(plugin_button_clone);
+                plugin_button = plugin_button_clone.firstElementChild
+                plugin_button.classList.remove("pink")
+                plugin_button.classList.add("orange", "plugin", "plugin-close")
+                const pluginText = document.querySelector("button.plugin > span:nth-child(1) > span:nth-child(2)")
+                pluginText.innerHTML = "Plugins"
+                const pluginIcon = document.querySelector("button.plugin > span:nth-child(1) > svg:nth-child(1)")
+                `)
+
+                //change plugin icon
+                win.webContents.executeJavaScript('pluginIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-tools" viewBox="0 0 16 16"><path d="M1 0 0 1l2.2 3.081a1 1 0 0 0 .815.419h.07a1 1 0 0 1 .708.293l2.675 2.675-2.617 2.654A3.003 3.003 0 0 0 0 13a3 3 0 1 0 5.878-.851l2.654-2.617.968.968-.305.914a1 1 0 0 0 .242 1.023l3.27 3.27a.997.997 0 0 0 1.414 0l1.586-1.586a.997.997 0 0 0 0-1.414l-3.27-3.27a1 1 0 0 0-1.023-.242L10.5 9.5l-.96-.96 2.68-2.643A3.005 3.005 0 0 0 16 3c0-.269-.035-.53-.102-.777l-2.14 2.141L12 4l-.364-1.757L13.777.102a3 3 0 0 0-3.675 3.68L7.462 6.46 4.793 3.793a1 1 0 0 1-.293-.707v-.071a1 1 0 0 0-.419-.814L1 0Zm9.646 10.646a.5.5 0 0 1 .708 0l2.914 2.915a.5.5 0 0 1-.707.707l-2.915-2.914a.5.5 0 0 1 0-.708ZM3 11l.471.242.529.026.287.445.445.287.026.529L5 13l-.242.471-.026.529-.445.287-.287.445-.529.026L3 15l-.471-.242L2 14.732l-.287-.445L1.268 14l-.026-.529L1 13l.242-.471.026-.529.445-.287.287-.445.529-.026L3 11Z"/></svg>`')
+
+                //build plugin modal
+                win.webContents.executeJavaScript(`
+                const plugin_style = document.createElement('style')
+                document.querySelector('head').appendChild(plugin_style)
+                plugin_style.innerHTML = '#plugin-list{max-height:450px;overflow:scroll}.button{display:inline-flex;justify-content:center;align-items:center;line-height:1;height:32px;white-space:nowrap;cursor:pointer;text-align:center;box-sizing:border-box;outline:0;transition:.1s;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;vertical-align:middle;-webkit-appearance:none;min-height:2.5rem;border-radius:.25rem;padding:.75rem 1.25rem;font-size:.875rem}.box-x-close{position:absolute;top:.3rem;right:.5rem}.plugin-blue{background-color:#3b82f6;border-color:#2563eb}.plugin-blue:hover{background-color:#2563eb;border-color:#1d4ed8}.plugin-green{background-color:#10b981;border-color:#059669}.plugin-green:hover{background-color:#059669;border-color:#047857}.plugin-black{background-color:#6b7280;border-color:#4b5563}.plugin-black:hover{background-color:#4b5563;border-color:#374151}body .plugin-button{border-bottom-width:4px;border-radius:1rem}.plugin-box.active{outline:white solid 2px;filter:brightness(100%)}.plugin-modal{background-color:#1f2937;border:2px solid #374151;border-radius:.75rem;width:100vh}.plugin-core{top:5px;right:5px;border:1px solid #fff;border-radius:25px;font-size:14px}#plugin-main{flex-wrap:wrap;width:88%;margin:auto;gap:15px;justify-content:center}.plugin-hidden{opacity:0;pointer-events:none}#plugin-modal{transition:opacity .2s}'
+                const plugin_div = document.createElement('div')
+                document.getElementById('app').appendChild(plugin_div)
+                plugin_div.outerHTML = '<div style="z-index: 100;" class="w-screen h-screen absolute" id="plugin-modal"> <div style="background-color: rgba(0,0,0,.5);" class="w-full h-full absolute"></div><div class="w-full h-full absolute flex justify-center items-center"> <div class="flex flex-col plugin-modal relative"> <div style="font-size: 1.3rem" class="text-center py-2">Plugins</div><button class="plugin-close box-x-close"> <svg width="1.125em" height="1.125em" viewBox="0 0 24 24" class="svg-icon" color="gray" style="--sx:1; --sy:1; --r:0deg;"> <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" fill="currentColor"></path> </svg> </button> <div style="flex: 1;" class="text-center"> <div class="p-4 flex" id="plugin-main"></div></div><div class="text-center py-4"> <div class="button plugin-button plugin-blue plugin-folder-open" style="margin-right: 10px;">Open plugins folder</div><div class="button plugin-button plugin-green plugin-download" style="margin-right: 10px;">Get plugins</div><div class="button plugin-button plugin-black plugin-close">Close</div></div></div></div></div>'
+                const pluginMain = document.getElementById("plugin-main")
+                const pluginBox = document.createElement("div")
+                pluginMain.appendChild(pluginBox)
+                pluginBox.innerHTML = '<p>No plugins installed</p>'
+                pluginBox.id = 'plugin-list'
+                const pluginCloses = document.getElementsByClassName("plugin-close")
+                const pluginModal = document.getElementById("plugin-modal")
+                pluginModal.classList.toggle("plugin-hidden")
+                for (const pluginClose of pluginCloses) {
+                  pluginClose.addEventListener("click", () => {
+                    pluginModal.classList.toggle("plugin-hidden")
+                  })
+                }
+                const pluginFolderOpen = document.querySelector(".plugin-folder-open")
+                pluginFolderOpen.addEventListener("click", () => {
+                    console.log("PLUGIN_FOLDER_OPEN_NOW_REQUEST_PLEASE")
+                    document.body.style.cursor = "progress"
+                    pluginFolderOpen.style.cursor = "progress"
+                    setTimeout(() => {
+                        document.body.style.cursor = ""
+                        pluginFolderOpen.style.cursor = ""
+                    }, 1000)
+                })
+                const pluginDownload = document.querySelector(".plugin-download")
+                pluginDownload.addEventListener("click", () => {
+                    window.open("https://blockyfish.netlify.app/plugins")
+                })
+                `)
+                var pluginDirectoryPath = path.join(__dirname, 'plugins')
+                fs.readdir(pluginDirectoryPath, function (err, files) {
+                    if (err) {
+                        return console.log('Unable to scan directory: ' + err);
+                    } 
+                    else if (files.length != 0) {
+                        win.webContents.executeJavaScript(`
+                        pluginBox.innerHTML = ''
+                        `)
+                        files.forEach(function (file) {
+                            var plugin = require(path.join(__dirname, 'plugins', file))
+                            win.webContents.executeJavaScript(`
+                            pluginBox.appendChild(document.createElement("br"))
+                            plugin_title = document.createElement("h3")
+                            pluginBox.appendChild(plugin_title)
+                            plugin_title.innerText = "` + plugin.name + `"
+                            plugin_title.style.fontSize = "revert"
+                            plugin_title.style.textAlign = "left"
+                            plugin_desc = document.createElement("p")
+                            pluginBox.appendChild(plugin_desc)
+                            plugin_desc.innerText = "` + plugin.description + `"
+                            plugin_desc.style.fontSize = "0.9em"
+                            plugin_desc.style.textAlign = "left"
+                            plugin_desc.style.color = "#aabbbb"
+                            pluginBox.appendChild(document.createElement("br"))
+                            pluginBox.appendChild(document.createElement("hr"))
+                            `)
+                        });
+                    }
+                });
     
                 // build asset swapper modal
                 win.webContents.executeJavaScript(`
@@ -788,16 +889,18 @@ const createWindow = () => {
     
                         }
                         document.querySelector('#pane-0 > form > div:nth-child(6) > div.el-form-item__content > label > span.el-checkbox__input > input').addEventListener("click", () => {
-                            restart_tooltip.style.display = 'block'
+                            // restart_tooltip.style.display = 'block'
                             if (theme_on == true) {
                                 document.querySelector('#pane-0 > form > div:nth-child(6) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
                                 console.log('store_settings: theme0')
                                 theme_on = false
+                                document.getElementById('customcss').href = ""
                             }
                             else {
                                 document.querySelector('#pane-0 > form > div:nth-child(6) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
                                 console.log('store_settings: theme1')
                                 theme_on = true
+                                document.getElementById('customcss').href = "https://blockyfish.netlify.app/themes/reefpenguin/theme.css"
                             }
                         })
 
@@ -815,16 +918,18 @@ const createWindow = () => {
     
                         }
                         document.querySelector('#pane-0 > form > div:nth-child(7) > div.el-form-item__content > label > span.el-checkbox__input > input').addEventListener("click", () => {
-                            restart_tooltip.style.display = 'block'
+                            // restart_tooltip.style.display = 'block'
                             if (v3ui_on == true) {
                                 document.querySelector('#pane-0 > form > div:nth-child(7) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
                                 console.log('store_settings: v3ui0')
                                 v3ui_on = false
+                                document.getElementById('v3uicss').href = ""
                             }
                             else {
                                 document.querySelector('#pane-0 > form > div:nth-child(7) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
                                 console.log('store_settings: v3ui1')
                                 v3ui_on = true
+                                document.getElementById('v3uicss').href = "https://blockyfish.netlify.app/themes/addon/v3ui.css"
                             }
                         })
 
@@ -1348,33 +1453,27 @@ const createWindow = () => {
                         if (matches(msg, "CREATE_A_NEW_WINDOW")) {
                             createWindow()
                         }
+
+                        if (matches(msg, "PLUGIN_FOLDER_OPEN_NOW_REQUEST_PLEASE")) {
+                            shell.openPath(path.join(__dirname, 'plugins'))
+                        }
         
                         // if game has loaded, inject the hacks xd
                         if (matches(msg, "Common.playLoadProgress (old, new),100,0")) {
+
+                            //load plugins
+                            var pluginDirectoryPath = path.join(__dirname, 'plugins');
+                            fs.readdir(pluginDirectoryPath, function (err, files) {
+                                if (err) {
+                                    return console.log('Unable to scan directory: ' + err);
+                                } 
+                                files.forEach(function (file) {
+                                    var plugin = require(path.join(__dirname, 'plugins', file))
+                                    win.webContents.executeJavaScript(plugin.script)
+                                });
+                            });
                             win.webContents.executeJavaScript(`
                             setInterval(function () {
-                                for (let i = 0; i < game.currentScene.entityManager.animalsList.length; i++) {
-                                    if (game.currentScene.entityManager.animalsList[i].alpha < 0.5) {
-                                        game.currentScene.entityManager.animalsList[i].alpha = 0.5
-                                    }
-                                    if (game.currentScene.entityManager.animalsList[i].inner.alpha < 0.5) {
-                                        game.currentScene.entityManager.animalsList[i].inner.alpha = 0.5
-                                    }
-                                    if (game.currentScene.entityManager.animalsList[i].relatedObjects.visible != true) {
-                                        game.currentScene.entityManager.animalsList[i].relatedObjects.visible = true
-                                    }
-                                    if (game.currentScene.entityManager.animalsList[i].nameObject.visible != true) {
-                                        game.currentScene.entityManager.animalsList[i].nameObject.visible = true
-                                    }
-                                }
-                            })
-                            setInterval(function () {
-                                game.currentScene.ceilingsContainer.alpha = 0.3
-                                game.viewport.clampZoom({
-                                    minWidth: 0,
-                                    maxWidth: 1e7,
-                                })
-        
                                 // TWEMOJI
                                 // for names
                                 if (game.currentScene.myAnimal != null) {
@@ -1405,22 +1504,6 @@ const createWindow = () => {
                                     game.currentScene.chatMessages[i].setText(chatMsg)
                                 }
                             }, 200);
-        
-                            //no flashbang/ink
-                            game.currentScene.toggleFlash = function() {}
-                            game.currentScene.terrainManager.shadow.setShadowSize(1000000)
-                            game.currentScene.terrainManager.shadow.setShadowSize = function() {}
-        
-                            //show ghosts
-                            game.currentScene.viewingGhosts = true
-    
-                            //animals over props and terrain
-                            game.currentScene.foodGlowContainer.zOrder = 996
-                            game.currentScene.foodContainer.zOrder = 997
-                            game.currentScene.namesLayer.zOrder = 998
-                            game.currentScene.animalsContainer.zOrder = 999
-                            game.currentScene.barsLayer.zOrder = 1000
-                            game.currentScene.chatContainer.zOrder = 1001
         
                             //evo wheel
                             var evo_wheel = document.createElement('div')
@@ -1679,50 +1762,6 @@ const createWindow = () => {
                             }
                             `)
         
-                            //muting people idk and slash commands
-                            //game.currentScene.chatMessages[0].originalMessage.senderRoomId
-                            win.webContents.executeJavaScript(`
-                            mutedList = []
-                            chat_value = ''
-                            targetLockScriptRan = 0
-                            targetID = 0
-                            window.addEventListener("keyup", function(e) {
-                                if (e.keyCode == 13) {
-                                    if (matches(chat_value, '/unmute ')) {
-                                        muteID = chat_value.replace('/unmute ', '')
-                                        if (mutedList.includes(muteID)) {
-                                            mutedList = arrayRemove(mutedList, muteID)
-                                        }
-                                    }
-                                    else if (matches(chat_value, '/mute ')) {
-                                        muteID = chat_value.replace('/mute ', '')
-                                        if (!mutedList.includes(muteID)) {
-                                            mutedList.push(muteID)
-                                        }
-                                    }
-                                    else if (matches(chat_value, '/settarget')) {
-                                        targetID = parseInt(chat_value.replace('/settarget ', '').replace('/settarget', ''))
-                                        console.log(targetID)
-                                        game.currentScene.uiManager.setTargetId(0)
-                                        game.currentScene.uiManager.setTargetId(targetID)
-                                        if (game.currentScene.myAnimal != null && targetLockScriptRan == 0) {
-                                            targetLockScriptRan = 1
-                                            console.log('RUN_TARGET_LOCK_SCRIPT')
-                                        }
-        
-                                    }
-                                    else if (matches(chat_value, '/help')) {
-                                        game.currentScene.showMessagePopup('/mute <id> - mute a player\\n/unmute <id> - unmute a player\\n/settarget <entityid> - lock on to an animal', 5000, 0)
-                                    }
-                                }
-                                else {
-                                    chat_value = document.querySelector('#app > div.overlay > div.chat-input.horizontal-center > input').value
-                                }
-                                if (e.key == '/' && document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
-                                    console.log('handle_slash_command')
-                                }
-                            })
-                            `)
                             //deleting muted chat messages
                             win.webContents.executeJavaScript(`
                             setInterval(function() {
@@ -1759,76 +1798,6 @@ const createWindow = () => {
                                     id_text.innerText = 'ID: ' + game.currentScene.myAnimal.id
                                 }
                             }, 5000)
-                            `)
-                            //aimbot
-                            win.webContents.executeJavaScript(`
-                            aimBot = false
-                            mouseX = 0
-                            mouseY = 0
-                            mapeditor = document.querySelector('#canvas-container > canvas')
-                            whitelistedAimbotAnimalId = [18, 26, 29, 33, 44, 47, 52, 67, 77, 88]
-                            if (!aimBotRan) {
-                                aimBotRan = true
-                                window.addEventListener("keyup", (e) => {
-                                    if (e.key.toLowerCase() == "a" && document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
-                                        aimBot = !aimBot
-                                        game.currentScene.uiManager.setTargetId(0)
-                                        if (aimBot) {
-                                            game.currentScene.showMessagePopup('Aim assist on', 1000, 0)
-                                        }
-                                        else {
-                                            game.currentScene.showMessagePopup('Aim assist off', 1000, 0)
-                                        }
-                                    }
-                                })
-                                setInterval(() => {
-                                    if (aimBot && game.currentScene != null) {
-                                        if (game.currentScene.myAnimal != null) {
-                                            closestEntityDistance = 9999999
-                                            closestEntity = 0
-                                            for (let i = 0; i < game.currentScene.entityManager.animalsList.length; i++) {
-                                                if (Math.sqrt(((mouseX - innerWidth/2) - (game.currentScene.entityManager.animalsList[i].position.x - game.currentScene.myAnimal.position._x))**2 + ((mouseY - innerHeight/2) - (game.currentScene.entityManager.animalsList[i].position.y - game.currentScene.myAnimal.position._y))**2) < closestEntityDistance && !game.currentScene.entityManager.animalsList[i].mine && (game.currentScene.myAnimal.tribeId == null || game.currentScene.myAnimal.tribeId != game.currentScene.entityManager.animalsList[i].tribeId) && !(game.gameMode == 2 && game.currentScene.entityManager.animalsList[i].nameObject._text.includes(game.currentScene.myAnimal.nameObject._text.slice(0, 10))) && !whitelistedAimbotAnimalId.includes(game.currentScene.entityManager.animalsList[i].fishLevelData.fishLevel)) {
-                                                    closestEntityDistance = Math.sqrt(((mouseX - innerWidth/2) - (game.currentScene.entityManager.animalsList[i].position.x - game.currentScene.myAnimal.position._x))**2 + ((mouseY - innerHeight/2) - (game.currentScene.entityManager.animalsList[i].position.y - game.currentScene.myAnimal.position._y))**2)
-                                                    closestEntity = game.currentScene.entityManager.animalsList[i].id
-                                                }
-                                            }
-                                        }
-                                    }
-                                }, 50)
-                                window.addEventListener("mousemove", (e) => {
-                                    mouseX = e.clientX
-                                    mouseY = e.clientY
-                                    if (aimBot && game.currentScene != null) {
-                                        if (game.currentScene.myAnimal != null) {
-                                            if (closestEntityDistance < 500) {
-                                                if (closestEntity != game.currentScene.uiManager.targetId) {
-                                                    game.currentScene.uiManager.setTargetId(0)
-                                                    game.currentScene.uiManager.setTargetId(closestEntity)
-                                                }
-                                                c = {"x": innerWidth/2 + game.currentScene.entityManager.getEntity(closestEntity).position.x - game.currentScene.myAnimal.position._x, "y": innerHeight/2 + game.currentScene.entityManager.getEntity(closestEntity).position.y - game.currentScene.myAnimal.position._y}
-                                                mapeditor.dispatchEvent(new MouseEvent("pointermove", {clientX:c.x, clientY:c.y}))
-                                            }
-                                            else {
-                                                game.currentScene.uiManager.setTargetId(0)
-                                            }
-                                        }
-                                    }
-                                })
-                                setInterval(() => {
-                                    if (aimBot && game.currentScene != null) {
-                                        if (game.currentScene.myAnimal != null) {
-                                            if (closestEntityDistance < 200) {
-                                                if (closestEntity != game.currentScene.uiManager.targetId) {
-                                                    game.currentScene.uiManager.setTargetId(0)
-                                                    game.currentScene.uiManager.setTargetId(closestEntity)
-                                                }
-                                                c = {"x": innerWidth/2 + game.currentScene.entityManager.getEntity(closestEntity).position.x - game.currentScene.myAnimal.position._x, "y": innerHeight/2 + game.currentScene.entityManager.getEntity(closestEntity).position.y - game.currentScene.myAnimal.position._y}
-                                                mapeditor.dispatchEvent(new MouseEvent("pointermove", {clientX:c.x, clientY:c.y}))
-                                            }
-                                        }
-                                    }
-                                }, 50)
-                            }
                             `)
                         }
                 });
