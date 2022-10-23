@@ -26,11 +26,11 @@ const fetch = require('node-fetch');
 // debug mode
 const debug = false
 
-if (!debug) {
+// if (!debug) {
     process.on("uncaughtException", () => {
         console.log('something really bad happened!')
     })
-}
+// }
 
 // force english
 app.commandLine.appendSwitch('lang', 'en-US')
@@ -151,7 +151,7 @@ const createWindow = () => {
         frame: false,
         icon: path.join(__dirname, 'img/icon.png'),
         minWidth: 960,
-        minHeight: 540,
+        minHeight: 600,
     })
 
     app.on('second-instance', (event, argv, cwd) => {
@@ -267,6 +267,9 @@ const createWindow = () => {
 
             if (debug) {
                 win.webContents.openDevTools()
+                globalShortcut.register('Shift+CommandOrControl+I', () => {
+                    win.webContents.toggleDevTools()
+                })
             }
     
             // keep everything running otherwise youll see a stack of 500 chat messages when you come back
@@ -694,6 +697,47 @@ const createWindow = () => {
                         });
                     }
                 });
+
+                // build home feed
+                win.webContents.executeJavaScript(`
+                const left_widget_container = document.querySelector('div.p-2.sidebar.left.space-y-2');
+                left_widget_container.style.maxWidth = '30vw'
+                left_widget_container.style.width = '21rem'
+                left_widget_container.style.bottom = '50px'
+                const news_feed_box = document.querySelector('div.p-2.sidebar.right.space-y-2 > div:nth-child(3)').cloneNode(true);
+                left_widget_container.appendChild(news_feed_box)
+                document.querySelector('div.p-2.sidebar.left.space-y-2 > div > div.title').innerText = 'Blockyfish News'
+                document.querySelector('div.p-2.sidebar.left.space-y-2 > div > div:nth-child(2)').outerHTML = '<div id="blockyfish-news"></div>'
+                const blockyfish_news = document.getElementById('blockyfish-news')
+                blockyfish_news.style.maxHeight = '30vh'
+                blockyfish_news.style.overflow = 'scroll'
+                blockyfish_news.style.overflowX = 'hidden'
+                blockyfish_news.style.padding = '10px'
+                blockyfish_news.style.fontSize = 'small'
+
+                async function getBlockyfishNews() {
+                    let news = await(await(fetch('https://blockyfish.netlify.app/blockyfishfeed/news'))).text()
+                    blockyfish_news.innerHTML = news
+                }
+                getBlockyfishNews()
+
+                const tutorial_box = document.querySelector('div.p-2.sidebar.right.space-y-2 > div:nth-child(3)').cloneNode(true);
+                left_widget_container.appendChild(tutorial_box)
+                document.querySelector('div.p-2.sidebar.left.space-y-2 > div:nth-child(4) > div.title').innerText = 'How to play'
+                document.querySelector('div.p-2.sidebar.left.space-y-2 > div:nth-child(4) > div:nth-child(2)').outerHTML = '<div id="tutorial"></div>'
+                const tutorial = document.getElementById('tutorial')
+                tutorial.style.maxHeight = '30vh'
+                tutorial.style.overflow = 'scroll'
+                tutorial.style.overflowX = 'hidden'
+                tutorial.style.padding = '10px'
+                tutorial.style.fontSize = 'small'
+
+                async function getBlockyfishTutorial() {
+                    let tut = await(await(fetch('https://blockyfish.netlify.app/blockyfishfeed/tutorial'))).text()
+                    tutorial.innerHTML = tut
+                }
+                getBlockyfishTutorial()
+                `)
     
                 // build asset swapper modal
                 win.webContents.executeJavaScript(`
