@@ -6,6 +6,12 @@ const setupEvents = require('./installers/setupEvents')
 
 // import stuff that makes client go brrrr
 const { app, BrowserWindow, globalShortcut, shell } = require('electron')
+
+let isSingleInstance = app.requestSingleInstanceLock()
+if (!isSingleInstance) {
+  app.quit()
+}
+
 const electronDl = require('electron-dl')
 const path = require('path')
 const { Client } = require("discord-rpc")
@@ -17,9 +23,14 @@ const request = require('request');
 const os = require('os');
 const fetch = require('node-fetch');
 
-process.on("uncaughtException", () => {
-    console.log('something really bad happened!')
-})
+// debug mode
+const debug = false
+
+if (!debug) {
+    process.on("uncaughtException", () => {
+        console.log('something really bad happened!')
+    })
+}
 
 // force english
 app.commandLine.appendSwitch('lang', 'en-US')
@@ -143,6 +154,15 @@ const createWindow = () => {
         minHeight: 540,
     })
 
+    app.on('second-instance', (event, argv, cwd) => {
+        if (win) {
+          if (win.isMinimized()) win.restore()
+          win.focus()
+        }
+    })
+
+    win.setTitle('Blockyfish Client')
+
     if (store.get("shh") == true) {
         win.webContents.executeJavaScript(`
         game.socketManager.disconnect()
@@ -245,7 +265,9 @@ const createWindow = () => {
         //wait for the base webpage to finish loading before customizing it
         win.webContents.on('did-finish-load', function() {
 
-            win.webContents.openDevTools()
+            if (debug) {
+                win.webContents.openDevTools()
+            }
     
             // keep everything running otherwise youll see a stack of 500 chat messages when you come back
             win.webContents.setBackgroundThrottling(false)
@@ -731,7 +753,7 @@ const createWindow = () => {
                 discord.classList.remove("black")
                 discord.classList.add("indigo")
                 discord.addEventListener("click", () => {
-                    window.open('https://discord.gg/vQnrUVxAvT')
+                    window.open('https://discord.gg/W3TU4kqD5f')
                 })
 
                 social_class.insertBefore(github_parent, social_class.children[5])
@@ -1254,7 +1276,10 @@ const createWindow = () => {
                 if (!global.consoleLogScriptRunning) {
                     win.webContents.on("console-message", (ev, level, message, line, file) => {
                         var msg = `${message}`
-                        console.log(msg);
+
+                        if (debug) {
+                            console.log(msg);
+                        }
                         
                         if (matches(msg, "window_action:")) {
                             msg = msg.replace("window_action: ", "")
@@ -1845,7 +1870,7 @@ const createWindow = () => {
             win.webContents.on('new-window', function(e, url) {
                 e.preventDefault();
                 require('electron').shell.openExternal(url);
-              });
+            });
             
             // discord rpc stuff lol
             var rpc = new Client({
