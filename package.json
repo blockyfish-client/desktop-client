@@ -27,6 +27,7 @@
     "discord-rpc": "^4.0.1",
     "electron-chrome-extensions": "^3.9.0",
     "electron-dl": "^3.3.1",
+    "electron-localshortcut": "^3.2.1",
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^8.1.0",
     "node-fetch": "^2.6.7",

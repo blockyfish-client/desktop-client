@@ -5,13 +5,14 @@ const setupEvents = require('./installers/setupEvents')
 }
 
 // import stuff that makes client go brrrr
-const { app, BrowserWindow, globalShortcut, shell } = require('electron')
+const { app, BrowserWindow, shell } = require('electron')
 
 let isSingleInstance = app.requestSingleInstanceLock()
 if (!isSingleInstance) {
   app.quit()
 }
 
+const localshortcut = require('electron-localshortcut');
 const electronDl = require('electron-dl')
 const path = require('path')
 const { Client } = require("discord-rpc")
@@ -29,6 +30,9 @@ const debug = false
 // if (!debug) {
     process.on("uncaughtException", () => {
         console.log('something really bad happened!')
+    })
+    process.on("unhandledRejection", () => {
+        console.log('uh oh!')
     })
 // }
 
@@ -145,7 +149,7 @@ const createWindow = () => {
         backgroundColor: '#1f2937',
         show: false,
         webPreferences: {
-            nodeIntegration: true,
+            nodeIntegration: true
         },
         titleBarStyle: 'hidden',
         frame: false,
@@ -232,12 +236,12 @@ const createWindow = () => {
         });
     
         // ctrl r for reload, debugging purposes, should not be needed
-        // globalShortcut.register('CommandOrControl+R', () => {
+        // localshortcut.register('CommandOrControl+R', () => {
         //     win.reload()
         // })
 
         // F2 to screenshot and save to download folder
-        globalShortcut.register('F2', () => {
+        localshortcut.register('F2', () => {
             win.webContents.capturePage().then(image => {
                 fs.writeFile(downloadPath + "\\" + new Date().getFullYear() + "-" + (new Date().getMonth() + 1) + "-" + new Date().getDate() + "-" + new Date().getHours() + "-" + new Date().getMinutes() + "-" + new Date().getSeconds() + "-" + new Date().getMilliseconds() +".png", image.toPNG(), (err) => {
                     if (err) throw err
@@ -267,7 +271,7 @@ const createWindow = () => {
 
             if (debug) {
                 win.webContents.openDevTools()
-                globalShortcut.register('Shift+CommandOrControl+I', () => {
+                localshortcut.register('Shift+CommandOrControl+I', () => {
                     win.webContents.toggleDevTools()
                 })
             }
@@ -1521,6 +1525,18 @@ const createWindow = () => {
         
                         if (matches(msg, "CREATE_A_NEW_WINDOW")) {
                             createWindow()
+                        }
+
+                        if (matches(msg, "TAKE_SCREENSHOT_REQUEST_PICTURE_NOW")) {
+                            win.webContents.capturePage().then(image => {
+                                fs.writeFile(downloadPath + "\\" + new Date().getFullYear() + "-" + (new Date().getMonth() + 1) + "-" + new Date().getDate() + "-" + new Date().getHours() + "-" + new Date().getMinutes() + "-" + new Date().getSeconds() + "-" + new Date().getMilliseconds() +".png", image.toPNG(), (err) => {
+                                    if (err) throw err
+                                })
+                            })
+                        }
+
+                        if (matches(msg, "REQUEST_FULLSCREEN_WINDOW_NOW")) {
+                            win.setFullScreen(!win.fullScreen)
                         }
 
                         if (matches(msg, "PLUGIN_FOLDER_OPEN_NOW_REQUEST_PLEASE")) {
