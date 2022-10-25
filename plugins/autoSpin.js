@@ -35,7 +35,7 @@ setInterval(() => {
         mapeditor.dispatchEvent(new MouseEvent("pointermove", {clientX: innerWidth/2 + spin_coords_x, clientY: innerHeight/2 + spin_coords_y}))
         spin_direction = (spin_direction + 1) % 23
     }
-}, 10)
+}, 15)
 `;
 exports.script = script;
 exports.name = name;
