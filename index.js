@@ -29,10 +29,10 @@ const debug = false
 
 // if (!debug) {
     process.on("uncaughtException", () => {
-        console.log('something really bad happened!')
+        // console.log('something really bad happened!')
     })
     process.on("unhandledRejection", () => {
-        console.log('uh oh!')
+        // console.log('uh oh!')
     })
 // }
 
@@ -93,6 +93,9 @@ if (docassets != true && docassets != false) {
 var ublock = store.get('ublock')
 if (ublock != true && ublock != false) {
     var ublock = true
+}
+if (rpc != true && rpc != false) {
+    var rpc = true
 }
 var twemoji = store.get('twemoji')
 if (twemoji != true && twemoji != false) {
@@ -314,18 +317,20 @@ const createWindow = () => {
             `)
 
             setInterval(() => {
-                if (win.isMaximized()) {
-                    win.webContents.executeJavaScript(`
-                    document.getElementById("max-button").style.display = "none"
-                    document.getElementById("restore-button").style.display = ""
-                    `)
-                }
-                else {
-                    win.webContents.executeJavaScript(`
-                    document.getElementById("max-button").style.display = ""
-                    document.getElementById("restore-button").style.display = "none"
-                    `)
-                }
+                try {
+                    if (win.isMaximized()) {
+                        win.webContents.executeJavaScript(`
+                        document.getElementById("max-button").style.display = "none"
+                        document.getElementById("restore-button").style.display = ""
+                        `)
+                    }
+                    else {
+                        win.webContents.executeJavaScript(`
+                        document.getElementById("max-button").style.display = ""
+                        document.getElementById("restore-button").style.display = "none"
+                        `)
+                    }
+                } catch {}
             }, 500);
 
             //custom theme
@@ -853,6 +858,7 @@ const createWindow = () => {
                 //fetch settings
                 win.webContents.executeJavaScript(`docassets_on = ` + docassets)
                 win.webContents.executeJavaScript(`ublock_on = ` + ublock)
+                win.webContents.executeJavaScript(`rpc_on = ` + rpc)
                 win.webContents.executeJavaScript(`twemoji_on = ` + twemoji)
                 win.webContents.executeJavaScript(`theme_on = ` + theme)
                 win.webContents.executeJavaScript(`v3ui_on = ` + v3ui)
@@ -1054,6 +1060,35 @@ const createWindow = () => {
                                 document.querySelector('#pane-2 > form > div:nth-child(3) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
                                 console.log('store_settings: ublock1')
                                 ublock_on = true
+                            }
+                        })
+
+                        //rpc
+                        var rpc_div = document.querySelector('#pane-0 > form > div:nth-child(3)').cloneNode(true)
+                        document.querySelector('#pane-2 > form').appendChild(rpc_div)
+                        const rpc_text = document.querySelector('#pane-2 > form > div:nth-child(4) > div.el-form-item__label')
+                        rpc_text.innerText = 'Discord RPC'
+                        const rpc_desc = document.querySelector('#pane-2 > form > div:nth-child(4) > div.el-form-item__content > span')
+                        rpc_desc.innerText = 'Display your status on Discord as "Playing Deeeep.io"'
+                        if (rpc_on == false) {
+                            document.querySelector('#pane-2 > form > div:nth-child(4) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
+                        }
+                        else {
+                            document.querySelector('#pane-2 > form > div:nth-child(4) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
+                        }
+                        document.querySelector('#pane-2 > form > div:nth-child(4) > div.el-form-item__content > label > span.el-checkbox__input > input').addEventListener("click", () => {
+                            // restart_tooltip.style.display = 'block'
+                            if (rpc_on == true) {
+                                document.querySelector('#pane-2 > form > div:nth-child(4) > div.el-form-item__content > label > span.el-checkbox__input').classList.remove('is-checked')
+                                console.log('store_settings: rpc0')
+                                console.log('TURN_DISCORD_RPC_OFF_REQUEST')
+                                rpc_on = false
+                            }
+                            else {
+                                document.querySelector('#pane-2 > form > div:nth-child(4) > div.el-form-item__content > label > span.el-checkbox__input').classList.add('is-checked')
+                                console.log('store_settings: rpc1')
+                                console.log('TURN_DISCORD_RPC_ON_REQUEST')
+                                rpc_on = true
                             }
                         })
     
@@ -1435,6 +1470,14 @@ const createWindow = () => {
                             }
                             store.set(setting_key, setting_value_bool)
                         }
+
+                        //discord rpc
+                        if (matches(msg, "TURN_DISCORD_RPC_OFF_REQUEST")) {
+                            rpc = false
+                        }
+                        if (matches(msg, "TURN_DISCORD_RPC_ON_REQUEST")) {
+                            rpc = true
+                        }
     
                         if (matches(msg, "NAVIGATE_TO_THIS_URL:")) {
                             var msg = msg.replace("NAVIGATE_TO_THIS_URL: ", "").toLowerCase().replace("https://", "").replace("http://", "")
@@ -1503,6 +1546,7 @@ const createWindow = () => {
         
                         if (matches(msg, "RUN_TARGET_LOCK_SCRIPT")) {
                             win.webContents.executeJavaScript(`
+                            mapeditor = document.querySelector('#canvas-container > canvas')
                             click0 = game.currentScene.entityManager.getEntity(targetID).relatedObjects.children[2].speedMultiplierDisplay.visible;
                             setInterval(function () {
                                 if (targetID != null && game.currentScene.entityManager.getEntity(targetID) != null) {
@@ -1884,6 +1928,23 @@ const createWindow = () => {
                                 }
                             }, 5000)
                             `)
+
+                            // auto spin
+                            // win.webContents.executeJavaScript(`
+                            // mapeditor = document.querySelector('#canvas-container > canvas')
+                            // var spin_direction = 0
+                            // const spin_coords_x = [0, 210, 300, 210, 0, -210, -300, -210]
+                            // const spin_coords_y = [300, 210, 0, -210, -300, -210, 0, 210]
+                            // document.body.addEventListener('keydown', function(e) {
+                            //     if (e.key.toLowerCase() == "z") {
+                            //         if (document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
+                            //             e.preventDefault()
+                            //             mapeditor.dispatchEvent(new MouseEvent("pointermove", {clientX: innerWidth/2 + spin_coords_x[spin_direction], clientY: innerHeight/2 + spin_coords_y[spin_direction]}))
+                            //             spin_direction = (spin_direction + 1) % 8
+                            //         }
+                            //     }
+                            // });
+                            // `)
                         }
                 });
             }
@@ -1931,26 +1992,27 @@ const createWindow = () => {
                 e.preventDefault();
                 require('electron').shell.openExternal(url);
             });
-            
-            // discord rpc stuff lol
-            var rpc = new Client({
+
+            //discord rpc
+            var Discord = new Client({
                 transport: "ipc",
             });
             
             // log into the client to get icon and app name
-            rpc.login({clientId: "918680181609213972"}).catch(console.error)
+            Discord.login({clientId: "918680181609213972"}).catch(console.error)
             var startTime = new Date()
             
             // fallback in-case v5 comes and i am gone
             // at least it will show something
-            rpc.on("ready", () => {
-                rpc.setActivity({
-                    details: "Idle",
-                    largeImageKey: "icon",
-                    largeImageText: "Deeeep.io",
-                    startTimestamp: startTime,
-                })
-            });
+            // Discord.on("ready", () => {
+            //     if (rpc) {
+            //         Discord.setActivity({
+            //             largeImageKey: "icon",
+            //             largeImageText: "Deeeep.io",
+            //             startTimestamp: startTime,
+            //         })
+            //     }
+            // });
             
             // update discord rpc
             function setGameMode(mode, menu) {
@@ -2007,25 +2069,30 @@ const createWindow = () => {
                 }
                 
                 // if the gamemode buttons exist, use them to update the status
-                if (labelText != '') {
-                    rpc.setActivity({
-                        details: detailText,
-                        largeImageKey: "icon",
-                        largeImageText: "Deeeep.io",
-                        startTimestamp: startTime,
-                        buttons: [
-                            { label: labelText, url: currentUrl }
-                        ]
-                    })
+                if (rpc) {
+                    if (labelText != '') {
+                        Discord.setActivity({
+                            details: detailText,
+                            largeImageKey: "icon",
+                            largeImageText: "Deeeep.io",
+                            startTimestamp: startTime,
+                            buttons: [
+                                { label: labelText, url: currentUrl }
+                            ]
+                        })
+                    }
+                    
+                    else {
+                        Discord.setActivity({
+                            details: detailText,
+                            largeImageKey: "icon",
+                            largeImageText: "Deeeep.io",
+                            startTimestamp: startTime,
+                        })
+                    }
                 }
-                
                 else {
-                    rpc.setActivity({
-                        details: detailText,
-                        largeImageKey: "icon",
-                        largeImageText: "Deeeep.io",
-                        startTimestamp: startTime,
-                    })
+                    Discord.clearActivity()
                 }
             }
         });
