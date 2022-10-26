@@ -25,7 +25,7 @@ const os = require('os');
 const fetch = require('node-fetch');
 
 // debug mode
-const debug = false
+const debug = true
 
 // if (!debug) {
     process.on("uncaughtException", () => {
@@ -297,7 +297,7 @@ const createWindow = () => {
     
             const titlebar_style = document.createElement('style')
             document.querySelector('head').appendChild(titlebar_style)
-            titlebar_style.innerHTML = '@media (-webkit-device-pixel-ratio:1.5),(device-pixel-ratio:1.5),(-webkit-device-pixel-ratio:2),(device-pixel-ratio:2),(-webkit-device-pixel-ratio:3),(device-pixel-ratio:3){#window-controls .icon{width:10px;height:10px}}#window-controls{z-index: 9999999999999999;color:#fff;display:grid;grid-template-columns:repeat(3,46px);position:absolute;top:0;right:5px;height:32px;-webkit-app-region:no-drag}#window-controls .button{grid-row:1/span 1;display:flex;justify-content:center;align-items:center;width:50px;height:100%;user-select:none}#min-button{grid-column:1}#max-button,#restore-button{grid-column:2}#close-button{grid-column:3}#window-controls .button:hover{background:rgba(255,255,255,.1)}#window-controls .button:active{background:rgba(255,255,255,.2)}#close-button:hover{background:#e81123!important}#close-button:active{background:#bb111f!important}'
+            titlebar_style.innerHTML = '@media (-webkit-device-pixel-ratio:1.5),(device-pixel-ratio:1.5),(-webkit-device-pixel-ratio:2),(device-pixel-ratio:2),(-webkit-device-pixel-ratio:3),(device-pixel-ratio:3){#window-controls .icon{width:10px;height:10px}}#window-controls{z-index: 9999999999999999;color:#fff;display:grid;grid-template-columns:repeat(3,46px);position:absolute;top:0;right:4px;height:32px;-webkit-app-region:no-drag}#window-controls .button{grid-row:1/span 1;display:flex;justify-content:center;align-items:center;width:50px;height:100%;user-select:none}#min-button{grid-column:1}#max-button,#restore-button{grid-column:2}#close-button{grid-column:3}#window-controls .button:hover{background:rgba(255,255,255,.1)}#window-controls .button:active{background:rgba(255,255,255,.2)}#close-button:hover{background:#e81123!important}#close-button:active{background:#bb111f!important}'
     
             document.getElementById("max-button").addEventListener("click", () => {
                 document.getElementById("max-button").style.display = "none"
@@ -1580,8 +1580,15 @@ const createWindow = () => {
                             })
                         }
 
-                        if (matches(msg, "REQUEST_FULLSCREEN_WINDOW_NOW")) {
+                        if (matches(msg, "REQUEST_TOGGLE_FULLSCREEN_STATE")) {
                             win.setFullScreen(!win.fullScreen)
+                            win.webContents.executeJavaScript(`
+                            if (document.fullscreenElement) {
+                                document.exitFullscreen();
+                            } else {
+                                document.documentElement.requestFullscreen();
+                            }
+                            `)
                         }
 
                         if (matches(msg, "PLUGIN_FOLDER_OPEN_NOW_REQUEST_PLEASE")) {
@@ -1699,10 +1706,20 @@ const createWindow = () => {
                                             })
                                         }
                                     }
-        
                                 }, 500)
                             }
                             createAssetSwapButton()
+                            `)
+
+                            // remove fullscreen button
+                            win.webContents.executeJavaScript(`
+                            setInterval(function() {
+                                if (document.querySelector('div.top-right') != null) {
+                                    if (document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(4) > span > svg').innerHTML == '<path d="M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17V19H5V14H7V17H10Z" data-v-35f7fcad=""></path>') {
+                                        document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(4)').remove()
+                                    }
+                                }
+                            }, 500)
                             `)
         
                             //quick chat UI
@@ -1965,11 +1982,7 @@ const createWindow = () => {
                     }
                 }
                 if (e.key == "F11") {
-                    if (document.fullscreenElement) {
-                        document.exitFullscreen();
-                    } else {
-                        document.documentElement.requestFullscreen();
-                    }
+                    console.log("REQUEST_TOGGLE_FULLSCREEN_STATE")
                 }
                 if (e.key.toLowerCase() == "k") {
                     if (document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
