@@ -25,7 +25,7 @@ const os = require('os');
 const fetch = require('node-fetch');
 
 // debug mode
-const debug = false
+const debug = true
 
 // if (!debug) {
     process.on("uncaughtException", () => {
@@ -1715,8 +1715,8 @@ const createWindow = () => {
                             win.webContents.executeJavaScript(`
                             setInterval(function() {
                                 if (document.querySelector('div.top-right') != null) {
-                                    if (document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(4) > span > svg').innerHTML == '<path d="M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17V19H5V14H7V17H10Z" data-v-35f7fcad=""></path>') {
-                                        document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(4)').remove()
+                                    if (document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(3) > span > svg').innerHTML == '<path d="M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17V19H5V14H7V17H10Z" data-v-35f7fcad=""></path>') {
+                                        document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(3)').remove()
                                     }
                                 }
                             }, 500)
@@ -1946,23 +1946,6 @@ const createWindow = () => {
                                 }
                             }, 5000)
                             `)
-
-                            // auto spin
-                            // win.webContents.executeJavaScript(`
-                            // mapeditor = document.querySelector('#canvas-container > canvas')
-                            // var spin_direction = 0
-                            // const spin_coords_x = [0, 210, 300, 210, 0, -210, -300, -210]
-                            // const spin_coords_y = [300, 210, 0, -210, -300, -210, 0, 210]
-                            // document.body.addEventListener('keydown', function(e) {
-                            //     if (e.key.toLowerCase() == "z") {
-                            //         if (document.querySelector('#app > div.modals-container > div') == null && document.querySelector('#app > div.ui > div').style.display == 'none' && document.activeElement.localName != 'input') {
-                            //             e.preventDefault()
-                            //             mapeditor.dispatchEvent(new MouseEvent("pointermove", {clientX: innerWidth/2 + spin_coords_x[spin_direction], clientY: innerHeight/2 + spin_coords_y[spin_direction]}))
-                            //             spin_direction = (spin_direction + 1) % 8
-                            //         }
-                            //     }
-                            // });
-                            // `)
                         }
                 });
             }
