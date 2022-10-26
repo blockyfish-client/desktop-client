@@ -94,6 +94,7 @@ var ublock = store.get('ublock')
 if (ublock != true && ublock != false) {
     var ublock = true
 }
+var rpc = store.get('rpc')
 if (rpc != true && rpc != false) {
     var rpc = true
 }
