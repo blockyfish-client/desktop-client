@@ -1,296 +1,318 @@
 // checks if the app is being run as an installer
-const setupEvents = require('./installers/setupEvents')
- if (setupEvents.handleSquirrelEvent()) {
-    return;
+const setupEvents = require("./installers/setupEvents");
+if (setupEvents.handleSquirrelEvent()) {
+	return;
 }
 
 // import stuff that makes client go brrrr
-const { app, BrowserWindow, shell } = require('electron')
+const { app, BrowserWindow, shell } = require("electron");
 
-let isSingleInstance = app.requestSingleInstanceLock()
+let isSingleInstance = app.requestSingleInstanceLock();
 if (!isSingleInstance) {
-  app.quit()
+	app.quit();
 }
 
-const localshortcut = require('electron-localshortcut');
-const electronDl = require('electron-dl')
-const path = require('path')
-const { Client } = require("discord-rpc")
-const child = require('child_process').execFile
-const fs = require('fs')
-const { ElectronChromeExtensions } = require('electron-chrome-extensions')
-const Store = require('electron-store');
-const request = require('request');
-const os = require('os');
-const fetch = require('node-fetch');
+const localshortcut = require("electron-localshortcut");
+const electronDl = require("electron-dl");
+const path = require("path");
+const { Client } = require("discord-rpc");
+const child = require("child_process").execFile;
+const fs = require("fs");
+const { ElectronChromeExtensions } = require("electron-chrome-extensions");
+const Store = require("electron-store");
+const request = require("request");
+const os = require("os");
+const fetch = require("node-fetch");
 
 // debug mode
-const debug = true
+const debug = false;
 
 // if (!debug) {
-    process.on("uncaughtException", () => {
-        // console.log('something really bad happened!')
-    })
-    process.on("unhandledRejection", () => {
-        // console.log('uh oh!')
-    })
+process.on("uncaughtException", () => {
+	// console.log('something really bad happened!')
+});
+process.on("unhandledRejection", () => {
+	// console.log('uh oh!')
+});
 // }
 
 // force english
-app.commandLine.appendSwitch('lang', 'en-US')
+app.commandLine.appendSwitch("lang", "en-US");
 
 // for the future, secret for now :)
-app.setAsDefaultProtocolClient("deeeepio")
+app.setAsDefaultProtocolClient("deeeepio");
 
 //extension one-time load
-var extensionsLoaded = false
+var extensionsLoaded = false;
 
 // version info
-const version_code = 'v2.0.0'
-const version_num = '200'
+const version_code = "v2.0.0";
+const version_num = "200";
 
 // custom function for later
 function matches(text, partial) {
-    try {
-        return text.toLowerCase().indexOf(partial.toLowerCase()) > -1;
-    } catch (e) {
-        console.log('uh oh')
-    }
+	try {
+		return text.toLowerCase().indexOf(partial.toLowerCase()) > -1;
+	} catch (e) {
+		console.log("uh oh");
+	}
 }
 
 //escape strings
-function addslashes( str ) {
-    return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
+function addslashes(str) {
+	return (str + "").replace(/[\\"']/g, "\\$&").replace(/\u0000/g, "\\0");
 }
 
 // emulate a keystroke
 function sendKeybinding(win, keyCode) {
-    win.webContents.sendInputEvent({ type: 'keyDown', keyCode });
-    win.webContents.sendInputEvent({ type: 'char', keyCode });
-    win.webContents.sendInputEvent({ type: 'keyUp', keyCode });
+	win.webContents.sendInputEvent({ type: "keyDown", keyCode });
+	win.webContents.sendInputEvent({ type: "char", keyCode });
+	win.webContents.sendInputEvent({ type: "keyUp", keyCode });
 }
 
 // delete update installer, doesn't delete manually downloaded installer
 // unless the user is stupid or smart enough to rename it to the name here
-let downloadPath = app.getPath('downloads')
+let downloadPath = app.getPath("downloads");
 if (fs.existsSync(downloadPath + "/blockyfishclient-update-download.exe")) {
-    fs.unlink(downloadPath + "/blockyfishclient-update-download.exe", (err) => {
-        if (err) {
-            alert("Could not delete update package, please manually delete it from the Downloads folder. ");
-            console.log(err);
-            return;
-        }
-        console.log("File succesfully deleted");
-    });
+	fs.unlink(downloadPath + "/blockyfishclient-update-download.exe", (err) => {
+		if (err) {
+			alert(
+				"Could not delete update package, please manually delete it from the Downloads folder. "
+			);
+			console.log(err);
+			return;
+		}
+		console.log("File succesfully deleted");
+	});
 }
 
 // import settings for stuff
 const store = new Store();
-var docassets = store.get('docassets')
+var docassets = store.get("docassets");
 if (docassets != true && docassets != false) {
-    var docassets = false
+	var docassets = false;
 }
-var ublock = store.get('ublock')
+var ublock = store.get("ublock");
 if (ublock != true && ublock != false) {
-    var ublock = true
+	var ublock = true;
 }
-var rpc = store.get('rpc')
+var rpc = store.get("rpc");
 if (rpc != true && rpc != false) {
-    var rpc = true
+	var rpc = true;
 }
-var twemoji = store.get('twemoji')
+var twemoji = store.get("twemoji");
 if (twemoji != true && twemoji != false) {
-    var twemoji = true
+	var twemoji = true;
 }
-var theme = store.get('theme')
+var theme = store.get("theme");
 if (theme != true && theme != false) {
-    var theme = true
+	var theme = true;
 }
-var v3ui = store.get('v3ui')
+var v3ui = store.get("v3ui");
 if (v3ui != true && v3ui != false) {
-    var v3ui = false
+	var v3ui = false;
 }
-var aim_helper = store.get('aim_helper')
+var aim_helper = store.get("aim_helper");
 if (aim_helper != true && aim_helper != false) {
-    var aim_helper = true
+	var aim_helper = true;
 }
-var qc1 = store.get('quick_chat.1')
-var qc2 = store.get('quick_chat.2')
-var qc3 = store.get('quick_chat.3')
-var qc4 = store.get('quick_chat.4')
-var spam_chat = store.get('quick_chat.spam')
+var qc1 = store.get("quick_chat.1");
+var qc2 = store.get("quick_chat.2");
+var qc3 = store.get("quick_chat.3");
+var qc4 = store.get("quick_chat.4");
+var spam_chat = store.get("quick_chat.spam");
 if (qc1 == undefined) {
-    store.set("quick_chat.1", "gg")
-    qc1 = "gg"
+	store.set("quick_chat.1", "gg");
+	qc1 = "gg";
 }
 if (qc2 == undefined) {
-    store.set("quick_chat.2", "lol")
-    qc2 = "lol"
+	store.set("quick_chat.2", "lol");
+	qc2 = "lol";
 }
 if (qc3 == undefined) {
-    store.set("quick_chat.3", "thank you")
-    qc3 = "thank you"
+	store.set("quick_chat.3", "thank you");
+	qc3 = "thank you";
 }
 if (qc4 == undefined) {
-    store.set("quick_chat.4", "ow!")
-    qc4 = "ow!"
+	store.set("quick_chat.4", "ow!");
+	qc4 = "ow!";
 }
 if (spam_chat == undefined) {
-    store.set("quick_chat.spam", "௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸")
-    spam_chat = "௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸"
+	store.set(
+		"quick_chat.spam",
+		"௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸"
+	);
+	spam_chat =
+		"௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸";
 }
 
 //main window
-app.whenReady().then(
-async function makeNewWindow() {
-const createWindow = () => {
-    const win = new BrowserWindow({
-        // load window settings
-        width: store.get('window.width'),
-        height: store.get('window.height'),
-        x: store.get('window.x'),
-        y: store.get('window.y'),
-        backgroundColor: '#1f2937',
-        show: false,
-        webPreferences: {
-            nodeIntegration: true
-        },
-        titleBarStyle: 'hidden',
-        frame: false,
-        icon: path.join(__dirname, 'img/icon.png'),
-        minWidth: 960,
-        minHeight: 600,
-    })
+app.whenReady().then(async function makeNewWindow() {
+	const createWindow = () => {
+		const win = new BrowserWindow({
+			// load window settings
+			width: store.get("window.width"),
+			height: store.get("window.height"),
+			x: store.get("window.x"),
+			y: store.get("window.y"),
+			backgroundColor: "#1f2937",
+			show: false,
+			webPreferences: {
+				nodeIntegration: true
+			},
+			titleBarStyle: "hidden",
+			frame: false,
+			icon: path.join(__dirname, "img/icon.png"),
+			minWidth: 960,
+			minHeight: 600
+		});
 
-    app.on('second-instance', (event, argv, cwd) => {
-        if (win) {
-          if (win.isMinimized()) win.restore()
-          win.focus()
-        }
-    })
+		app.on("second-instance", (event, argv, cwd) => {
+			if (win) {
+				if (win.isMinimized()) win.restore();
+				win.focus();
+			}
+		});
 
-    win.setTitle('Blockyfish Client')
+		win.setTitle("Blockyfish Client");
 
-    if (store.get("shh") == true) {
-        win.webContents.executeJavaScript(`
+		if (store.get("shh") == true) {
+			win.webContents.executeJavaScript(`
         game.socketManager.disconnect()
-        `)
-        app.e = 'ban'
-        win.hide()
-        store.set("shh", true)
-        require('electron').dialog.showMessageBoxSync(win,
-            {
-                type: 'question',
-                buttons: ['Close'],
-                title: 'Banned!',
-                message: 'You are banned from Blockyfish Client\nGoodbye!',
-                icon: path.join(__dirname, 'img/icon.png'),
-        });
-        app.quit()
-    }
+        `);
+			app.e = "ban";
+			win.hide();
+			store.set("shh", true);
+			require("electron").dialog.showMessageBoxSync(win, {
+				type: "question",
+				buttons: ["Close"],
+				title: "Banned!",
+				message: "You are banned from Blockyfish Client\nGoodbye!",
+				icon: path.join(__dirname, "img/icon.png")
+			});
+			app.quit();
+		}
 
-    // set extension paths
-    if (!extensionsLoaded) {
-        const extensions = new ElectronChromeExtensions()
-        extensions.addTab(win.webContents, win)
-        if (docassets) {
-            docassetsPath = app.getAppPath() + `/extensions/docassets/1.0.42_0`
-        }
-        else {
+		// set extension paths
+		if (!extensionsLoaded) {
+			const extensions = new ElectronChromeExtensions();
+			extensions.addTab(win.webContents, win);
+			if (docassets) {
+				docassetsPath = app.getAppPath() + `/extensions/docassets/1.0.42_0`;
+			} else {
+				docassetsPath = app.getAppPath() + `/extensions/nodocassets/1.0.42_0`;
+			}
+			ublockPath = app.getAppPath() + `/extensions/ublock/1.43.0_0`;
+		}
 
-            docassetsPath = app.getAppPath() + `/extensions/nodocassets/1.0.42_0`
-        }
-        ublockPath = app.getAppPath() + `/extensions/ublock/1.43.0_0`
-    }
+		// close confirmation dialog
+		function makeNewWindow() {
+			win.on("close", function (e) {
+				if (app.e != "ban") {
+					const choice = require("electron").dialog.showMessageBoxSync(this, {
+						type: "question",
+						buttons: ["Yes", "No"],
+						title: "Exit Deeeep.io",
+						message: "Are you sure you want to close?",
+						icon: path.join(__dirname, "img/icon.png")
+					});
 
-    // close confirmation dialog
-    function makeNewWindow() {
-        win.on('close', function(e) {
-            if (app.e != 'ban') {
-                const choice = require('electron').dialog.showMessageBoxSync(this,
-                {
-                    type: 'question',
-                    buttons: ['Yes', 'No'],
-                    title: 'Exit Deeeep.io',
-                    message: 'Are you sure you want to close?',
-                    icon: path.join(__dirname, 'img/icon.png'),
-                });
-    
-                // if user click "no"
-                if (choice === 1) {
-                  e.preventDefault();
-                }
-    
-                // if user click "yes" 😢
-                else {
-                    // dont save settings if window is maximized because we dont want the app to start back in full screen
-                    if (win.isMaximized() == false) {
-                        store.set("window.width", win.getSize()[0])
-                        store.set("window.height", win.getSize()[1])
-                        store.set("window.x",  win.getPosition()[0])
-                        store.set("window.y", win.getPosition()[1])
-                    }
-                    store.set("quick_chat.1", qc1)
-                    store.set("quick_chat.2", qc2)
-                    store.set("quick_chat.3", qc3)
-                    store.set("quick_chat.4", qc4)
-                    store.set("quick_chat.spam", spam_chat)
-                }
-            }
-        });
-    
-        // ctrl r for reload, debugging purposes, should not be needed
-        // localshortcut.register('CommandOrControl+R', () => {
-        //     win.reload()
-        // })
+					// if user click "no"
+					if (choice === 1) {
+						e.preventDefault();
+					}
 
-        // F2 to screenshot and save to download folder
-        localshortcut.register('F2', () => {
-            win.webContents.capturePage().then(image => {
-                fs.writeFile(downloadPath + "\\" + new Date().getFullYear() + "-" + (new Date().getMonth() + 1) + "-" + new Date().getDate() + "-" + new Date().getHours() + "-" + new Date().getMinutes() + "-" + new Date().getSeconds() + "-" + new Date().getMilliseconds() +".png", image.toPNG(), (err) => {
-                    if (err) throw err
-                })
-            })
-        })
-    
-        // load the website
-        win.loadURL('https://beta.deeeep.io')
-        win.webContents.on("did-fail-load", (_event, _errorCode, errorDescription) => {
-            if (errorDescription == "ERR_INTERNET_DISCONNECTED") {
-                win.loadFile('offline.html')
-                win.show()
-                setTimeout(() => {
-                    win.loadURL('https://beta.deeeep.io')
-                }, 5000);
-            }
-        });
-    
-        // bye-bye stinky electron menu bar (no one likes you anyways)
-        win.removeMenu();
+					// if user click "yes" 😢
+					else {
+						// dont save settings if window is maximized because we dont want the app to start back in full screen
+						if (win.isMaximized() == false) {
+							store.set("window.width", win.getSize()[0]);
+							store.set("window.height", win.getSize()[1]);
+							store.set("window.x", win.getPosition()[0]);
+							store.set("window.y", win.getPosition()[1]);
+						}
+						store.set("quick_chat.1", qc1);
+						store.set("quick_chat.2", qc2);
+						store.set("quick_chat.3", qc3);
+						store.set("quick_chat.4", qc4);
+						store.set("quick_chat.spam", spam_chat);
+					}
+				}
+			});
 
-        global.consoleLogScriptRunning = false
-    
-        //wait for the base webpage to finish loading before customizing it
-        win.webContents.on('did-finish-load', function() {
+			// ctrl r for reload, debugging purposes, should not be needed
+			// localshortcut.register('CommandOrControl+R', () => {
+			//     win.reload()
+			// })
 
-            if (debug) {
-                win.webContents.openDevTools()
-                localshortcut.register('Shift+CommandOrControl+I', () => {
-                    win.webContents.toggleDevTools()
-                })
-            }
-    
-            // keep everything running otherwise youll see a stack of 500 chat messages when you come back
-            win.webContents.setBackgroundThrottling(false)
+			// F2 to screenshot and save to download folder
+			localshortcut.register("F2", () => {
+				win.webContents.capturePage().then((image) => {
+					fs.writeFile(
+						downloadPath +
+							"\\" +
+							new Date().getFullYear() +
+							"-" +
+							(new Date().getMonth() + 1) +
+							"-" +
+							new Date().getDate() +
+							"-" +
+							new Date().getHours() +
+							"-" +
+							new Date().getMinutes() +
+							"-" +
+							new Date().getSeconds() +
+							"-" +
+							new Date().getMilliseconds() +
+							".png",
+						image.toPNG(),
+						(err) => {
+							if (err) throw err;
+						}
+					);
+				});
+			});
 
-            // blockyfish logo
-            win.webContents.executeJavaScript(`
+			// load the website
+			win.loadURL("https://beta.deeeep.io");
+			win.webContents.on(
+				"did-fail-load",
+				(_event, _errorCode, errorDescription) => {
+					if (errorDescription == "ERR_INTERNET_DISCONNECTED") {
+						win.loadFile("offline.html");
+						win.show();
+						setTimeout(() => {
+							win.loadURL("https://beta.deeeep.io");
+						}, 5000);
+					}
+				}
+			);
+
+			// bye-bye stinky electron menu bar (no one likes you anyways)
+			win.removeMenu();
+
+			global.consoleLogScriptRunning = false;
+
+			//wait for the base webpage to finish loading before customizing it
+			win.webContents.on("did-finish-load", function () {
+				if (debug) {
+					win.webContents.openDevTools();
+					localshortcut.register("Shift+CommandOrControl+I", () => {
+						win.webContents.toggleDevTools();
+					});
+				}
+
+				// keep everything running otherwise youll see a stack of 500 chat messages when you come back
+				win.webContents.setBackgroundThrottling(false);
+
+				// blockyfish logo
+				win.webContents.executeJavaScript(`
             const brand_css = document.createElement('style')
             document.querySelector('head').appendChild(brand_css)
             brand_css.outerHTML = '<link rel="stylesheet" href="https://blockyfish.netlify.app/themes/branding.css">'
-            `)
+            `);
 
-            win.webContents.executeJavaScript(`
+				win.webContents.executeJavaScript(`
             const titlebar_html = document.createElement('div')
             document.body.appendChild(titlebar_html)
             titlebar_html.outerHTML = '<div id="window-controls"> <div class="button" id="min-button"> <img class="icon" srcset="https://blockyfish.netlify.app/assets/titlebar/min-w-10.png 1x, https://blockyfish.netlify.app/assets/titlebar/min-w-12.png 1.25x, https://blockyfish.netlify.app/assets/titlebar/min-w-15.png 1.5x, https://blockyfish.netlify.app/assets/titlebar/min-w-15.png 1.75x, https://blockyfish.netlify.app/assets/titlebar/min-w-20.png 2x, https://blockyfish.netlify.app/assets/titlebar/min-w-20.png 2.25x, https://blockyfish.netlify.app/assets/titlebar/min-w-24.png 2.5x, https://blockyfish.netlify.app/assets/titlebar/min-w-30.png 3x, https://blockyfish.netlify.app/assets/titlebar/min-w-30.png 3.5x" draggable="false"/> </div><div class="button" id="max-button"> <img class="icon" srcset="https://blockyfish.netlify.app/assets/titlebar/max-w-10.png 1x, https://blockyfish.netlify.app/assets/titlebar/max-w-12.png 1.25x, https://blockyfish.netlify.app/assets/titlebar/max-w-15.png 1.5x, https://blockyfish.netlify.app/assets/titlebar/max-w-15.png 1.75x, https://blockyfish.netlify.app/assets/titlebar/max-w-20.png 2x, https://blockyfish.netlify.app/assets/titlebar/max-w-20.png 2.25x, https://blockyfish.netlify.app/assets/titlebar/max-w-24.png 2.5x, https://blockyfish.netlify.app/assets/titlebar/max-w-30.png 3x, https://blockyfish.netlify.app/assets/titlebar/max-w-30.png 3.5x" draggable="false"/> </div><div class="button" id="restore-button" style="display: none;"> <img class="icon" srcset="https://blockyfish.netlify.app/assets/titlebar/restore-w-10.png 1x, https://blockyfish.netlify.app/assets/titlebar/restore-w-12.png 1.25x, https://blockyfish.netlify.app/assets/titlebar/restore-w-15.png 1.5x, https://blockyfish.netlify.app/assets/titlebar/restore-w-15.png 1.75x, https://blockyfish.netlify.app/assets/titlebar/restore-w-20.png 2x, https://blockyfish.netlify.app/assets/titlebar/restore-w-20.png 2.25x, https://blockyfish.netlify.app/assets/titlebar/restore-w-24.png 2.5x, https://blockyfish.netlify.app/assets/titlebar/restore-w-30.png 3x, https://blockyfish.netlify.app/assets/titlebar/restore-w-30.png 3.5x" draggable="false"/> </div><div class="button" id="close-button"> <img class="icon" srcset="https://blockyfish.netlify.app/assets/titlebar/close-w-10.png 1x, https://blockyfish.netlify.app/assets/titlebar/close-w-12.png 1.25x, https://blockyfish.netlify.app/assets/titlebar/close-w-15.png 1.5x, https://blockyfish.netlify.app/assets/titlebar/close-w-15.png 1.75x, https://blockyfish.netlify.app/assets/titlebar/close-w-20.png 2x, https://blockyfish.netlify.app/assets/titlebar/close-w-20.png 2.25x, https://blockyfish.netlify.app/assets/titlebar/close-w-24.png 2.5x, https://blockyfish.netlify.app/assets/titlebar/close-w-30.png 3x, https://blockyfish.netlify.app/assets/titlebar/close-w-30.png 3.5x" draggable="false"/> </div></div>'
@@ -315,116 +337,115 @@ const createWindow = () => {
             document.getElementById("close-button").addEventListener("click", () => {
                 console.log('window_action: cls')
             })
-            `)
+            `);
 
-            setInterval(() => {
-                try {
-                    if (win.isMaximized()) {
-                        win.webContents.executeJavaScript(`
+				setInterval(() => {
+					try {
+						if (win.isMaximized()) {
+							win.webContents.executeJavaScript(`
                         document.getElementById("max-button").style.display = "none"
                         document.getElementById("restore-button").style.display = ""
-                        `)
-                    }
-                    else {
-                        win.webContents.executeJavaScript(`
+                        `);
+						} else {
+							win.webContents.executeJavaScript(`
                         document.getElementById("max-button").style.display = ""
                         document.getElementById("restore-button").style.display = "none"
-                        `)
-                    }
-                } catch {}
-            }, 500);
+                        `);
+						}
+					} catch {}
+				}, 500);
 
-            //custom theme
-            if (theme) {
-                win.webContents.executeJavaScript(`
+				//custom theme
+				if (theme) {
+					win.webContents.executeJavaScript(`
                 const custom_css = document.createElement('style')
                 document.querySelector('body').appendChild(custom_css)
                 custom_css.outerHTML = '<link id="customcss" rel="stylesheet" href="https://blockyfish.netlify.app/themes/reefpenguin/theme.css">'
-                `)
-            }
-            else {
-                win.webContents.executeJavaScript(`
+                `);
+				} else {
+					win.webContents.executeJavaScript(`
                 const custom_css = document.createElement('style')
                 document.querySelector('body').appendChild(custom_css)
                 custom_css.outerHTML = '<link id="customcss" rel="stylesheet" href="">'
-                `)
-            }
+                `);
+				}
 
-            if (v3ui) {
-                win.webContents.executeJavaScript(`
+				if (v3ui) {
+					win.webContents.executeJavaScript(`
                 const v3ui_css = document.createElement('style')
                 document.querySelector('body').appendChild(v3ui_css)
                 v3ui_css.outerHTML = '<link id="v3uicss" rel="stylesheet" href="https://blockyfish.netlify.app/themes/addon/v3ui.css">'
-                `)
-            }
-            else {
-                win.webContents.executeJavaScript(`
+                `);
+				} else {
+					win.webContents.executeJavaScript(`
                 const v3ui_css = document.createElement('style')
                 document.querySelector('body').appendChild(v3ui_css)
                 v3ui_css.outerHTML = '<link id="v3uicss" rel="stylesheet" href="">'
-                `)
-            }
-            
-            //twemoji
-            if (twemoji) {
-                win.webContents.executeJavaScript(`
+                `);
+				}
+
+				//twemoji
+				if (twemoji) {
+					win.webContents.executeJavaScript(`
                 //css
                 const twe_style = document.createElement('style')
                 document.querySelector('head').appendChild(twe_style)
                 twe_style.innerHTML = '@font-face { font-family: emoji; font-weight: normal; src: url(//xem.github.io/unicode13/Twemoji.ttf) } html{font-family: Quicksand,emoji} @font-face { font-family: emoji; font-weight: bold; src: url(//xem.github.io/unicode13/Twemoji.ttf) } html{font-family: Quicksand,emoji}'
-                `)
-            }
+                `);
+				}
 
-            async function runRemoteScript() {
-                let remote_script = await (await (fetch('https://blockyfish.netlify.app/scripts/script.json'))).json();
-                for (let i = 0; i < remote_script.length; i++) {
-                    win.webContents.executeJavaScript(remote_script[i].js)
-                }
-            }
-            runRemoteScript()
+				async function runRemoteScript() {
+					let remote_script = await (
+						await fetch("https://blockyfish.netlify.app/scripts/script.json")
+					).json();
+					for (let i = 0; i < remote_script.length; i++) {
+						win.webContents.executeJavaScript(remote_script[i].js);
+					}
+				}
+				runRemoteScript();
 
-            //custom cursor
-            // win.webContents.executeJavaScript(`
-            //     //css
-            //     const cursor_style = document.createElement('style')
-            //     document.querySelector('head').appendChild(cursor_style)
-            //     cursor_style.innerHTML = 'a,body,button,img,input,textarea,li,div,tr,td,label,span{cursor:none!important}.mouse-cursor{position:fixed;left:0;top:0;pointer-events:none;border-radius:50%;-webkit-transform:translateZ(0);transform:translateZ(0);visibility:hidden;display:block}.cursor-inner{margin-left:-3px;margin-top:-3px;width:6px;height:6px;z-index:10000001;background-color:#ced0d4;-webkit-transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;filter:drop-shadow(0 0 2px white)}.cursor-inner.cursor-hover{margin-left:-4px;margin-top:-4px;width:8px;height:8px;background-color:#ced0d4}.cursor-outer{margin-left:-15px;margin-top:-15px;width:30px;height:30px;border:2px solid #ced0d4;-webkit-box-sizing:border-box;box-sizing:border-box;z-index:10000000;opacity:.7;-webkit-transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;filter:drop-shadow(0 0 3px black)}.cursor-outer.cursor-hover{margin-left:-25px;margin-top:-25px;width:50px;height:50px;opacity:.3}.cursor-hide{display:none!important}'
-            //     //dot
-            //     const cursor_inner = document.createElement('div')
-            //     document.body.appendChild(cursor_inner)
-            //     cursor_inner.outerHTML = '<div id="cursor-inner" class="mouse-cursor cursor-inner" style="visibility: visible; transform: translate(0px, 0px);"></div>'
-            //     const mouse_inner = document.getElementById('cursor-inner')
-            //     //circle
-            //     const cursor_outer = document.createElement('div')
-            //     document.body.appendChild(cursor_outer)
-            //     cursor_outer.outerHTML = '<div id="cursor-outer" class="mouse-cursor cursor-outer" style="visibility: visible; transform: translate(0px, 0px);"></div>'
-            //     const mouse_outer = document.getElementById('cursor-outer')
-            //     //effects
-            //     document.addEventListener('mousemove', (event) => {
-            //         mouse_inner.style.transform = 'translate(' + event.clientX + 'px, ' + event.clientY + 'px)'
-            //         mouse_outer.style.transform = 'translate(' + event.clientX + 'px, ' + event.clientY + 'px)'
-            //         // console.log(event.clientX + ', ' + event.clientY)
-            //         if (document.querySelector('button:hover') != null || document.querySelector('a:hover') != null || document.querySelector('input:hover') != null || document.querySelector('textarea:hover') != null || document.querySelector('img:hover') != null) {
-            //             mouse_inner.classList.add('cursor-hover')
-            //             mouse_outer.classList.add('cursor-hover')
-            //         }
-            //         else {
-            //             mouse_inner.classList.remove('cursor-hover')
-            //             mouse_outer.classList.remove('cursor-hover')
-            //         }
-            //     });
-            //     document.addEventListener('mouseleave', () => {
-            //         mouse_inner.classList.add('cursor-hide')
-            //         mouse_outer.classList.add('cursor-hide')
-            //     })
-            //     document.addEventListener('mouseenter', () => {
-            //         mouse_inner.classList.remove('cursor-hide')
-            //         mouse_outer.classList.remove('cursor-hide')
-            //     })
-            // `)
-    
-            //state checks and UI adjustments
-            win.webContents.executeJavaScript(`
+				//custom cursor
+				// win.webContents.executeJavaScript(`
+				//     //css
+				//     const cursor_style = document.createElement('style')
+				//     document.querySelector('head').appendChild(cursor_style)
+				//     cursor_style.innerHTML = 'a,body,button,img,input,textarea,li,div,tr,td,label,span{cursor:none!important}.mouse-cursor{position:fixed;left:0;top:0;pointer-events:none;border-radius:50%;-webkit-transform:translateZ(0);transform:translateZ(0);visibility:hidden;display:block}.cursor-inner{margin-left:-3px;margin-top:-3px;width:6px;height:6px;z-index:10000001;background-color:#ced0d4;-webkit-transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;filter:drop-shadow(0 0 2px white)}.cursor-inner.cursor-hover{margin-left:-4px;margin-top:-4px;width:8px;height:8px;background-color:#ced0d4}.cursor-outer{margin-left:-15px;margin-top:-15px;width:30px;height:30px;border:2px solid #ced0d4;-webkit-box-sizing:border-box;box-sizing:border-box;z-index:10000000;opacity:.7;-webkit-transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;transition:width .3s ease-in-out,height .3s ease-in-out,margin .3s ease-in-out,opacity .3s ease-in-out;filter:drop-shadow(0 0 3px black)}.cursor-outer.cursor-hover{margin-left:-25px;margin-top:-25px;width:50px;height:50px;opacity:.3}.cursor-hide{display:none!important}'
+				//     //dot
+				//     const cursor_inner = document.createElement('div')
+				//     document.body.appendChild(cursor_inner)
+				//     cursor_inner.outerHTML = '<div id="cursor-inner" class="mouse-cursor cursor-inner" style="visibility: visible; transform: translate(0px, 0px);"></div>'
+				//     const mouse_inner = document.getElementById('cursor-inner')
+				//     //circle
+				//     const cursor_outer = document.createElement('div')
+				//     document.body.appendChild(cursor_outer)
+				//     cursor_outer.outerHTML = '<div id="cursor-outer" class="mouse-cursor cursor-outer" style="visibility: visible; transform: translate(0px, 0px);"></div>'
+				//     const mouse_outer = document.getElementById('cursor-outer')
+				//     //effects
+				//     document.addEventListener('mousemove', (event) => {
+				//         mouse_inner.style.transform = 'translate(' + event.clientX + 'px, ' + event.clientY + 'px)'
+				//         mouse_outer.style.transform = 'translate(' + event.clientX + 'px, ' + event.clientY + 'px)'
+				//         // console.log(event.clientX + ', ' + event.clientY)
+				//         if (document.querySelector('button:hover') != null || document.querySelector('a:hover') != null || document.querySelector('input:hover') != null || document.querySelector('textarea:hover') != null || document.querySelector('img:hover') != null) {
+				//             mouse_inner.classList.add('cursor-hover')
+				//             mouse_outer.classList.add('cursor-hover')
+				//         }
+				//         else {
+				//             mouse_inner.classList.remove('cursor-hover')
+				//             mouse_outer.classList.remove('cursor-hover')
+				//         }
+				//     });
+				//     document.addEventListener('mouseleave', () => {
+				//         mouse_inner.classList.add('cursor-hide')
+				//         mouse_outer.classList.add('cursor-hide')
+				//     })
+				//     document.addEventListener('mouseenter', () => {
+				//         mouse_inner.classList.remove('cursor-hide')
+				//         mouse_outer.classList.remove('cursor-hide')
+				//     })
+				// `)
+
+				//state checks and UI adjustments
+				win.webContents.executeJavaScript(`
                 chatSpamLoop = false
                 // document.querySelector('head > link[href*="/assets/index"][rel="stylesheet"]').href = "https://thepiguy3141.github.io/doc-assets/images/misc/index.8b74f9b3.css"
                 notif_count_old = 0
@@ -562,10 +583,10 @@ const createWindow = () => {
                         }
                     }
                 }, 500)
-                `)
+                `);
 
-                //url input textfield
-                win.webContents.executeJavaScript(`
+				//url input textfield
+				win.webContents.executeJavaScript(`
                 const top_corner_section = document.querySelector('#app > div.ui > div > div.el-row.header > div.el-col.el-col-24.auto-col.left')
                 const url_div = document.createElement('div')
                 top_corner_section.appendChild(url_div)
@@ -580,17 +601,17 @@ const createWindow = () => {
                 }, 100)
                 const go_to_url = 'NAVIGATE_TO_THIS_URL: '
                 url_div.outerHTML = '<div style=" margin: 10px; padding: 5px 10px; background-color: #0003; border: solid #374151 1px; border-radius: 7px;"><input type="text" style=" background-color: #1f293700; outline: none;" placeholder="Enter a URL..." id="url-input-box"><button style="padding: 0 0 0 5px;outline:none;" id="url-input-confirm" onclick="console.log(go_to_url + url_input_type.value)">Go</button></div>'
-                `)
+                `);
 
-                //edit button layout
-                win.webContents.executeJavaScript(`
+				//edit button layout
+				win.webContents.executeJavaScript(`
                 const button_container_css = document.createElement('style')
                 document.body.appendChild(button_container_css)
                 button_container_css.innerHTML = '@media only screen and (min-width: 768px) {.el-col-sm-8 {max-width: 25% !important;flex: 0 0 25% !important;}}'
-                `)
-    
-                //build evo button
-                win.webContents.executeJavaScript(`
+                `);
+
+				//build evo button
+				win.webContents.executeJavaScript(`
                 const button_clone = document.querySelector('div.p-2.sidebar.right.space-y-2 > div.container > div > div').cloneNode(true);
                 document.querySelector('div.p-2.sidebar.right.space-y-2 > div.container > div').appendChild(button_clone);
                 button = button_clone.firstElementChild
@@ -599,13 +620,15 @@ const createWindow = () => {
                 const evoText = document.querySelector("button.evo > span:nth-child(1) > span:nth-child(2)")
                 evoText.innerHTML = "Evo Tree"
                 const evoIcon = document.querySelector("button.evo > span:nth-child(1) > svg:nth-child(1)")
-                `)
-    
-                //change evo icon
-                win.webContents.executeJavaScript('evoIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-diagram-3-fill" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5v-1zm-6 8A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5v-1zm6 0A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5v-1zm6 0a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5v-1z"/></svg>`')
-                
-                //build evo modal
-                win.webContents.executeJavaScript(`
+                `);
+
+				//change evo icon
+				win.webContents.executeJavaScript(
+					'evoIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-diagram-3-fill" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5v-1zm-6 8A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5v-1zm6 0A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5v-1zm6 0a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5v-1z"/></svg>`'
+				);
+
+				//build evo modal
+				win.webContents.executeJavaScript(`
                 const style = document.createElement('style')
                 document.querySelector('head').appendChild(style)
                 style.innerHTML = '.button{display:inline-flex;justify-content:center;align-items:center;line-height:1;height:32px;white-space:nowrap;cursor:pointer;text-align:center;box-sizing:border-box;outline:0;transition:.1s;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;vertical-align:middle;-webkit-appearance:none;min-height:2.5rem;border-radius:.25rem;padding:.75rem 1.25rem;font-size:.875rem}.box-x-close{position:absolute;top:.3rem;right:.5rem}.evo-red{background-color:#ef4444;border-color:#dc2626}.evo-red:hover{background-color:#dc2626;border-color:#b91c1c}.evo-black{background-color:#6b7280;border-color:#4b5563}.evo-black:hover{background-color:#4b5563;border-color:#374151}body .evo-button{border-bottom-width:4px;border-radius:1rem}.evo-box.active{outline:white solid 2px;filter:brightness(100%)}.evo-modal{background-color:#1f2937;border:2px solid #374151;border-radius:.75rem;width:100vh}.evo-core{top:5px;right:5px;border:1px solid #fff;border-radius:25px;font-size:14px}#evo-main{flex-wrap:wrap;width:88%;margin:auto;gap:15px}.evo-hidden{opacity: 0;pointer-events: none;}#evo-modal{transition: 0.2s opacity;}'
@@ -624,10 +647,10 @@ const createWindow = () => {
                     evoModal.classList.toggle("evo-hidden")
                   })
                 }
-                `)
+                `);
 
-                //build plugins button
-                win.webContents.executeJavaScript(`
+				//build plugins button
+				win.webContents.executeJavaScript(`
                 const plugin_button_clone = document.querySelector('div.p-2.sidebar.right.space-y-2 > div.container > div > div').cloneNode(true);
                 document.querySelector('div.p-2.sidebar.right.space-y-2 > div.container > div').appendChild(plugin_button_clone);
                 plugin_button = plugin_button_clone.firstElementChild
@@ -636,13 +659,15 @@ const createWindow = () => {
                 const pluginText = document.querySelector("button.plugin > span:nth-child(1) > span:nth-child(2)")
                 pluginText.innerHTML = "Plugins"
                 const pluginIcon = document.querySelector("button.plugin > span:nth-child(1) > svg:nth-child(1)")
-                `)
+                `);
 
-                //change plugin icon
-                win.webContents.executeJavaScript('pluginIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-tools" viewBox="0 0 16 16"><path d="M1 0 0 1l2.2 3.081a1 1 0 0 0 .815.419h.07a1 1 0 0 1 .708.293l2.675 2.675-2.617 2.654A3.003 3.003 0 0 0 0 13a3 3 0 1 0 5.878-.851l2.654-2.617.968.968-.305.914a1 1 0 0 0 .242 1.023l3.27 3.27a.997.997 0 0 0 1.414 0l1.586-1.586a.997.997 0 0 0 0-1.414l-3.27-3.27a1 1 0 0 0-1.023-.242L10.5 9.5l-.96-.96 2.68-2.643A3.005 3.005 0 0 0 16 3c0-.269-.035-.53-.102-.777l-2.14 2.141L12 4l-.364-1.757L13.777.102a3 3 0 0 0-3.675 3.68L7.462 6.46 4.793 3.793a1 1 0 0 1-.293-.707v-.071a1 1 0 0 0-.419-.814L1 0Zm9.646 10.646a.5.5 0 0 1 .708 0l2.914 2.915a.5.5 0 0 1-.707.707l-2.915-2.914a.5.5 0 0 1 0-.708ZM3 11l.471.242.529.026.287.445.445.287.026.529L5 13l-.242.471-.026.529-.445.287-.287.445-.529.026L3 15l-.471-.242L2 14.732l-.287-.445L1.268 14l-.026-.529L1 13l.242-.471.026-.529.445-.287.287-.445.529-.026L3 11Z"/></svg>`')
+				//change plugin icon
+				win.webContents.executeJavaScript(
+					'pluginIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-tools" viewBox="0 0 16 16"><path d="M1 0 0 1l2.2 3.081a1 1 0 0 0 .815.419h.07a1 1 0 0 1 .708.293l2.675 2.675-2.617 2.654A3.003 3.003 0 0 0 0 13a3 3 0 1 0 5.878-.851l2.654-2.617.968.968-.305.914a1 1 0 0 0 .242 1.023l3.27 3.27a.997.997 0 0 0 1.414 0l1.586-1.586a.997.997 0 0 0 0-1.414l-3.27-3.27a1 1 0 0 0-1.023-.242L10.5 9.5l-.96-.96 2.68-2.643A3.005 3.005 0 0 0 16 3c0-.269-.035-.53-.102-.777l-2.14 2.141L12 4l-.364-1.757L13.777.102a3 3 0 0 0-3.675 3.68L7.462 6.46 4.793 3.793a1 1 0 0 1-.293-.707v-.071a1 1 0 0 0-.419-.814L1 0Zm9.646 10.646a.5.5 0 0 1 .708 0l2.914 2.915a.5.5 0 0 1-.707.707l-2.915-2.914a.5.5 0 0 1 0-.708ZM3 11l.471.242.529.026.287.445.445.287.026.529L5 13l-.242.471-.026.529-.445.287-.287.445-.529.026L3 15l-.471-.242L2 14.732l-.287-.445L1.268 14l-.026-.529L1 13l.242-.471.026-.529.445-.287.287-.445.529-.026L3 11Z"/></svg>`'
+				);
 
-                //build plugin modal
-                win.webContents.executeJavaScript(`
+				//build plugin modal
+				win.webContents.executeJavaScript(`
                 const plugin_style = document.createElement('style')
                 document.querySelector('head').appendChild(plugin_style)
                 plugin_style.innerHTML = '#plugin-list{max-height:450px;overflow:scroll}.button{display:inline-flex;justify-content:center;align-items:center;line-height:1;height:32px;white-space:nowrap;cursor:pointer;text-align:center;box-sizing:border-box;outline:0;transition:.1s;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;vertical-align:middle;-webkit-appearance:none;min-height:2.5rem;border-radius:.25rem;padding:.75rem 1.25rem;font-size:.875rem}.box-x-close{position:absolute;top:.3rem;right:.5rem}.plugin-blue{background-color:#3b82f6;border-color:#2563eb}.plugin-blue:hover{background-color:#2563eb;border-color:#1d4ed8}.plugin-green{background-color:#10b981;border-color:#059669}.plugin-green:hover{background-color:#059669;border-color:#047857}.plugin-black{background-color:#6b7280;border-color:#4b5563}.plugin-black:hover{background-color:#4b5563;border-color:#374151}body .plugin-button{border-bottom-width:4px;border-radius:1rem}.plugin-box.active{outline:white solid 2px;filter:brightness(100%)}.plugin-modal{background-color:#1f2937;border:2px solid #374151;border-radius:.75rem;width:100vh}.plugin-core{top:5px;right:5px;border:1px solid #fff;border-radius:25px;font-size:14px}#plugin-main{flex-wrap:wrap;width:88%;margin:auto;gap:15px;justify-content:center}.plugin-hidden{opacity:0;pointer-events:none}#plugin-modal{transition:opacity .2s}'
@@ -676,40 +701,45 @@ const createWindow = () => {
                 pluginDownload.addEventListener("click", () => {
                     window.open("https://blockyfish.netlify.app/plugins")
                 })
-                `)
-                var pluginDirectoryPath = path.join(__dirname, 'plugins')
-                fs.readdir(pluginDirectoryPath, function (err, files) {
-                    if (err) {
-                        return console.log('Unable to scan directory: ' + err);
-                    } 
-                    else if (files.length != 0) {
-                        win.webContents.executeJavaScript(`
+                `);
+				var pluginDirectoryPath = path.join(__dirname, "plugins");
+				fs.readdir(pluginDirectoryPath, function (err, files) {
+					if (err) {
+						return console.log("Unable to scan directory: " + err);
+					} else if (files.length != 0) {
+						win.webContents.executeJavaScript(`
                         pluginBox.innerHTML = ''
-                        `)
-                        files.forEach(function (file) {
-                            var plugin = require(path.join(__dirname, 'plugins', file))
-                            win.webContents.executeJavaScript(`
+                        `);
+						files.forEach(function (file) {
+							var plugin = require(path.join(__dirname, "plugins", file));
+							win.webContents.executeJavaScript(
+								`
                             pluginBox.appendChild(document.createElement("br"))
                             plugin_title = document.createElement("h3")
                             pluginBox.appendChild(plugin_title)
-                            plugin_title.innerText = "` + plugin.name + `"
+                            plugin_title.innerText = "` +
+									plugin.name +
+									`"
                             plugin_title.style.fontSize = "revert"
                             plugin_title.style.textAlign = "left"
                             plugin_desc = document.createElement("p")
                             pluginBox.appendChild(plugin_desc)
-                            plugin_desc.innerText = "` + plugin.description + `"
+                            plugin_desc.innerText = "` +
+									plugin.description +
+									`"
                             plugin_desc.style.fontSize = "0.9em"
                             plugin_desc.style.textAlign = "left"
                             plugin_desc.style.color = "#aabbbb"
                             pluginBox.appendChild(document.createElement("br"))
                             pluginBox.appendChild(document.createElement("hr"))
-                            `)
-                        });
-                    }
-                });
+                            `
+							);
+						});
+					}
+				});
 
-                // build home feed
-                win.webContents.executeJavaScript(`
+				// build home feed
+				win.webContents.executeJavaScript(`
                 const left_widget_container = document.querySelector('div.p-2.sidebar.left.space-y-2');
                 left_widget_container.style.maxWidth = '30vw'
                 left_widget_container.style.width = '21rem'
@@ -747,10 +777,10 @@ const createWindow = () => {
                     tutorial.innerHTML = tut
                 }
                 getBlockyfishTutorial()
-                `)
-    
-                // build asset swapper modal
-                win.webContents.executeJavaScript(`
+                `);
+
+				// build asset swapper modal
+				win.webContents.executeJavaScript(`
                 const aswp_style = document.createElement('style')
                 document.querySelector('head').appendChild(aswp_style)
                 aswp_style.innerHTML = '.button{display:inline-flex;justify-content:center;align-items:center;line-height:1;height:32px;white-space:nowrap;cursor:pointer;text-align:center;box-sizing:border-box;outline:0;transition:.1s;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;vertical-align:middle;-webkit-appearance:none;min-height:2.5rem;border-radius:.25rem;padding:.75rem 1.25rem;font-size:.875rem}.box-x-close{position:absolute;top:.3rem;right:.5rem}body .aswp-button{border-bottom-width:4px;border-radius:1rem}.aswp-gre{background-color:#ef4444;border-color:#dc2626}.aswp-gre:hover{background-color:#dc2626;border-color:#b91c1c}.aswp-black{background-color:#6b7280;border-color:#4b5563}.aswp-black:hover{background-color:#4b5563;border-color:#374151}.aswp-box.active{outline:white solid 1px;filter:brightness(100%)}.aswp-modal{background-color:#1f2937;border:2px solid #374151;border-radius:.75rem;width:300px;height:200px}.aswp-core{top:5px;right:5px;border:1px solid #fff;border-radius:25px;font-size:14px}#aswp-main{flex-wrap:wrap;width:88%;height:100%;margin:auto;gap:15px}.aswp-hidden{opacity:0;pointer-events:none}#aswp-modal{transition:opacity .2s}'
@@ -776,24 +806,24 @@ const createWindow = () => {
                         toggleAswp()
                     })
                 }
-                `)
-    
-                // css for quick chat
-                win.webContents.executeJavaScript(`
+                `);
+
+				// css for quick chat
+				win.webContents.executeJavaScript(`
                 const qc_style = document.createElement('style')
                 document.querySelector('head').appendChild(qc_style)
                 qc_style.innerHTML = '#quick-chat-container{width:600px;min-height:360px;display:flex;flex-direction:column;position:absolute}.quick-chat.row{display:flex;flex-direction:row;height:100px}.quick-chat.one{justify-content:center}.quick-chat.two{justify-content:space-between}.quick-chat>div{width:180px;height:100px;background-color:#0006;border-radius:10px;display:flex;padding:5px;opacity:.8}.quick-chat>div:hover{opacity:1;box-shadow:0 0 .5rem rgb(255 255 255 / 50%)}.quick-chat>div>p{text-align:center;width:100%;margin:auto;color:#fff;overflow-wrap:break-word}'
-                `)
-    
-                //build titlebar to drag window around
-                win.webContents.executeJavaScript(`
+                `);
+
+				//build titlebar to drag window around
+				win.webContents.executeJavaScript(`
                 const drag = document.createElement('div')
                 document.querySelector('#app > div.ui > div').appendChild(drag)
                 drag.outerHTML = '<div style="-webkit-app-region: drag;width: 100vw;height: 20px;position: absolute;top: 0;left: 0;cursor: move;"></div>'
-                `)
-    
-                //website and github button on top right menu
-                win.webContents.executeJavaScript(`
+                `);
+
+				//website and github button on top right menu
+				win.webContents.executeJavaScript(`
                 const discord_old_parent_clone = document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(5)').cloneNode(true)
                 const discord_old_parent = document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(5)')
                 const github_parent = document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(5)').cloneNode(true)
@@ -838,10 +868,10 @@ const createWindow = () => {
                 newtab.addEventListener("click", () => {
                     console.log('CREATE_A_NEW_WINDOW')
                 })
-                `)
-    
-                //build updater button
-                win.webContents.executeJavaScript(`
+                `);
+
+				//build updater button
+				win.webContents.executeJavaScript(`
                 //updater button
                 const update_parent = document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div > div:nth-child(5)').cloneNode(true);
                 social_class.appendChild(update_parent);
@@ -854,19 +884,20 @@ const createWindow = () => {
                 const update_notif_div = document.createElement('div')
                 update.appendChild(update_notif_div)
                 update_notif_div.outerHTML = '<div id="update-notif" style="width: 10px;height: 10px;position: absolute;background: #f00;right: -1px;bottom: -4px;border-radius: 10px; display:none;"></div>'
-                `)
-    
-                //fetch settings
-                win.webContents.executeJavaScript(`docassets_on = ` + docassets)
-                win.webContents.executeJavaScript(`ublock_on = ` + ublock)
-                win.webContents.executeJavaScript(`rpc_on = ` + rpc)
-                win.webContents.executeJavaScript(`twemoji_on = ` + twemoji)
-                win.webContents.executeJavaScript(`theme_on = ` + theme)
-                win.webContents.executeJavaScript(`v3ui_on = ` + v3ui)
-                win.webContents.executeJavaScript(`aim_helper_on = ` + aim_helper)
-                
-                //build custom settings item
-                win.webContents.executeJavaScript(`
+                `);
+
+				//fetch settings
+				win.webContents.executeJavaScript(`docassets_on = ` + docassets);
+				win.webContents.executeJavaScript(`ublock_on = ` + ublock);
+				win.webContents.executeJavaScript(`rpc_on = ` + rpc);
+				win.webContents.executeJavaScript(`twemoji_on = ` + twemoji);
+				win.webContents.executeJavaScript(`theme_on = ` + theme);
+				win.webContents.executeJavaScript(`v3ui_on = ` + v3ui);
+				win.webContents.executeJavaScript(`aim_helper_on = ` + aim_helper);
+
+				//build custom settings item
+				win.webContents.executeJavaScript(
+					`
                 //detect modal changes
                 var observer = new MutationObserver(function (mutations) {
                     mutations.forEach(function (mutation) {
@@ -1096,7 +1127,9 @@ const createWindow = () => {
                         //version info
                         var settings_version = document.querySelector('#pane-2 > form > p.help-note').cloneNode(true)
                         modal_parent.appendChild(settings_version)
-                        settings_version.innerHTML = 'Deeeep.io ' + document.querySelector("#app > div.ui > div > div.first > div > div > div > div.play-game > div.relative > span").innerText + '<br>Blockyfish client ` + version_code + `'
+                        settings_version.innerHTML = 'Deeeep.io ' + document.querySelector("#app > div.ui > div > div.first > div > div > div > div.play-game > div.relative > span").innerText + '<br>Blockyfish client ` +
+						version_code +
+						`'
                         settings_version.style.position = 'absolute'
                         settings_version.style.bottom = '10px'
                         settings_version.style.left = '10px'
@@ -1131,10 +1164,11 @@ const createWindow = () => {
                         })
                     }
                 }
-                `)
-    
-                //build updater modal
-                win.webContents.executeJavaScript(`
+                `
+				);
+
+				//build updater modal
+				win.webContents.executeJavaScript(`
                 //updater modal
                 //styles
                 const updater_style = document.createElement('style')
@@ -1169,12 +1203,13 @@ const createWindow = () => {
                     updateText.innerText = 'No updates available'
                   })
                 }
-                `)
-    
-                //i love spinny things so there's a spinny feature in the updater :D
-                // also update checking and downloading
-                // and auto update check
-                win.webContents.executeJavaScript(`
+                `);
+
+				//i love spinny things so there's a spinny feature in the updater :D
+				// also update checking and downloading
+				// and auto update check
+				win.webContents.executeJavaScript(
+					`
                 function matches(text, partial) {
                     try {
                         return text.toLowerCase().indexOf(partial.toLowerCase()) > -1;
@@ -1207,11 +1242,15 @@ const createWindow = () => {
                     }
                     var ver_num = download_ver.replace("v", "").replace(".", "").replace(".", "")
                     setTimeout(function() {
-                        if (ver_num > ` + version_num + `) {
+                        if (ver_num > ` +
+						version_num +
+						`) {
                             updateText.style.display = 'none'
                             updateImg.style.display = 'none'
                             updateAvailableDiv.style.display = 'flex'
-                            updateAvailableText.outerHTML = '<p id="download-percent" style="text-align: left;">Update available<br><span style="color: #aaa">` + version_code + ` -&gt; ' + download_ver + '</span></p>'
+                            updateAvailableText.outerHTML = '<p id="download-percent" style="text-align: left;">Update available<br><span style="color: #aaa">` +
+						version_code +
+						` -&gt; ' + download_ver + '</span></p>'
                             downloadPercentText = document.getElementById('download-percent')
                             document.getElementById('update-notif').style.display = 'block'
                             updateDownloadButton.addEventListener("click", () => {
@@ -1238,10 +1277,11 @@ const createWindow = () => {
                     getUpdates()
                 }, 60000)
                 getUpdates()
-                `)
-    
-                // autoload posts in forums
-                win.webContents.executeJavaScript(`
+                `
+				);
+
+				// autoload posts in forums
+				win.webContents.executeJavaScript(`
                 function isInViewport(e) {
                     const rect = e.getBoundingClientRect();
                     return (
@@ -1258,295 +1298,339 @@ const createWindow = () => {
                         }
                     })
                 })
-                `)
-                
-                // make sure aimbot script isnt run twice
-                win.webContents.executeJavaScript(`
+                `);
+
+				// make sure aimbot script isnt run twice
+				win.webContents.executeJavaScript(`
                 aimBotRan = false
-                `)
-    
-                //pink badge for me!!
-                function insertClientOwnerBadge() {
-                    win.webContents.executeJavaScript(`
+                `);
+
+				//pink badge for me!!
+				function insertClientOwnerBadge() {
+					win.webContents.executeJavaScript(`
                     if (document.querySelector('#app > div.vfm.vfm--inset.vfm--fixed.modal > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div > div > div > div.el-row.header > div.el-col.el-col-24.auto-col.fill > div > div:nth-child(2) > img') == null) {
                         badgeParentDiv = document.querySelector('#app > div.vfm.vfm--inset.vfm--fixed.modal > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div > div > div > div.el-row.header > div.el-col.el-col-24.auto-col.fill > div')
                         clientOwnerBadge = document.createElement('div')
                         badgeParentDiv.insertBefore(clientOwnerBadge, badgeParentDiv.children[1])
                         clientOwnerBadge.outerHTML = '<div class="el-image verified-icon el-tooltip__trigger el-tooltip__trigger" style="height: 1rem;margin-right: 0.25rem;width: 1rem;"><img src="/img/verified.png" class="el-image__inner" style="filter: hue-rotate(90deg);"></div>'
                     }
-                    `)
-                }
-                function insertClientVerifiedBadge() {
-                    win.webContents.executeJavaScript(`
+                    `);
+				}
+				function insertClientVerifiedBadge() {
+					win.webContents.executeJavaScript(`
                     if (document.querySelector('#app > div.vfm.vfm--inset.vfm--fixed.modal > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div > div > div > div.el-row.header > div.el-col.el-col-24.auto-col.fill > div > div:nth-child(2) > img') == null) {
                         badgeParentDiv = document.querySelector('#app > div.vfm.vfm--inset.vfm--fixed.modal > div.vfm__container.vfm--absolute.vfm--inset.vfm--outline-none.modal-container > div > div > div > div.el-row.header > div.el-col.el-col-24.auto-col.fill > div')
                         clientOwnerBadge = document.createElement('div')
                         badgeParentDiv.insertBefore(clientOwnerBadge, badgeParentDiv.children[1])
                         clientOwnerBadge.outerHTML = '<div class="el-image verified-icon el-tooltip__trigger el-tooltip__trigger" style="height: 1rem;margin-right: 0.25rem;width: 1rem;"><img src="/img/verified.png" class="el-image__inner" style="filter: hue-rotate(165deg);"></div>'
                     }
-                    `)
-                }
-    
-                //make progress bar and track download progress to keep people sane
-                function setUpdateDownloadBar(percent) {
-                    if (percent < 100) {
-                        win.webContents.executeJavaScript(`
-                        downloadPercentText.innerHTML = '<p id="download-percent" style="text-align: left;">Downloading - ` + percent + `%</p>'
-                        `)
-                        win.webContents.executeJavaScript(`
-                        updateAvailableDiv.style.backgroundImage = 'linear-gradient(90deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.34) ` + percent + `%, rgba(255,255,255,0) ` + percent + `%, rgba(255,255,255,0) 100%)'
-                        `)
-                    }
-                    else {
-                        win.webContents.executeJavaScript(`
+                    `);
+				}
+
+				//make progress bar and track download progress to keep people sane
+				function setUpdateDownloadBar(percent) {
+					if (percent < 100) {
+						win.webContents.executeJavaScript(
+							`
+                        downloadPercentText.innerHTML = '<p id="download-percent" style="text-align: left;">Downloading - ` +
+								percent +
+								`%</p>'
+                        `
+						);
+						win.webContents.executeJavaScript(
+							`
+                        updateAvailableDiv.style.backgroundImage = 'linear-gradient(90deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.34) ` +
+								percent +
+								`%, rgba(255,255,255,0) ` +
+								percent +
+								`%, rgba(255,255,255,0) 100%)'
+                        `
+						);
+					} else {
+						win.webContents.executeJavaScript(`
                         downloadPercentText.innerHTML = '<p id="download-percent" style="text-align: left;">Installing...</p>'
                         updateAvailableDiv.style.backgroundImage = ''
-                        `)
-                    
-                    }
-                }
-    
-                //autorun update after downloaded
-                function runUpdateInstaller(location) {
-                    console.log(location)
-                    child(location, function(err, data) {
-                        if(err){
-                           console.error(err);
-                           return;
-                        }
-                    
-                        console.log(data.toString());
-                    });
-                }
-    
-            // pause game when switching to another window
-            // annoying feature so it got commented out
-            // and yeeted into unused-features-land
-            // win.on('blur', () => {
-            //     win.webContents.executeJavaScript(`
-            //     if (document.querySelector('#app > div.ui > div').classList.contains('playing') == true) {
-            //         if (document.querySelector('#app > div.ui > div').style.display == 'none') {
-            //             window.dispatchEvent(new KeyboardEvent("keydown", {keyCode: 27}))
-            //         }
-            //     }
-            //     `)
-            // });
-            
-            request('https://blockyfish.netlify.app/data.json', {json: true}, (error, res, body) => {
-                if (error) {
-                    return  console.log(error)
-                };
-            
-                if (!error && res.statusCode == 200) {
-                    var e = body.ban
-                    var v = body.verified
-                    var t = body.verified2
-                    // console.log(e)
-                    win.webContents.executeJavaScript(`
+                        `);
+					}
+				}
+
+				//autorun update after downloaded
+				function runUpdateInstaller(location) {
+					console.log(location);
+					child(location, function (err, data) {
+						if (err) {
+							console.error(err);
+							return;
+						}
+
+						console.log(data.toString());
+					});
+				}
+
+				// pause game when switching to another window
+				// annoying feature so it got commented out
+				// and yeeted into unused-features-land
+				// win.on('blur', () => {
+				//     win.webContents.executeJavaScript(`
+				//     if (document.querySelector('#app > div.ui > div').classList.contains('playing') == true) {
+				//         if (document.querySelector('#app > div.ui > div').style.display == 'none') {
+				//             window.dispatchEvent(new KeyboardEvent("keydown", {keyCode: 27}))
+				//         }
+				//     }
+				//     `)
+				// });
+
+				request(
+					"https://blockyfish.netlify.app/data.json",
+					{ json: true },
+					(error, res, body) => {
+						if (error) {
+							return console.log(error);
+						}
+
+						if (!error && res.statusCode == 200) {
+							var e = body.ban;
+							var v = body.verified;
+							var t = body.verified2;
+							// console.log(e)
+							win.webContents.executeJavaScript(`
                     setInterval(async function() {
                         if (document.querySelector('div.el-row.is-align-start.user__data > div > div.mb-1.whitespace-nowrap.flex.items-center > h3') != null) {
                             console.log('user: ' + document.querySelector('div.el-row.is-align-start.user__data > div > div.mb-1.whitespace-nowrap.flex.items-center > h3').innerText)
                         }
                     }, 3000)
-                    `)
-                };
-                
-                // set funny variables for discord rpc
-                var old_mode = 'FFA'
-                var old_menu = '0'
-                var old_url = 'https://beta.deeeep.io'
-                
-                // intercept every console log 😈🔥
-                if (!global.consoleLogScriptRunning) {
-                    win.webContents.on("console-message", (ev, level, message, line, file) => {
-                        var msg = `${message}`
+                    `);
+						}
 
-                        if (debug) {
-                            console.log(msg);
-                        }
-                        
-                        if (matches(msg, "window_action:")) {
-                            msg = msg.replace("window_action: ", "")
-                            if (msg == "max") win.maximize()
-                            else if (msg == "res") win.unmaximize()
-                            else if (msg == "min") win.minimize()
-                            else if (msg == "cls") win.close()
-                        }
+						// set funny variables for discord rpc
+						var old_mode = "FFA";
+						var old_menu = "0";
+						var old_url = "https://beta.deeeep.io";
 
-                        if (matches(msg, "user: ")) {
-                            msg = msg.replace("user: ", "")
-                            request('https://apibeta.deeeep.io/users/u/' + msg, {json: true}, (error, res, body) => {
-                                if (error) {
-                                    return  console.log(error)
-                                };
-                            
-                                if (!error && res.statusCode == 200) {
-                                    if (e.includes(body.id)) {
-                                        win.webContents.executeJavaScript(`
+						// intercept every console log 😈🔥
+						if (!global.consoleLogScriptRunning) {
+							win.webContents.on(
+								"console-message",
+								(ev, level, message, line, file) => {
+									var msg = `${message}`;
+
+									if (debug) {
+										console.log(msg);
+									}
+
+									if (matches(msg, "window_action:")) {
+										msg = msg.replace("window_action: ", "");
+										if (msg == "max") win.maximize();
+										else if (msg == "res") win.unmaximize();
+										else if (msg == "min") win.minimize();
+										else if (msg == "cls") win.close();
+									}
+
+									if (matches(msg, "user: ")) {
+										msg = msg.replace("user: ", "");
+										request(
+											"https://apibeta.deeeep.io/users/u/" + msg,
+											{ json: true },
+											(error, res, body) => {
+												if (error) {
+													return console.log(error);
+												}
+
+												if (!error && res.statusCode == 200) {
+													if (e.includes(body.id)) {
+														win.webContents.executeJavaScript(`
                                         game.socketManager.disconnect()
-                                        `)
-                                        app.e = 'ban'
-                                        win.hide()
-                                        store.set("shh", true)
-                                        require('electron').dialog.showMessageBoxSync(win,
-                                            {
-                                                type: 'question',
-                                                buttons: ['Close'],
-                                                title: 'Banned!',
-                                                message: 'You are banned from Blockyfish Client\nGoodbye!',
-                                                icon: path.join(__dirname, 'img/icon.png'),
-                                        });
-                                        app.quit()
-                                    }
-                                };
-                            });
-                        }
-        
-                        //find notification updates
-                        if (matches(msg, "notifs:")) {
-                            if (msg.length < 10) {
-                                const msg_num = msg.charAt(msg.length - 1);
-                                if (msg_num != 0) {
-                                    win.setOverlayIcon(path.join(__dirname, 'img/' + msg_num + '.png'), 'Over ' + msg_num + ' notifications')
-                                }
-                                else {
-                                    win.setOverlayIcon(null, '')
-                                }
-                            }
-                            else {
-                                win.setOverlayIcon(path.join(__dirname, 'img/9_plus.png'), 'Over 9 notifications')
-                            }
-                        }
-        
-                        //find rpc update events
-                        if (matches(msg, "state:")) {
-                            var msg = msg.replace("state: ", "")
-                            var mode = msg.slice(0,-1)
-                            var menu = msg.slice(-1)
-                            try {
-                                var url = win.webContents.getURL()
-                            } catch (e) {
-                                console.log('oops')
-                            }
-                            // if (mode != old_mode || menu != old_menu || url != old_url) {
-                                setGameMode(mode, menu)
-                                old_mode = mode
-                                old_menu = menu
-                                old_url = url
-                            // }
-                        }
-        
-                        // download the file
-                        // yes, this is actually what starts the download
-                        // not that stupid bs 140 lines above
-                        if (matches(msg, "request_download:")) {
-                            var url = msg.replace("request_download: ", "")
-                            var extension = "zip"
-                            if (os.platform().indexOf("Win") != -1) extension = "exe";
-                            if (os.platform().indexOf("Mac") != -1) extension = "dmg";
-                            if (os.platform().indexOf("Linux") != -1) extension = "zip";
-                            electronDl.download(BrowserWindow.getFocusedWindow(), url, {
-                                directory:downloadPath, 
-                                filename:"blockyfishclient-update-download." + extension, 
-                                onProgress: function(progress) {
-                                    setUpdateDownloadBar(Math.floor(progress.percent * 100))
-                                }, 
-                                onCompleted: function(file) {
-                                    runUpdateInstaller(file.path)
-                                }
-                            })
-                        }
-        
-                        // store extension related settings so they can be loaded later
-                        // also saves your window size and location so you dont have to adjust it everytime
-                        if (matches(msg, "store_settings:")) {
-                            var msg = msg.replace("store_settings: ", "")
-                            var setting_key = msg.slice(0,-1)
-                            var setting_value = msg.slice(-1)
-                            if (setting_value == 0) {
-                                var setting_value_bool = false
-                            }
-                            else if (setting_value == 1) {
-                                var setting_value_bool = true
-                            }
-                            store.set(setting_key, setting_value_bool)
-                        }
+                                        `);
+														app.e = "ban";
+														win.hide();
+														store.set("shh", true);
+														require("electron").dialog.showMessageBoxSync(win, {
+															type: "question",
+															buttons: ["Close"],
+															title: "Banned!",
+															message:
+																"You are banned from Blockyfish Client\nGoodbye!",
+															icon: path.join(__dirname, "img/icon.png")
+														});
+														app.quit();
+													}
+												}
+											}
+										);
+									}
 
-                        //discord rpc
-                        if (matches(msg, "TURN_DISCORD_RPC_OFF_REQUEST")) {
-                            rpc = false
-                        }
-                        if (matches(msg, "TURN_DISCORD_RPC_ON_REQUEST")) {
-                            rpc = true
-                        }
-    
-                        if (matches(msg, "NAVIGATE_TO_THIS_URL:")) {
-                            var msg = msg.replace("NAVIGATE_TO_THIS_URL: ", "").toLowerCase().replace("https://", "").replace("http://", "")
-                            if (msg.match(/^beta\.deeeep\.io(\/|\?)/)) {
-                                // win.webContents.loadURL("https://" + msg)
-                                win.webContents.executeJavaScript(`
-                                window.location.href = "https://` + msg + `"
-                                `)
-                            }
-                        }
-        
-                        // store quick chat messages
-                        if (matches(msg, "qc_ms_1: ")) {
-                            var msg = msg.replace("qc_ms_1: ", "")
-                            msg = addslashes(msg)
-                            qc1 = msg
-                        }
-                        if (matches(msg, "qc_ms_2: ")) {
-                            var msg = msg.replace("qc_ms_2: ", "")
-                            msg = addslashes(msg)
-                            qc2 = msg
-                        }
-                        if (matches(msg, "qc_ms_3: ")) {
-                            var msg = msg.replace("qc_ms_3: ", "")
-                            msg = addslashes(msg)
-                            qc3 = msg
-                        }
-                        if (matches(msg, "qc_ms_4: ")) {
-                            var msg = msg.replace("qc_ms_4: ", "")
-                            msg = addslashes(msg)
-                            qc4 = msg
-                        }
-                        if (matches(msg, "qc_ms_spam: ")) {
-                            var msg = msg.replace("qc_ms_spam: ", "")
-                            msg = addslashes(msg)
-                            spam_chat = msg
-                        }
-        
-                        // send quick-chat message
-                        if (matches(msg, "send_chat_msg:")) {
-                            var msg = msg.replace("send_chat_msg: ", "")
-                            sendKeybinding(win, 'enter')
-                            for (var i = 0; i < msg.length; i++) {
-                                sendKeybinding(win, msg[i])
-                            }
-                            sendKeybinding(win, 'enter')
-                            win.webContents.executeJavaScript(`quickChatTyping = false`)
-                        }
-        
-                        // slash commands
-                        if (matches(msg, "handle_slash_command")) {
-                            sendKeybinding(win, 'enter')
-                            sendKeybinding(win, '/')
-                        }
-        
-                        //load custom settings
-                        if (matches(msg, "Modal Added:[object HTMLDivElement]")) {
-                            win.webContents.executeJavaScript(`buildCustomSettingsItems('` + qc1 + `', '` + qc2 + `', '` + qc3 + `', '` + qc4 + `', '` + spam_chat + `')`)
-                        }
-    
-                        if (matches(msg, "ERR_INTERNET_DISCONNECTED")) {
-                            setInterval(() => {
-                                console.log('sjfdhgkbsdf')
-                            })
-                        }
-        
-                        if (matches(msg, "RUN_TARGET_LOCK_SCRIPT")) {
-                            win.webContents.executeJavaScript(`
+									//find notification updates
+									if (matches(msg, "notifs:")) {
+										if (msg.length < 10) {
+											const msg_num = msg.charAt(msg.length - 1);
+											if (msg_num != 0) {
+												win.setOverlayIcon(
+													path.join(__dirname, "img/" + msg_num + ".png"),
+													"Over " + msg_num + " notifications"
+												);
+											} else {
+												win.setOverlayIcon(null, "");
+											}
+										} else {
+											win.setOverlayIcon(
+												path.join(__dirname, "img/9_plus.png"),
+												"Over 9 notifications"
+											);
+										}
+									}
+
+									//find rpc update events
+									if (matches(msg, "state:")) {
+										var msg = msg.replace("state: ", "");
+										var mode = msg.slice(0, -1);
+										var menu = msg.slice(-1);
+										try {
+											var url = win.webContents.getURL();
+										} catch (e) {
+											console.log("oops");
+										}
+										// if (mode != old_mode || menu != old_menu || url != old_url) {
+										setGameMode(mode, menu);
+										old_mode = mode;
+										old_menu = menu;
+										old_url = url;
+										// }
+									}
+
+									// download the file
+									// yes, this is actually what starts the download
+									// not that stupid bs 140 lines above
+									if (matches(msg, "request_download:")) {
+										var url = msg.replace("request_download: ", "");
+										var extension = "zip";
+										if (os.platform().indexOf("Win") != -1) extension = "exe";
+										if (os.platform().indexOf("Mac") != -1) extension = "dmg";
+										if (os.platform().indexOf("Linux") != -1) extension = "zip";
+										electronDl.download(BrowserWindow.getFocusedWindow(), url, {
+											directory: downloadPath,
+											filename: "blockyfishclient-update-download." + extension,
+											onProgress: function (progress) {
+												setUpdateDownloadBar(
+													Math.floor(progress.percent * 100)
+												);
+											},
+											onCompleted: function (file) {
+												runUpdateInstaller(file.path);
+											}
+										});
+									}
+
+									// store extension related settings so they can be loaded later
+									// also saves your window size and location so you dont have to adjust it everytime
+									if (matches(msg, "store_settings:")) {
+										var msg = msg.replace("store_settings: ", "");
+										var setting_key = msg.slice(0, -1);
+										var setting_value = msg.slice(-1);
+										if (setting_value == 0) {
+											var setting_value_bool = false;
+										} else if (setting_value == 1) {
+											var setting_value_bool = true;
+										}
+										store.set(setting_key, setting_value_bool);
+									}
+
+									//discord rpc
+									if (matches(msg, "TURN_DISCORD_RPC_OFF_REQUEST")) {
+										rpc = false;
+									}
+									if (matches(msg, "TURN_DISCORD_RPC_ON_REQUEST")) {
+										rpc = true;
+									}
+
+									if (matches(msg, "NAVIGATE_TO_THIS_URL:")) {
+										var msg = msg
+											.replace("NAVIGATE_TO_THIS_URL: ", "")
+											.toLowerCase()
+											.replace("https://", "")
+											.replace("http://", "");
+										if (msg.match(/^beta\.deeeep\.io(\/|\?)/)) {
+											// win.webContents.loadURL("https://" + msg)
+											win.webContents.executeJavaScript(
+												`
+                                window.location.href = "https://` +
+													msg +
+													`"
+                                `
+											);
+										}
+									}
+
+									// store quick chat messages
+									if (matches(msg, "qc_ms_1: ")) {
+										var msg = msg.replace("qc_ms_1: ", "");
+										msg = addslashes(msg);
+										qc1 = msg;
+									}
+									if (matches(msg, "qc_ms_2: ")) {
+										var msg = msg.replace("qc_ms_2: ", "");
+										msg = addslashes(msg);
+										qc2 = msg;
+									}
+									if (matches(msg, "qc_ms_3: ")) {
+										var msg = msg.replace("qc_ms_3: ", "");
+										msg = addslashes(msg);
+										qc3 = msg;
+									}
+									if (matches(msg, "qc_ms_4: ")) {
+										var msg = msg.replace("qc_ms_4: ", "");
+										msg = addslashes(msg);
+										qc4 = msg;
+									}
+									if (matches(msg, "qc_ms_spam: ")) {
+										var msg = msg.replace("qc_ms_spam: ", "");
+										msg = addslashes(msg);
+										spam_chat = msg;
+									}
+
+									// send quick-chat message
+									if (matches(msg, "send_chat_msg:")) {
+										var msg = msg.replace("send_chat_msg: ", "");
+										sendKeybinding(win, "enter");
+										for (var i = 0; i < msg.length; i++) {
+											sendKeybinding(win, msg[i]);
+										}
+										sendKeybinding(win, "enter");
+										win.webContents.executeJavaScript(
+											`quickChatTyping = false`
+										);
+									}
+
+									// slash commands
+									if (matches(msg, "handle_slash_command")) {
+										sendKeybinding(win, "enter");
+										sendKeybinding(win, "/");
+									}
+
+									//load custom settings
+									if (matches(msg, "Modal Added:[object HTMLDivElement]")) {
+										win.webContents.executeJavaScript(
+											`buildCustomSettingsItems('` +
+												qc1 +
+												`', '` +
+												qc2 +
+												`', '` +
+												qc3 +
+												`', '` +
+												qc4 +
+												`', '` +
+												spam_chat +
+												`')`
+										);
+									}
+
+									if (matches(msg, "ERR_INTERNET_DISCONNECTED")) {
+										setInterval(() => {
+											console.log("sjfdhgkbsdf");
+										});
+									}
+
+									if (matches(msg, "RUN_TARGET_LOCK_SCRIPT")) {
+										win.webContents.executeJavaScript(`
                             mapeditor = document.querySelector('#canvas-container > canvas')
                             click0 = game.currentScene.entityManager.getEntity(targetID).relatedObjects.children[2].speedMultiplierDisplay.visible;
                             setInterval(function () {
@@ -1565,51 +1649,75 @@ const createWindow = () => {
                                     }
                                 }
                             });
-                            `)
-                        }
-        
-                        if (matches(msg, "CREATE_A_NEW_WINDOW")) {
-                            createWindow()
-                        }
+                            `);
+									}
 
-                        if (matches(msg, "TAKE_SCREENSHOT_REQUEST_PICTURE_NOW")) {
-                            win.webContents.capturePage().then(image => {
-                                fs.writeFile(downloadPath + "\\" + new Date().getFullYear() + "-" + (new Date().getMonth() + 1) + "-" + new Date().getDate() + "-" + new Date().getHours() + "-" + new Date().getMinutes() + "-" + new Date().getSeconds() + "-" + new Date().getMilliseconds() +".png", image.toPNG(), (err) => {
-                                    if (err) throw err
-                                })
-                            })
-                        }
+									if (matches(msg, "CREATE_A_NEW_WINDOW")) {
+										createWindow();
+									}
 
-                        if (matches(msg, "REQUEST_TOGGLE_FULLSCREEN_STATE")) {
-                            win.setFullScreen(!win.fullScreen)
-                            win.webContents.executeJavaScript(`
+									if (matches(msg, "TAKE_SCREENSHOT_REQUEST_PICTURE_NOW")) {
+										win.webContents.capturePage().then((image) => {
+											fs.writeFile(
+												downloadPath +
+													"\\" +
+													new Date().getFullYear() +
+													"-" +
+													(new Date().getMonth() + 1) +
+													"-" +
+													new Date().getDate() +
+													"-" +
+													new Date().getHours() +
+													"-" +
+													new Date().getMinutes() +
+													"-" +
+													new Date().getSeconds() +
+													"-" +
+													new Date().getMilliseconds() +
+													".png",
+												image.toPNG(),
+												(err) => {
+													if (err) throw err;
+												}
+											);
+										});
+									}
+
+									if (matches(msg, "REQUEST_TOGGLE_FULLSCREEN_STATE")) {
+										win.setFullScreen(!win.fullScreen);
+										win.webContents.executeJavaScript(`
                             if (document.fullscreenElement) {
                                 document.exitFullscreen();
                             } else {
                                 document.documentElement.requestFullscreen();
                             }
-                            `)
-                        }
+                            `);
+									}
 
-                        if (matches(msg, "PLUGIN_FOLDER_OPEN_NOW_REQUEST_PLEASE")) {
-                            shell.openPath(path.join(__dirname, 'plugins'))
-                        }
-        
-                        // if game has loaded, inject the hacks xd
-                        if (matches(msg, "Common.playLoadProgress (old, new),100,0")) {
+									if (matches(msg, "PLUGIN_FOLDER_OPEN_NOW_REQUEST_PLEASE")) {
+										shell.openPath(path.join(__dirname, "plugins"));
+									}
 
-                            //load plugins
-                            var pluginDirectoryPath = path.join(__dirname, 'plugins');
-                            fs.readdir(pluginDirectoryPath, function (err, files) {
-                                if (err) {
-                                    return console.log('Unable to scan directory: ' + err);
-                                } 
-                                files.forEach(function (file) {
-                                    var plugin = require(path.join(__dirname, 'plugins', file))
-                                    win.webContents.executeJavaScript(plugin.script)
-                                });
-                            });
-                            win.webContents.executeJavaScript(`
+									// if game has loaded, inject the hacks xd
+									if (
+										matches(msg, "Common.playLoadProgress (old, new),100,0")
+									) {
+										//load plugins
+										var pluginDirectoryPath = path.join(__dirname, "plugins");
+										fs.readdir(pluginDirectoryPath, function (err, files) {
+											if (err) {
+												return console.log("Unable to scan directory: " + err);
+											}
+											files.forEach(function (file) {
+												var plugin = require(path.join(
+													__dirname,
+													"plugins",
+													file
+												));
+												win.webContents.executeJavaScript(plugin.script);
+											});
+										});
+										win.webContents.executeJavaScript(`
                             setInterval(function () {
                                 // TWEMOJI
                                 // for names
@@ -1684,10 +1792,10 @@ const createWindow = () => {
                                     evo_wheel.style.opacity = 0
                                 }
                             });
-                            `)
-        
-                            // asset swapper
-                            win.webContents.executeJavaScript(`
+                            `);
+
+										// asset swapper
+										win.webContents.executeJavaScript(`
                             async function createAssetSwapButton() {
                                 setInterval(function() {
                                     if (document.querySelector('div.top-right') != null) {
@@ -1709,10 +1817,10 @@ const createWindow = () => {
                                 }, 500)
                             }
                             createAssetSwapButton()
-                            `)
+                            `);
 
-                            // remove fullscreen button
-                            win.webContents.executeJavaScript(`
+										// remove fullscreen button
+										win.webContents.executeJavaScript(`
                             setInterval(function() {
                                 if (document.querySelector('div.top-right') != null) {
                                     if (document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(3) > span > svg').innerHTML == '<path d="M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17V19H5V14H7V17H10Z" data-v-35f7fcad=""></path>') {
@@ -1720,14 +1828,23 @@ const createWindow = () => {
                                     }
                                 }
                             }, 500)
-                            `)
-        
-                            //quick chat UI
-                            win.webContents.executeJavaScript(`
+                            `);
+
+										//quick chat UI
+										win.webContents.executeJavaScript(
+											`
                             quickChatTyping = false
                             var qc_div = document.createElement('div')
                             document.querySelector('div.game').insertBefore(qc_div, document.querySelector('div.game').children[0])
-                            qc_div.outerHTML = '<div id=quick-chat-container style=display:none><div class="quick-chat row one"><div><p>` + qc1 + `</div></div><div class="quick-chat row two"><div><p>` + qc4 + `</div><div><p>` + qc2 + `</div></div><div class="quick-chat row one"><div><p>` + qc3 + `</div></div></div>'
+                            qc_div.outerHTML = '<div id=quick-chat-container style=display:none><div class="quick-chat row one"><div><p>` +
+												qc1 +
+												`</div></div><div class="quick-chat row two"><div><p>` +
+												qc4 +
+												`</div><div><p>` +
+												qc2 +
+												`</div></div><div class="quick-chat row one"><div><p>` +
+												qc3 +
+												`</div></div></div>'
                             var quickChatDiv = document.getElementById('quick-chat-container')
                             document.body.addEventListener("mousemove", (e) => {
                                 window.mouseX = e.clientX
@@ -1760,10 +1877,12 @@ const createWindow = () => {
                                     }
                                 }
                             })
-                            `)
-    
-                            //spam chat
-                            win.webContents.executeJavaScript(`
+                            `
+										);
+
+										//spam chat
+										win.webContents.executeJavaScript(
+											`
                             if (chatSpamLoop == false) {
                                 spamOn = false
                                 window.addEventListener("keyup", (e) => {
@@ -1779,32 +1898,35 @@ const createWindow = () => {
                                 })
                                 setInterval(() => {
                                     if (document.querySelector('div.home-page').style.display == 'none' && spamOn) {
-                                        console.log("send_chat_msg: " + "` + spam_chat + `")
+                                        console.log("send_chat_msg: " + "` +
+												spam_chat +
+												`")
                                     }
                                 }, 10000)
                                 chatSpamLoop = true
                             }
-                            `)
-        
-                            // overlays
-                            win.webContents.executeJavaScript(`
+                            `
+										);
+
+										// overlays
+										win.webContents.executeJavaScript(`
                             var ctrl_overlay = document.createElement('div')
                             document.querySelector('div.game').insertBefore(ctrl_overlay, document.querySelector('div.game').children[0])
                             ctrl_overlay.outerHTML = '<div id="ctrl-overlay" style="width: 100%;height: 100%;position: absolute;display: block;z-index:10000;pointer-events:none;"></div>'
                             var aim_overlay = document.createElement('hr')
                             document.querySelector('div.game').insertBefore(aim_overlay, document.querySelector('div.game').children[1])
                             aim_overlay.outerHTML = '<hr id="aim-overlay" style="border: 2px #fff dotted;border-image: linear-gradient(to right, #fff8, #fff0) 1;transform-origin: left;position: absolute;top: 50%;left: 50%;width: 40vw;display:none;pointer-events:none;">'
-                            `)
-        
-                            //fish levels:
-                            // 61: goblin shark
-                            // 93: archerfish
-                            // 94: sea otter
-                            // 101: thresher shark
-                            // 107: beaked whale
-                            // 109: beluga
-                            // 113: japanese spider crab
-                            win.webContents.executeJavaScript(`
+                            `);
+
+										//fish levels:
+										// 61: goblin shark
+										// 93: archerfish
+										// 94: sea otter
+										// 101: thresher shark
+										// 107: beaked whale
+										// 109: beluga
+										// 113: japanese spider crab
+										win.webContents.executeJavaScript(`
                             listForAnimalsWithAimOverlay = [61, 93, 94, 113]
                             listForGamemodesWithAimOverlay = [1, 2, 6]
                             setInterval(function() {
@@ -1893,11 +2015,11 @@ const createWindow = () => {
                                 document.getElementById('ctrl-overlay').style.pointerEvents = 'none'
                                 document.getElementById('aim-overlay').style.display = 'none'
                             })
-                            `)
-        
-                            //matching strings - for utilities
-                            //removing items from array for unmuting
-                            win.webContents.executeJavaScript(`
+                            `);
+
+										//matching strings - for utilities
+										//removing items from array for unmuting
+										win.webContents.executeJavaScript(`
                             function matches(text, partial) {
                                 console.log(text)
                                 return text.toLowerCase().indexOf(partial.toLowerCase()) > -1;
@@ -1907,10 +2029,10 @@ const createWindow = () => {
                                     return ele != value; 
                                 });
                             }
-                            `)
-        
-                            //deleting muted chat messages
-                            win.webContents.executeJavaScript(`
+                            `);
+
+										//deleting muted chat messages
+										win.webContents.executeJavaScript(`
                             setInterval(function() {
                                 if (game.currentScene != null) {
                                     for (let i = 0; i < game.currentScene.chatMessages.length; i++) {
@@ -1920,10 +2042,10 @@ const createWindow = () => {
                                     }
                                 }
                             }, 200)
-                            `)
-        
-                            //show id
-                            win.webContents.executeJavaScript(`
+                            `);
+
+										//show id
+										win.webContents.executeJavaScript(`
                             setInterval(() => {
                                 if (document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1').childElementCount != 5 || document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(5) > span').innerText != "ID: " + game.currentScene.myAnimal.id) {
                                     if (document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(4)') != null) {
@@ -1945,14 +2067,15 @@ const createWindow = () => {
                                     id_text.innerText = 'ID: ' + game.currentScene.myAnimal.id
                                 }
                             }, 5000)
-                            `)
-                        }
-                });
-            }
-            global.consoleLogScriptRunning = true
-            
-            //custom keybinds
-            win.webContents.executeJavaScript(`
+                            `);
+									}
+								}
+							);
+						}
+						global.consoleLogScriptRunning = true;
+
+						//custom keybinds
+						win.webContents.executeJavaScript(`
             var evo_wheel_rot = 0
             setInterval(function() {
                 evo_wheel_rot += 1
@@ -1974,162 +2097,164 @@ const createWindow = () => {
                     }
                 }
             });
-            `)
-            
-            // show the window after all the scripts finish
-            // this is so that the app shows only when the UI in complete
-            // if this was shown before everything finished loading, 
-            // it would make me look noob and unprofessional
-            win.show();
-            
-            // no u electron xd
-            // open all links in the default browser
-            // instead of yucky electron windows
-            win.webContents.on('new-window', function(e, url) {
-                e.preventDefault();
-                require('electron').shell.openExternal(url);
-            });
+            `);
 
-            //discord rpc
-            var Discord = new Client({
-                transport: "ipc",
-            });
-            
-            // log into the client to get icon and app name
-            Discord.login({clientId: "918680181609213972"}).catch(console.error)
-            var startTime = new Date()
-            
-            // fallback in-case v5 comes and i am gone
-            // at least it will show something
-            // Discord.on("ready", () => {
-            //     if (rpc) {
-            //         Discord.setActivity({
-            //             largeImageKey: "icon",
-            //             largeImageText: "Deeeep.io",
-            //             startTimestamp: startTime,
-            //         })
-            //     }
-            // });
-            
-            // update discord rpc
-            function setGameMode(mode, menu) {
-                //greb url and eats it (jk)
-                try {
-                    var currentUrl = win.webContents.getURL()
-                } catch (e) {
-                    console.log('oops')
-                }
-                
-                // viewing <user>'s profile
-                if (matches(currentUrl, "/u/")) {
-                    var detailText = 'Viewing ' + currentUrl.replace("https://beta.deeeep.io/u/", "").replace(/\?host=....../i, "") + "'s profile"
-                    var labelText = ''
-                    request('https://apibeta.deeeep.io/users/u/' + currentUrl.replace("https://beta.deeeep.io/u/", "").replace(/\?host=....../i, ""), {json: true}, (error, res, body) => {
-                        if (error) {
-                            return  console.log(error)
-                        };
-                        if (!error && res.statusCode == 200) {
-                            if (v.includes(body.id)) {
-                                insertClientOwnerBadge()
-                            }
-                            else if (t.includes(body.id)) {
-                                insertClientVerifiedBadge()
-                            }
-                        };
-                    });
-                }
-                
-                // these ones are self-explainatory
-                else if (matches(currentUrl, "/forum/")) {
-                    var detailText = "Visiting the forums"
-                    var labelText = ''
-                }
-                else if (matches(currentUrl, "/store/")) {
-                    var detailText = "Browsing through the store"
-                    var labelText = ''
-                }
-                else if (matches(currentUrl, "/inventory/")) {
-                    var detailText = "Checking inventory"
-                    var labelText = ''
-                }
-                else if (menu == '0') {
-                    var detailText = 'In the menus'
-                    var labelText = ''
-                }
-                else if (menu == '1') {
-                    var detailText = 'AFK in ' + mode
-                    var labelText = 'Join game'
-                }
-                else if (menu == '2') {
-                    var detailText = 'Playing ' + mode
-                    var labelText = 'Join game'
-                }
-                
-                // if the gamemode buttons exist, use them to update the status
-                if (rpc) {
-                    if (labelText != '') {
-                        Discord.setActivity({
-                            details: detailText,
-                            largeImageKey: "icon",
-                            largeImageText: "Deeeep.io",
-                            startTimestamp: startTime,
-                            buttons: [
-                                { label: labelText, url: currentUrl }
-                            ]
-                        })
-                    }
-                    
-                    else {
-                        Discord.setActivity({
-                            details: detailText,
-                            largeImageKey: "icon",
-                            largeImageText: "Deeeep.io",
-                            startTimestamp: startTime,
-                        })
-                    }
-                }
-                else {
-                    Discord.clearActivity()
-                }
-            }
-        });
-        });
-        extensionsLoaded = true
-    }
-    // load the extensions in
-    if (!extensionsLoaded) {
-        if (ublock) {
-            win.webContents.session.loadExtension(docassetsPath).then(() => {
-                win.webContents.session.loadExtension(ublockPath).then(() => {
-                    setTimeout(() => {
-                        makeNewWindow()
-                    }, 100)
-                })
-            })
-        }
-        else {
-            win.webContents.session.loadExtension(docassetsPath).then(() => {
-                setTimeout(() => {
-                    makeNewWindow()
-                }, 100)
-            })
-        }
-    }
-    else {
-        makeNewWindow()
-    }
-}
+						// show the window after all the scripts finish
+						// this is so that the app shows only when the UI in complete
+						// if this was shown before everything finished loading,
+						// it would make me look noob and unprofessional
+						win.show();
 
-// now you actually see it, the win.show() thing was all a lie
-createWindow()
-})
+						// no u electron xd
+						// open all links in the default browser
+						// instead of yucky electron windows
+						win.webContents.on("new-window", function (e, url) {
+							e.preventDefault();
+							require("electron").shell.openExternal(url);
+						});
+
+						//discord rpc
+						var Discord = new Client({
+							transport: "ipc"
+						});
+
+						// log into the client to get icon and app name
+						Discord.login({ clientId: "918680181609213972" }).catch(
+							console.error
+						);
+						var startTime = new Date();
+
+						// fallback in-case v5 comes and i am gone
+						// at least it will show something
+						// Discord.on("ready", () => {
+						//     if (rpc) {
+						//         Discord.setActivity({
+						//             largeImageKey: "icon",
+						//             largeImageText: "Deeeep.io",
+						//             startTimestamp: startTime,
+						//         })
+						//     }
+						// });
+
+						// update discord rpc
+						function setGameMode(mode, menu) {
+							//greb url and eats it (jk)
+							try {
+								var currentUrl = win.webContents.getURL();
+							} catch (e) {
+								console.log("oops");
+							}
+
+							// viewing <user>'s profile
+							if (matches(currentUrl, "/u/")) {
+								var detailText =
+									"Viewing " +
+									currentUrl
+										.replace("https://beta.deeeep.io/u/", "")
+										.replace(/\?host=....../i, "") +
+									"'s profile";
+								var labelText = "";
+								request(
+									"https://apibeta.deeeep.io/users/u/" +
+										currentUrl
+											.replace("https://beta.deeeep.io/u/", "")
+											.replace(/\?host=....../i, ""),
+									{ json: true },
+									(error, res, body) => {
+										if (error) {
+											return console.log(error);
+										}
+										if (!error && res.statusCode == 200) {
+											if (v.includes(body.id)) {
+												insertClientOwnerBadge();
+											} else if (t.includes(body.id)) {
+												insertClientVerifiedBadge();
+											}
+										}
+									}
+								);
+							}
+
+							// these ones are self-explainatory
+							else if (matches(currentUrl, "/forum/")) {
+								var detailText = "Visiting the forums";
+								var labelText = "";
+							} else if (matches(currentUrl, "/store/")) {
+								var detailText = "Browsing through the store";
+								var labelText = "";
+							} else if (matches(currentUrl, "/inventory/")) {
+								var detailText = "Checking inventory";
+								var labelText = "";
+							} else if (menu == "0") {
+								var detailText = "In the menus";
+								var labelText = "";
+							} else if (menu == "1") {
+								var detailText = "AFK in " + mode;
+								var labelText = "Join game";
+							} else if (menu == "2") {
+								var detailText = "Playing " + mode;
+								var labelText = "Join game";
+							}
+
+							// if the gamemode buttons exist, use them to update the status
+							if (rpc) {
+								if (labelText != "") {
+									Discord.setActivity({
+										details: detailText,
+										largeImageKey: "icon",
+										largeImageText: "Deeeep.io",
+										startTimestamp: startTime,
+										buttons: [{ label: labelText, url: currentUrl }]
+									});
+								} else {
+									Discord.setActivity({
+										details: detailText,
+										largeImageKey: "icon",
+										largeImageText: "Deeeep.io",
+										startTimestamp: startTime
+									});
+								}
+							} else {
+								Discord.clearActivity();
+							}
+						}
+					}
+				);
+			});
+			extensionsLoaded = true;
+		}
+		// load the extensions in
+		if (!extensionsLoaded) {
+			if (ublock) {
+				win.webContents.session.loadExtension(docassetsPath).then(() => {
+					win.webContents.session.loadExtension(ublockPath).then(() => {
+						setTimeout(() => {
+							makeNewWindow();
+						}, 100);
+					});
+				});
+			} else {
+				win.webContents.session.loadExtension(docassetsPath).then(() => {
+					setTimeout(() => {
+						makeNewWindow();
+					}, 100);
+				});
+			}
+		} else {
+			makeNewWindow();
+		}
+	};
+
+	// now you actually see it, the win.show() thing was all a lie
+	createWindow();
+});
 
 // stupid mac os thing idk
-app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-})
+app.on("activate", () => {
+	if (BrowserWindow.getAllWindows().length === 0) createWindow();
+});
 
 // kill everything related to the app when you press the close button
-app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') app.quit()
-})
+app.on("window-all-closed", () => {
+	if (process.platform !== "darwin") app.quit();
+});
