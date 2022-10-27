@@ -1,5 +1,5 @@
 var name = "Auto spin"
-var description = "Spin really fast without breaking your arms"
+var description = "Spin really fast without breaking your arms. Hold Z to activate."
 var script = `
 mapeditor = document.querySelector('#canvas-container > canvas')
 var spin_direction = 0
