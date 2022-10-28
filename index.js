@@ -721,7 +721,12 @@ app.whenReady().then(async function makeNewWindow() {
                         pluginBox.innerHTML = ''
                         `);
 						files.forEach(function (file) {
-							var plugin = require(path.join(__dirname, "plugins", file));
+							console.log(file);
+							var plugin = require(path.join(
+								app.getPath("userData"),
+								"plugins",
+								file
+							));
 							win.webContents.executeJavaScript(
 								`
                             pluginBox.appendChild(document.createElement("br"))
@@ -1705,7 +1710,6 @@ app.whenReady().then(async function makeNewWindow() {
 									}
 
 									if (matches(msg, "PLUGIN_FOLDER_OPEN_NOW_REQUEST_PLEASE")) {
-										// shell.openPath(path.join(__dirname, "plugins"));
 										shell.openPath(
 											path.join(app.getPath("userData"), "plugins")
 										);
@@ -1726,7 +1730,7 @@ app.whenReady().then(async function makeNewWindow() {
 											}
 											files.forEach(function (file) {
 												var plugin = require(path.join(
-													__dirname,
+													app.getPath("userData"),
 													"plugins",
 													file
 												));
