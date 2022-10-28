@@ -46,8 +46,8 @@ app.setAsDefaultProtocolClient("deeeepio");
 var extensionsLoaded = false;
 
 // version info
-const version_code = "v2.0.0";
-const version_num = "200";
+const version_code = "v2.0.1";
+const version_num = "201";
 
 // custom function for later
 function matches(text, partial) {
