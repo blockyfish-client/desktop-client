@@ -86,6 +86,16 @@ if (fs.existsSync(downloadPath + "/blockyfishclient-update-download.exe")) {
 	});
 }
 
+// create plugin folder
+var pluginDirectoryPath = path.join(app.getPath("userData"), "plugins");
+try {
+	if (!fs.existsSync(pluginDirectoryPath)) {
+		fs.mkdirSync(pluginDirectoryPath);
+	}
+} catch (err) {
+	console.error(err);
+}
+
 // import settings for stuff
 const store = new Store();
 var docassets = store.get("docassets");
@@ -677,7 +687,7 @@ app.whenReady().then(async function makeNewWindow() {
                 const pluginMain = document.getElementById("plugin-main")
                 const pluginBox = document.createElement("div")
                 pluginMain.appendChild(pluginBox)
-                pluginBox.innerHTML = '<p>No plugins installed</p>'
+                pluginBox.innerHTML = '<p>No plugins installed</p><p>You must restart the client to load new plugins</p>'
                 pluginBox.id = 'plugin-list'
                 const pluginCloses = document.getElementsByClassName("plugin-close")
                 const pluginModal = document.getElementById("plugin-modal")
@@ -702,7 +712,7 @@ app.whenReady().then(async function makeNewWindow() {
                     window.open("https://blockyfish.netlify.app/plugins")
                 })
                 `);
-				var pluginDirectoryPath = path.join(__dirname, "plugins");
+				var pluginDirectoryPath = path.join(app.getPath("userData"), "plugins");
 				fs.readdir(pluginDirectoryPath, function (err, files) {
 					if (err) {
 						return console.log("Unable to scan directory: " + err);
@@ -1695,7 +1705,10 @@ app.whenReady().then(async function makeNewWindow() {
 									}
 
 									if (matches(msg, "PLUGIN_FOLDER_OPEN_NOW_REQUEST_PLEASE")) {
-										shell.openPath(path.join(__dirname, "plugins"));
+										// shell.openPath(path.join(__dirname, "plugins"));
+										shell.openPath(
+											path.join(app.getPath("userData"), "plugins")
+										);
 									}
 
 									// if game has loaded, inject the hacks xd
@@ -1703,7 +1716,10 @@ app.whenReady().then(async function makeNewWindow() {
 										matches(msg, "Common.playLoadProgress (old, new),100,0")
 									) {
 										//load plugins
-										var pluginDirectoryPath = path.join(__dirname, "plugins");
+										var pluginDirectoryPath = path.join(
+											app.getPath("userData"),
+											"plugins"
+										);
 										fs.readdir(pluginDirectoryPath, function (err, files) {
 											if (err) {
 												return console.log("Unable to scan directory: " + err);
