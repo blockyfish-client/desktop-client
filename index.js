@@ -25,7 +25,7 @@ const os = require("os");
 const fetch = require("node-fetch");
 
 // debug mode
-const debug = false;
+const debug = true;
 
 // if (!debug) {
 process.on("uncaughtException", () => {
@@ -183,6 +183,21 @@ app.whenReady().then(async function makeNewWindow() {
 				win.focus();
 			}
 		});
+
+		setInterval(() => {
+			win.webContents.executeJavaScript(
+				`
+            if (` +
+					win.fullScreen.toString() +
+					`) {
+                isFullscreen = true
+            }
+            else {
+                isFullscreen = false
+            }
+            `
+			);
+		}, 500);
 
 		win.setTitle("Blockyfish Client");
 
@@ -455,7 +470,8 @@ app.whenReady().then(async function makeNewWindow() {
 				// `)
 
 				//state checks and UI adjustments
-				win.webContents.executeJavaScript(`
+				win.webContents.executeJavaScript(
+					`
                 chatSpamLoop = false
                 // document.querySelector('head > link[href*="/assets/index"][rel="stylesheet"]').href = "https://thepiguy3141.github.io/doc-assets/images/misc/index.8b74f9b3.css"
                 notif_count_old = 0
@@ -499,7 +515,7 @@ app.whenReady().then(async function makeNewWindow() {
                         document.querySelector('#app > div.ui > div > div.first > div > div > div > div.play-game > div.relative > div > div > input').maxLength = 22
                     }
                     //changing layouts according to fullscreen
-                    if (document.fullscreenElement) {
+                    if (isFullscreen) {
                         if (document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div').style.paddingRight != '') {
                             document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div').style.paddingRight = ''
                         }
@@ -525,7 +541,7 @@ app.whenReady().then(async function makeNewWindow() {
                 
                     //GAME UI MOD
                     if (document.querySelector('div.game') != null) {
-                        if (document.fullscreenElement) {
+                        if (isFullscreen) {
                             if (document.querySelector('div.flex.flex-col').style.marginTop != '') {
                                 document.querySelector('div.flex.flex-col').style.marginTop = ''
                             }
@@ -593,7 +609,8 @@ app.whenReady().then(async function makeNewWindow() {
                         }
                     }
                 }, 500)
-                `);
+                `
+				);
 
 				//url input textfield
 				win.webContents.executeJavaScript(`
@@ -1700,13 +1717,6 @@ app.whenReady().then(async function makeNewWindow() {
 
 									if (matches(msg, "REQUEST_TOGGLE_FULLSCREEN_STATE")) {
 										win.setFullScreen(!win.fullScreen);
-										win.webContents.executeJavaScript(`
-                            if (document.fullscreenElement) {
-                                document.exitFullscreen();
-                            } else {
-                                document.documentElement.requestFullscreen();
-                            }
-                            `);
 									}
 
 									if (matches(msg, "PLUGIN_FOLDER_OPEN_NOW_REQUEST_PLEASE")) {
