@@ -76,9 +76,7 @@ let downloadPath = app.getPath("downloads");
 if (fs.existsSync(downloadPath + "/blockyfishclient-update-download.exe")) {
 	fs.unlink(downloadPath + "/blockyfishclient-update-download.exe", (err) => {
 		if (err) {
-			alert(
-				"Could not delete update package, please manually delete it from the Downloads folder. "
-			);
+			alert("Could not delete update package, please manually delete it from the Downloads folder. ");
 			console.log(err);
 			return;
 		}
@@ -148,12 +146,8 @@ if (qc4 == undefined) {
 	qc4 = "ow!";
 }
 if (spam_chat == undefined) {
-	store.set(
-		"quick_chat.spam",
-		"௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸"
-	);
-	spam_chat =
-		"௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸";
+	store.set("quick_chat.spam", "௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸");
+	spam_chat = "௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸௸";
 }
 
 //main window
@@ -172,7 +166,7 @@ app.whenReady().then(async function makeNewWindow() {
 			},
 			titleBarStyle: "hidden",
 			frame: false,
-			icon: path.join(__dirname, "img/icon.png"),
+			icon: path.join(__dirname, "img", "icon.png"),
 			minWidth: 960,
 			minHeight: 600
 		});
@@ -274,22 +268,7 @@ app.whenReady().then(async function makeNewWindow() {
 			localshortcut.register("F2", () => {
 				win.webContents.capturePage().then((image) => {
 					fs.writeFile(
-						downloadPath +
-							"\\" +
-							new Date().getFullYear() +
-							"-" +
-							(new Date().getMonth() + 1) +
-							"-" +
-							new Date().getDate() +
-							"-" +
-							new Date().getHours() +
-							"-" +
-							new Date().getMinutes() +
-							"-" +
-							new Date().getSeconds() +
-							"-" +
-							new Date().getMilliseconds() +
-							".png",
+						downloadPath + "\\" + new Date().getFullYear() + "-" + (new Date().getMonth() + 1) + "-" + new Date().getDate() + "-" + new Date().getHours() + "-" + new Date().getMinutes() + "-" + new Date().getSeconds() + "-" + new Date().getMilliseconds() + ".png",
 						image.toPNG(),
 						(err) => {
 							if (err) throw err;
@@ -300,18 +279,15 @@ app.whenReady().then(async function makeNewWindow() {
 
 			// load the website
 			win.loadURL("https://beta.deeeep.io");
-			win.webContents.on(
-				"did-fail-load",
-				(_event, _errorCode, errorDescription) => {
-					if (errorDescription == "ERR_INTERNET_DISCONNECTED") {
-						win.loadFile("offline.html");
-						win.show();
-						setTimeout(() => {
-							win.loadURL("https://beta.deeeep.io");
-						}, 5000);
-					}
+			win.webContents.on("did-fail-load", (_event, _errorCode, errorDescription) => {
+				if (errorDescription == "ERR_INTERNET_DISCONNECTED") {
+					win.loadFile("offline.html");
+					win.show();
+					setTimeout(() => {
+						win.loadURL("https://beta.deeeep.io");
+					}, 5000);
 				}
-			);
+			});
 
 			// bye-bye stinky electron menu bar (no one likes you anyways)
 			win.removeMenu();
@@ -420,9 +396,7 @@ app.whenReady().then(async function makeNewWindow() {
 				}
 
 				async function runRemoteScript() {
-					let remote_script = await (
-						await fetch("https://blockyfish.netlify.app/scripts/script.json")
-					).json();
+					let remote_script = await (await fetch("https://blockyfish.netlify.app/scripts/script.json")).json();
 					for (let i = 0; i < remote_script.length; i++) {
 						win.webContents.executeJavaScript(remote_script[i].js);
 					}
@@ -739,11 +713,7 @@ app.whenReady().then(async function makeNewWindow() {
                         `);
 						files.forEach(function (file) {
 							console.log(file);
-							var plugin = require(path.join(
-								app.getPath("userData"),
-								"plugins",
-								file
-							));
+							var plugin = require(path.join(app.getPath("userData"), "plugins", file));
 							win.webContents.executeJavaScript(
 								`
                             pluginBox.appendChild(document.createElement("br"))
@@ -1412,257 +1382,221 @@ app.whenReady().then(async function makeNewWindow() {
 				//     `)
 				// });
 
-				request(
-					"https://blockyfish.netlify.app/data.json",
-					{ json: true },
-					(error, res, body) => {
-						if (error) {
-							return console.log(error);
-						}
+				request("https://blockyfish.netlify.app/data.json", { json: true }, (error, res, body) => {
+					if (error) {
+						return console.log(error);
+					}
 
-						if (!error && res.statusCode == 200) {
-							var e = body.ban;
-							var v = body.verified;
-							var t = body.verified2;
-							// console.log(e)
-							win.webContents.executeJavaScript(`
+					if (!error && res.statusCode == 200) {
+						var e = body.ban;
+						var v = body.verified;
+						var t = body.verified2;
+						// console.log(e)
+						win.webContents.executeJavaScript(`
                     setInterval(async function() {
                         if (document.querySelector('div.el-row.is-align-start.user__data > div > div.mb-1.whitespace-nowrap.flex.items-center > h3') != null) {
                             console.log('user: ' + document.querySelector('div.el-row.is-align-start.user__data > div > div.mb-1.whitespace-nowrap.flex.items-center > h3').innerText)
                         }
                     }, 3000)
                     `);
-						}
+					}
 
-						// set funny variables for discord rpc
-						var old_mode = "FFA";
-						var old_menu = "0";
-						var old_url = "https://beta.deeeep.io";
+					// set funny variables for discord rpc
+					var old_mode = "FFA";
+					var old_menu = "0";
+					var old_url = "https://beta.deeeep.io";
 
-						// intercept every console log 😈🔥
-						if (!global.consoleLogScriptRunning) {
-							win.webContents.on(
-								"console-message",
-								(ev, level, message, line, file) => {
-									var msg = `${message}`;
+					// intercept every console log 😈🔥
+					if (!global.consoleLogScriptRunning) {
+						win.webContents.on("console-message", (ev, level, message, line, file) => {
+							var msg = `${message}`;
 
-									if (debug) {
-										console.log(msg);
+							if (debug) {
+								console.log(msg);
+							}
+
+							if (matches(msg, "window_action:")) {
+								msg = msg.replace("window_action: ", "");
+								if (msg == "max") win.maximize();
+								else if (msg == "res") win.unmaximize();
+								else if (msg == "min") win.minimize();
+								else if (msg == "cls") win.close();
+							}
+
+							if (matches(msg, "user: ")) {
+								msg = msg.replace("user: ", "");
+								request("https://apibeta.deeeep.io/users/u/" + msg, { json: true }, (error, res, body) => {
+									if (error) {
+										return console.log(error);
 									}
 
-									if (matches(msg, "window_action:")) {
-										msg = msg.replace("window_action: ", "");
-										if (msg == "max") win.maximize();
-										else if (msg == "res") win.unmaximize();
-										else if (msg == "min") win.minimize();
-										else if (msg == "cls") win.close();
-									}
-
-									if (matches(msg, "user: ")) {
-										msg = msg.replace("user: ", "");
-										request(
-											"https://apibeta.deeeep.io/users/u/" + msg,
-											{ json: true },
-											(error, res, body) => {
-												if (error) {
-													return console.log(error);
-												}
-
-												if (!error && res.statusCode == 200) {
-													if (e.includes(body.id)) {
-														win.webContents.executeJavaScript(`
+									if (!error && res.statusCode == 200) {
+										if (e.includes(body.id)) {
+											win.webContents.executeJavaScript(`
                                         game.socketManager.disconnect()
                                         `);
-														app.e = "ban";
-														win.hide();
-														store.set("shh", true);
-														require("electron").dialog.showMessageBoxSync(win, {
-															type: "question",
-															buttons: ["Close"],
-															title: "Banned!",
-															message:
-																"You are banned from Blockyfish Client\nGoodbye!",
-															icon: path.join(__dirname, "img/icon.png")
-														});
-														app.quit();
-													}
-												}
-											}
-										);
-									}
-
-									//find notification updates
-									if (matches(msg, "notifs:")) {
-										if (msg.length < 10) {
-											const msg_num = msg.charAt(msg.length - 1);
-											if (msg_num != 0) {
-												win.setOverlayIcon(
-													path.join(__dirname, "img/" + msg_num + ".png"),
-													"Over " + msg_num + " notifications"
-												);
-											} else {
-												win.setOverlayIcon(null, "");
-											}
-										} else {
-											win.setOverlayIcon(
-												path.join(__dirname, "img/9_plus.png"),
-												"Over 9 notifications"
-											);
+											app.e = "ban";
+											win.hide();
+											store.set("shh", true);
+											require("electron").dialog.showMessageBoxSync(win, {
+												type: "question",
+												buttons: ["Close"],
+												title: "Banned!",
+												message: "You are banned from Blockyfish Client\nGoodbye!",
+												icon: path.join(__dirname, "img/icon.png")
+											});
+											app.quit();
 										}
 									}
+								});
+							}
 
-									//find rpc update events
-									if (matches(msg, "state:")) {
-										var msg = msg.replace("state: ", "");
-										var mode = msg.slice(0, -1);
-										var menu = msg.slice(-1);
-										try {
-											var url = win.webContents.getURL();
-										} catch (e) {
-											console.log("oops");
-										}
-										// if (mode != old_mode || menu != old_menu || url != old_url) {
-										setGameMode(mode, menu);
-										old_mode = mode;
-										old_menu = menu;
-										old_url = url;
-										// }
+							//find notification updates
+							if (matches(msg, "notifs:")) {
+								if (msg.length < 10) {
+									const msg_num = msg.charAt(msg.length - 1);
+									if (msg_num != 0) {
+										win.setOverlayIcon(path.join(__dirname, "img/" + msg_num + ".png"), "Over " + msg_num + " notifications");
+									} else {
+										win.setOverlayIcon(null, "");
 									}
+								} else {
+									win.setOverlayIcon(path.join(__dirname, "img/9_plus.png"), "Over 9 notifications");
+								}
+							}
 
-									// download the file
-									// yes, this is actually what starts the download
-									// not that stupid bs 140 lines above
-									if (matches(msg, "request_download:")) {
-										var url = msg.replace("request_download: ", "");
-										var extension = "zip";
-										if (os.platform().indexOf("Win") != -1) extension = "exe";
-										if (os.platform().indexOf("Mac") != -1) extension = "dmg";
-										if (os.platform().indexOf("Linux") != -1) extension = "zip";
-										electronDl.download(BrowserWindow.getFocusedWindow(), url, {
-											directory: downloadPath,
-											filename: "blockyfishclient-update-download." + extension,
-											onProgress: function (progress) {
-												setUpdateDownloadBar(
-													Math.floor(progress.percent * 100)
-												);
-											},
-											onCompleted: function (file) {
-												runUpdateInstaller(file.path);
-											}
-										});
-									}
+							//find rpc update events
+							if (matches(msg, "state:")) {
+								var msg = msg.replace("state: ", "");
+								var mode = msg.slice(0, -1);
+								var menu = msg.slice(-1);
+								try {
+									var url = win.webContents.getURL();
+								} catch (e) {
+									console.log("oops");
+								}
+								// if (mode != old_mode || menu != old_menu || url != old_url) {
+								setGameMode(mode, menu);
+								old_mode = mode;
+								old_menu = menu;
+								old_url = url;
+								// }
+							}
 
-									// store extension related settings so they can be loaded later
-									// also saves your window size and location so you dont have to adjust it everytime
-									if (matches(msg, "store_settings:")) {
-										var msg = msg.replace("store_settings: ", "");
-										var setting_key = msg.slice(0, -1);
-										var setting_value = msg.slice(-1);
-										if (setting_value == 0) {
-											var setting_value_bool = false;
-										} else if (setting_value == 1) {
-											var setting_value_bool = true;
-										}
-										store.set(setting_key, setting_value_bool);
+							// download the file
+							// yes, this is actually what starts the download
+							// not that stupid bs 140 lines above
+							if (matches(msg, "request_download:")) {
+								var url = msg.replace("request_download: ", "");
+								var extension = "zip";
+								if (os.platform().indexOf("Win") != -1) extension = "exe";
+								if (os.platform().indexOf("Mac") != -1) extension = "dmg";
+								if (os.platform().indexOf("Linux") != -1) extension = "zip";
+								electronDl.download(BrowserWindow.getFocusedWindow(), url, {
+									directory: downloadPath,
+									filename: "blockyfishclient-update-download." + extension,
+									onProgress: function (progress) {
+										setUpdateDownloadBar(Math.floor(progress.percent * 100));
+									},
+									onCompleted: function (file) {
+										runUpdateInstaller(file.path);
 									}
+								});
+							}
 
-									//discord rpc
-									if (matches(msg, "TURN_DISCORD_RPC_OFF_REQUEST")) {
-										rpc = false;
-									}
-									if (matches(msg, "TURN_DISCORD_RPC_ON_REQUEST")) {
-										rpc = true;
-									}
+							// store extension related settings so they can be loaded later
+							// also saves your window size and location so you dont have to adjust it everytime
+							if (matches(msg, "store_settings:")) {
+								var msg = msg.replace("store_settings: ", "");
+								var setting_key = msg.slice(0, -1);
+								var setting_value = msg.slice(-1);
+								if (setting_value == 0) {
+									var setting_value_bool = false;
+								} else if (setting_value == 1) {
+									var setting_value_bool = true;
+								}
+								store.set(setting_key, setting_value_bool);
+							}
 
-									if (matches(msg, "NAVIGATE_TO_THIS_URL:")) {
-										var msg = msg
-											.replace("NAVIGATE_TO_THIS_URL: ", "")
-											.toLowerCase()
-											.replace("https://", "")
-											.replace("http://", "");
-										if (msg.match(/^beta\.deeeep\.io(\/|\?)/)) {
-											// win.webContents.loadURL("https://" + msg)
-											win.webContents.executeJavaScript(
-												`
+							//discord rpc
+							if (matches(msg, "TURN_DISCORD_RPC_OFF_REQUEST")) {
+								rpc = false;
+							}
+							if (matches(msg, "TURN_DISCORD_RPC_ON_REQUEST")) {
+								rpc = true;
+							}
+
+							if (matches(msg, "NAVIGATE_TO_THIS_URL:")) {
+								var msg = msg.replace("NAVIGATE_TO_THIS_URL: ", "").toLowerCase().replace("https://", "").replace("http://", "");
+								if (msg.match(/^beta\.deeeep\.io(\/|\?)/)) {
+									// win.webContents.loadURL("https://" + msg)
+									win.webContents.executeJavaScript(
+										`
                                 window.location.href = "https://` +
-													msg +
-													`"
+											msg +
+											`"
                                 `
-											);
-										}
-									}
+									);
+								}
+							}
 
-									// store quick chat messages
-									if (matches(msg, "qc_ms_1: ")) {
-										var msg = msg.replace("qc_ms_1: ", "");
-										msg = addslashes(msg);
-										qc1 = msg;
-									}
-									if (matches(msg, "qc_ms_2: ")) {
-										var msg = msg.replace("qc_ms_2: ", "");
-										msg = addslashes(msg);
-										qc2 = msg;
-									}
-									if (matches(msg, "qc_ms_3: ")) {
-										var msg = msg.replace("qc_ms_3: ", "");
-										msg = addslashes(msg);
-										qc3 = msg;
-									}
-									if (matches(msg, "qc_ms_4: ")) {
-										var msg = msg.replace("qc_ms_4: ", "");
-										msg = addslashes(msg);
-										qc4 = msg;
-									}
-									if (matches(msg, "qc_ms_spam: ")) {
-										var msg = msg.replace("qc_ms_spam: ", "");
-										msg = addslashes(msg);
-										spam_chat = msg;
-									}
+							// store quick chat messages
+							if (matches(msg, "qc_ms_1: ")) {
+								var msg = msg.replace("qc_ms_1: ", "");
+								msg = addslashes(msg);
+								qc1 = msg;
+							}
+							if (matches(msg, "qc_ms_2: ")) {
+								var msg = msg.replace("qc_ms_2: ", "");
+								msg = addslashes(msg);
+								qc2 = msg;
+							}
+							if (matches(msg, "qc_ms_3: ")) {
+								var msg = msg.replace("qc_ms_3: ", "");
+								msg = addslashes(msg);
+								qc3 = msg;
+							}
+							if (matches(msg, "qc_ms_4: ")) {
+								var msg = msg.replace("qc_ms_4: ", "");
+								msg = addslashes(msg);
+								qc4 = msg;
+							}
+							if (matches(msg, "qc_ms_spam: ")) {
+								var msg = msg.replace("qc_ms_spam: ", "");
+								msg = addslashes(msg);
+								spam_chat = msg;
+							}
 
-									// send quick-chat message
-									if (matches(msg, "send_chat_msg:")) {
-										var msg = msg.replace("send_chat_msg: ", "");
-										sendKeybinding(win, "enter");
-										for (var i = 0; i < msg.length; i++) {
-											sendKeybinding(win, msg[i]);
-										}
-										sendKeybinding(win, "enter");
-										win.webContents.executeJavaScript(
-											`quickChatTyping = false`
-										);
-									}
+							// send quick-chat message
+							if (matches(msg, "send_chat_msg:")) {
+								var msg = msg.replace("send_chat_msg: ", "");
+								sendKeybinding(win, "enter");
+								for (var i = 0; i < msg.length; i++) {
+									sendKeybinding(win, msg[i]);
+								}
+								sendKeybinding(win, "enter");
+								win.webContents.executeJavaScript(`quickChatTyping = false`);
+							}
 
-									// slash commands
-									if (matches(msg, "handle_slash_command")) {
-										sendKeybinding(win, "enter");
-										sendKeybinding(win, "/");
-									}
+							// slash commands
+							if (matches(msg, "handle_slash_command")) {
+								sendKeybinding(win, "enter");
+								sendKeybinding(win, "/");
+							}
 
-									//load custom settings
-									if (matches(msg, "Modal Added:[object HTMLDivElement]")) {
-										win.webContents.executeJavaScript(
-											`buildCustomSettingsItems('` +
-												qc1 +
-												`', '` +
-												qc2 +
-												`', '` +
-												qc3 +
-												`', '` +
-												qc4 +
-												`', '` +
-												spam_chat +
-												`')`
-										);
-									}
+							//load custom settings
+							if (matches(msg, "Modal Added:[object HTMLDivElement]")) {
+								win.webContents.executeJavaScript(`buildCustomSettingsItems('` + qc1 + `', '` + qc2 + `', '` + qc3 + `', '` + qc4 + `', '` + spam_chat + `')`);
+							}
 
-									if (matches(msg, "ERR_INTERNET_DISCONNECTED")) {
-										setInterval(() => {
-											console.log("sjfdhgkbsdf");
-										});
-									}
+							if (matches(msg, "ERR_INTERNET_DISCONNECTED")) {
+								setInterval(() => {
+									console.log("sjfdhgkbsdf");
+								});
+							}
 
-									if (matches(msg, "RUN_TARGET_LOCK_SCRIPT")) {
-										win.webContents.executeJavaScript(`
+							if (matches(msg, "RUN_TARGET_LOCK_SCRIPT")) {
+								win.webContents.executeJavaScript(`
                             mapeditor = document.querySelector('#canvas-container > canvas')
                             click0 = game.currentScene.entityManager.getEntity(targetID).relatedObjects.children[2].speedMultiplierDisplay.visible;
                             setInterval(function () {
@@ -1682,72 +1616,46 @@ app.whenReady().then(async function makeNewWindow() {
                                 }
                             });
                             `);
-									}
+							}
 
-									if (matches(msg, "CREATE_A_NEW_WINDOW")) {
-										createWindow();
-									}
+							if (matches(msg, "CREATE_A_NEW_WINDOW")) {
+								createWindow();
+							}
 
-									if (matches(msg, "TAKE_SCREENSHOT_REQUEST_PICTURE_NOW")) {
-										win.webContents.capturePage().then((image) => {
-											fs.writeFile(
-												downloadPath +
-													"\\" +
-													new Date().getFullYear() +
-													"-" +
-													(new Date().getMonth() + 1) +
-													"-" +
-													new Date().getDate() +
-													"-" +
-													new Date().getHours() +
-													"-" +
-													new Date().getMinutes() +
-													"-" +
-													new Date().getSeconds() +
-													"-" +
-													new Date().getMilliseconds() +
-													".png",
-												image.toPNG(),
-												(err) => {
-													if (err) throw err;
-												}
-											);
-										});
-									}
+							if (matches(msg, "TAKE_SCREENSHOT_REQUEST_PICTURE_NOW")) {
+								win.webContents.capturePage().then((image) => {
+									fs.writeFile(
+										downloadPath + "\\" + new Date().getFullYear() + "-" + (new Date().getMonth() + 1) + "-" + new Date().getDate() + "-" + new Date().getHours() + "-" + new Date().getMinutes() + "-" + new Date().getSeconds() + "-" + new Date().getMilliseconds() + ".png",
+										image.toPNG(),
+										(err) => {
+											if (err) throw err;
+										}
+									);
+								});
+							}
 
-									if (matches(msg, "REQUEST_TOGGLE_FULLSCREEN_STATE")) {
-										win.setFullScreen(!win.fullScreen);
-									}
+							if (matches(msg, "REQUEST_TOGGLE_FULLSCREEN_STATE")) {
+								win.setFullScreen(!win.fullScreen);
+							}
 
-									if (matches(msg, "PLUGIN_FOLDER_OPEN_NOW_REQUEST_PLEASE")) {
-										shell.openPath(
-											path.join(app.getPath("userData"), "plugins")
-										);
-									}
+							if (matches(msg, "PLUGIN_FOLDER_OPEN_NOW_REQUEST_PLEASE")) {
+								shell.openPath(path.join(app.getPath("userData"), "plugins"));
+							}
 
-									// if game has loaded, inject the hacks xd
-									if (
-										matches(msg, "Common.playLoadProgress (old, new),100,0")
-									) {
-										//load plugins
-										var pluginDirectoryPath = path.join(
-											app.getPath("userData"),
-											"plugins"
-										);
-										fs.readdir(pluginDirectoryPath, function (err, files) {
-											if (err) {
-												return console.log("Unable to scan directory: " + err);
-											}
-											files.forEach(function (file) {
-												var plugin = require(path.join(
-													app.getPath("userData"),
-													"plugins",
-													file
-												));
-												win.webContents.executeJavaScript(plugin.script);
-											});
-										});
-										win.webContents.executeJavaScript(`
+							// if game has loaded, inject the hacks xd
+							if (matches(msg, "Common.playLoadProgress (old, new),100,0")) {
+								//load plugins
+								var pluginDirectoryPath = path.join(app.getPath("userData"), "plugins");
+								fs.readdir(pluginDirectoryPath, function (err, files) {
+									if (err) {
+										return console.log("Unable to scan directory: " + err);
+									}
+									files.forEach(function (file) {
+										var plugin = require(path.join(app.getPath("userData"), "plugins", file));
+										win.webContents.executeJavaScript(plugin.script);
+									});
+								});
+								win.webContents.executeJavaScript(`
                             setInterval(function () {
                                 // TWEMOJI
                                 // for names
@@ -1824,8 +1732,8 @@ app.whenReady().then(async function makeNewWindow() {
                             });
                             `);
 
-										// asset swapper
-										win.webContents.executeJavaScript(`
+								// asset swapper
+								win.webContents.executeJavaScript(`
                             async function createAssetSwapButton() {
                                 setInterval(function() {
                                     if (document.querySelector('div.top-right') != null) {
@@ -1849,8 +1757,8 @@ app.whenReady().then(async function makeNewWindow() {
                             createAssetSwapButton()
                             `);
 
-										// remove fullscreen button
-										win.webContents.executeJavaScript(`
+								// remove fullscreen button
+								win.webContents.executeJavaScript(`
                             setInterval(function() {
                                 if (document.querySelector('div.top-right') != null) {
                                     if (document.querySelector('#app > div.overlay > div.top-right > div.buttons.button-bar > div > button:nth-child(3) > span > svg').innerHTML == '<path d="M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17V19H5V14H7V17H10Z" data-v-35f7fcad=""></path>') {
@@ -1860,21 +1768,21 @@ app.whenReady().then(async function makeNewWindow() {
                             }, 500)
                             `);
 
-										//quick chat UI
-										win.webContents.executeJavaScript(
-											`
+								//quick chat UI
+								win.webContents.executeJavaScript(
+									`
                             quickChatTyping = false
                             var qc_div = document.createElement('div')
                             document.querySelector('div.game').insertBefore(qc_div, document.querySelector('div.game').children[0])
                             qc_div.outerHTML = '<div id=quick-chat-container style=display:none><div class="quick-chat row one"><div><p>` +
-												qc1 +
-												`</div></div><div class="quick-chat row two"><div><p>` +
-												qc4 +
-												`</div><div><p>` +
-												qc2 +
-												`</div></div><div class="quick-chat row one"><div><p>` +
-												qc3 +
-												`</div></div></div>'
+										qc1 +
+										`</div></div><div class="quick-chat row two"><div><p>` +
+										qc4 +
+										`</div><div><p>` +
+										qc2 +
+										`</div></div><div class="quick-chat row one"><div><p>` +
+										qc3 +
+										`</div></div></div>'
                             var quickChatDiv = document.getElementById('quick-chat-container')
                             document.body.addEventListener("mousemove", (e) => {
                                 window.mouseX = e.clientX
@@ -1908,11 +1816,11 @@ app.whenReady().then(async function makeNewWindow() {
                                 }
                             })
                             `
-										);
+								);
 
-										//spam chat
-										win.webContents.executeJavaScript(
-											`
+								//spam chat
+								win.webContents.executeJavaScript(
+									`
                             if (chatSpamLoop == false) {
                                 spamOn = false
                                 window.addEventListener("keyup", (e) => {
@@ -1929,17 +1837,17 @@ app.whenReady().then(async function makeNewWindow() {
                                 setInterval(() => {
                                     if (document.querySelector('div.home-page').style.display == 'none' && spamOn) {
                                         console.log("send_chat_msg: " + "` +
-												spam_chat +
-												`")
+										spam_chat +
+										`")
                                     }
                                 }, 10000)
                                 chatSpamLoop = true
                             }
                             `
-										);
+								);
 
-										// overlays
-										win.webContents.executeJavaScript(`
+								// overlays
+								win.webContents.executeJavaScript(`
                             var ctrl_overlay = document.createElement('div')
                             document.querySelector('div.game').insertBefore(ctrl_overlay, document.querySelector('div.game').children[0])
                             ctrl_overlay.outerHTML = '<div id="ctrl-overlay" style="width: 100%;height: 100%;position: absolute;display: block;z-index:10000;pointer-events:none;"></div>'
@@ -1948,15 +1856,15 @@ app.whenReady().then(async function makeNewWindow() {
                             aim_overlay.outerHTML = '<hr id="aim-overlay" style="border: 2px #fff dotted;border-image: linear-gradient(to right, #fff8, #fff0) 1;transform-origin: left;position: absolute;top: 50%;left: 50%;width: 40vw;display:none;pointer-events:none;">'
                             `);
 
-										//fish levels:
-										// 61: goblin shark
-										// 93: archerfish
-										// 94: sea otter
-										// 101: thresher shark
-										// 107: beaked whale
-										// 109: beluga
-										// 113: japanese spider crab
-										win.webContents.executeJavaScript(`
+								//fish levels:
+								// 61: goblin shark
+								// 93: archerfish
+								// 94: sea otter
+								// 101: thresher shark
+								// 107: beaked whale
+								// 109: beluga
+								// 113: japanese spider crab
+								win.webContents.executeJavaScript(`
                             listForAnimalsWithAimOverlay = [61, 93, 94, 113]
                             listForGamemodesWithAimOverlay = [1, 2, 6]
                             setInterval(function() {
@@ -2047,9 +1955,9 @@ app.whenReady().then(async function makeNewWindow() {
                             })
                             `);
 
-										//matching strings - for utilities
-										//removing items from array for unmuting
-										win.webContents.executeJavaScript(`
+								//matching strings - for utilities
+								//removing items from array for unmuting
+								win.webContents.executeJavaScript(`
                             function matches(text, partial) {
                                 console.log(text)
                                 return text.toLowerCase().indexOf(partial.toLowerCase()) > -1;
@@ -2061,8 +1969,8 @@ app.whenReady().then(async function makeNewWindow() {
                             }
                             `);
 
-										//deleting muted chat messages
-										win.webContents.executeJavaScript(`
+								//deleting muted chat messages
+								win.webContents.executeJavaScript(`
                             setInterval(function() {
                                 if (game.currentScene != null) {
                                     for (let i = 0; i < game.currentScene.chatMessages.length; i++) {
@@ -2074,8 +1982,8 @@ app.whenReady().then(async function makeNewWindow() {
                             }, 200)
                             `);
 
-										//show id
-										win.webContents.executeJavaScript(`
+								//show id
+								win.webContents.executeJavaScript(`
                             setInterval(() => {
                                 if (document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1').childElementCount != 5 || document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(5) > span').innerText != "ID: " + game.currentScene.myAnimal.id) {
                                     if (document.querySelector('#app > div.overlay > div.top-right > div.flex.flex-col > div.info.mb-1.mr-1 > div:nth-child(4)') != null) {
@@ -2098,14 +2006,13 @@ app.whenReady().then(async function makeNewWindow() {
                                 }
                             }, 5000)
                             `);
-									}
-								}
-							);
-						}
-						global.consoleLogScriptRunning = true;
+							}
+						});
+					}
+					global.consoleLogScriptRunning = true;
 
-						//custom keybinds
-						win.webContents.executeJavaScript(`
+					//custom keybinds
+					win.webContents.executeJavaScript(`
             var evo_wheel_rot = 0
             setInterval(function() {
                 evo_wheel_rot += 1
@@ -2129,127 +2036,112 @@ app.whenReady().then(async function makeNewWindow() {
             });
             `);
 
-						// show the window after all the scripts finish
-						// this is so that the app shows only when the UI in complete
-						// if this was shown before everything finished loading,
-						// it would make me look noob and unprofessional
-						win.show();
+					// show the window after all the scripts finish
+					// this is so that the app shows only when the UI in complete
+					// if this was shown before everything finished loading,
+					// it would make me look noob and unprofessional
+					win.show();
 
-						// no u electron xd
-						// open all links in the default browser
-						// instead of yucky electron windows
-						win.webContents.on("new-window", function (e, url) {
-							e.preventDefault();
-							require("electron").shell.openExternal(url);
-						});
+					// no u electron xd
+					// open all links in the default browser
+					// instead of yucky electron windows
+					win.webContents.on("new-window", function (e, url) {
+						e.preventDefault();
+						require("electron").shell.openExternal(url);
+					});
 
-						//discord rpc
-						var Discord = new Client({
-							transport: "ipc"
-						});
+					//discord rpc
+					var Discord = new Client({
+						transport: "ipc"
+					});
 
-						// log into the client to get icon and app name
-						Discord.login({ clientId: "918680181609213972" }).catch(
-							console.error
-						);
-						var startTime = new Date();
+					// log into the client to get icon and app name
+					Discord.login({ clientId: "918680181609213972" }).catch(console.error);
+					var startTime = new Date();
 
-						// fallback in-case v5 comes and i am gone
-						// at least it will show something
-						// Discord.on("ready", () => {
-						//     if (rpc) {
-						//         Discord.setActivity({
-						//             largeImageKey: "icon",
-						//             largeImageText: "Deeeep.io",
-						//             startTimestamp: startTime,
-						//         })
-						//     }
-						// });
+					// fallback in-case v5 comes and i am gone
+					// at least it will show something
+					// Discord.on("ready", () => {
+					//     if (rpc) {
+					//         Discord.setActivity({
+					//             largeImageKey: "icon",
+					//             largeImageText: "Deeeep.io",
+					//             startTimestamp: startTime,
+					//         })
+					//     }
+					// });
 
-						// update discord rpc
-						function setGameMode(mode, menu) {
-							//greb url and eats it (jk)
-							try {
-								var currentUrl = win.webContents.getURL();
-							} catch (e) {
-								console.log("oops");
-							}
+					// update discord rpc
+					function setGameMode(mode, menu) {
+						//greb url and eats it (jk)
+						try {
+							var currentUrl = win.webContents.getURL();
+						} catch (e) {
+							console.log("oops");
+						}
 
-							// viewing <user>'s profile
-							if (matches(currentUrl, "/u/")) {
-								var detailText =
-									"Viewing " +
-									currentUrl
-										.replace("https://beta.deeeep.io/u/", "")
-										.replace(/\?host=....../i, "") +
-									"'s profile";
-								var labelText = "";
-								request(
-									"https://apibeta.deeeep.io/users/u/" +
-										currentUrl
-											.replace("https://beta.deeeep.io/u/", "")
-											.replace(/\?host=....../i, ""),
-									{ json: true },
-									(error, res, body) => {
-										if (error) {
-											return console.log(error);
-										}
-										if (!error && res.statusCode == 200) {
-											if (v.includes(body.id)) {
-												insertClientOwnerBadge();
-											} else if (t.includes(body.id)) {
-												insertClientVerifiedBadge();
-											}
-										}
-									}
-								);
-							}
-
-							// these ones are self-explainatory
-							else if (matches(currentUrl, "/forum/")) {
-								var detailText = "Visiting the forums";
-								var labelText = "";
-							} else if (matches(currentUrl, "/store/")) {
-								var detailText = "Browsing through the store";
-								var labelText = "";
-							} else if (matches(currentUrl, "/inventory/")) {
-								var detailText = "Checking inventory";
-								var labelText = "";
-							} else if (menu == "0") {
-								var detailText = "In the menus";
-								var labelText = "";
-							} else if (menu == "1") {
-								var detailText = "AFK in " + mode;
-								var labelText = "Join game";
-							} else if (menu == "2") {
-								var detailText = "Playing " + mode;
-								var labelText = "Join game";
-							}
-
-							// if the gamemode buttons exist, use them to update the status
-							if (rpc) {
-								if (labelText != "") {
-									Discord.setActivity({
-										details: detailText,
-										largeImageKey: "icon",
-										largeImageText: "Deeeep.io",
-										startTimestamp: startTime,
-										buttons: [{ label: labelText, url: currentUrl }]
-									});
-								} else {
-									Discord.setActivity({
-										details: detailText,
-										largeImageKey: "icon",
-										largeImageText: "Deeeep.io",
-										startTimestamp: startTime
-									});
+						// viewing <user>'s profile
+						if (matches(currentUrl, "/u/")) {
+							var detailText = "Viewing " + currentUrl.replace("https://beta.deeeep.io/u/", "").replace(/\?host=....../i, "") + "'s profile";
+							var labelText = "";
+							request("https://apibeta.deeeep.io/users/u/" + currentUrl.replace("https://beta.deeeep.io/u/", "").replace(/\?host=....../i, ""), { json: true }, (error, res, body) => {
+								if (error) {
+									return console.log(error);
 								}
+								if (!error && res.statusCode == 200) {
+									if (v.includes(body.id)) {
+										insertClientOwnerBadge();
+									} else if (t.includes(body.id)) {
+										insertClientVerifiedBadge();
+									}
+								}
+							});
+						}
+
+						// these ones are self-explainatory
+						else if (matches(currentUrl, "/forum/")) {
+							var detailText = "Visiting the forums";
+							var labelText = "";
+						} else if (matches(currentUrl, "/store/")) {
+							var detailText = "Browsing through the store";
+							var labelText = "";
+						} else if (matches(currentUrl, "/inventory/")) {
+							var detailText = "Checking inventory";
+							var labelText = "";
+						} else if (menu == "0") {
+							var detailText = "In the menus";
+							var labelText = "";
+						} else if (menu == "1") {
+							var detailText = "AFK in " + mode;
+							var labelText = "Join game";
+						} else if (menu == "2") {
+							var detailText = "Playing " + mode;
+							var labelText = "Join game";
+						}
+
+						// if the gamemode buttons exist, use them to update the status
+						if (rpc) {
+							if (labelText != "") {
+								Discord.setActivity({
+									details: detailText,
+									largeImageKey: "icon",
+									largeImageText: "Deeeep.io",
+									startTimestamp: startTime,
+									buttons: [{ label: labelText, url: currentUrl }]
+								});
 							} else {
-								Discord.clearActivity();
+								Discord.setActivity({
+									details: detailText,
+									largeImageKey: "icon",
+									largeImageText: "Deeeep.io",
+									startTimestamp: startTime
+								});
 							}
+						} else {
+							Discord.clearActivity();
 						}
 					}
-				);
+				});
 			});
 			extensionsLoaded = true;
 		}
