@@ -11,7 +11,7 @@
     "make-linux": "npx electron-packager . Blockyfish --overwrite --platform=linux --arch=x64 --icon=img/icons/win/icon.ico --prune=true --electron-version=10.4.7 --app-copyright=\"Pi 2022\" --out=release-builds --version-string.CompanyName=Pi --version-string.ProductName=\"Blockyfish Client\""
   },
   "author": "Pi",
-  "license": "MIT",
+  "license": "GPLV3",
   "protocols": {
     "name": "main",
     "schemes": [
