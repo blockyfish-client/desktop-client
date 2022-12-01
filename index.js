@@ -485,8 +485,8 @@ app.whenReady().then(async function makeNewWindow() {
                     for (const link of links) {
                         link.draggable = false
                     }
-                    if (document.querySelector('#app > div.ui > div > div.first > div > div > div > div.play-game > div.relative > div > div > input').maxLength != 22) {
-                        document.querySelector('#app > div.ui > div > div.first > div > div > div > div.play-game > div.relative > div > div > input').maxLength = 22
+                    if (document.querySelector('#app > div.ui > div > div.first > div > div > div > div.play-game > div.relative > div > div > input').maxLength != 40) {
+                        document.querySelector('#app > div.ui > div > div.first > div > div > div > div.play-game > div.relative > div > div > input').maxLength = 40
                     }
                     //changing layouts according to fullscreen
                     if (isFullscreen) {
