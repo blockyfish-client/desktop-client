@@ -1,7 +1,6 @@
-const createWindowsInstaller =
-	require("electron-winstaller").createWindowsInstaller;
+const createWindowsInstaller = require("electron-winstaller").createWindowsInstaller;
 const path = require("path");
-const version = "2.0.1";
+const version = "2.0.2";
 
 getInstallerConfig()
 	.then(createWindowsInstaller)
@@ -23,8 +22,7 @@ function getInstallerConfig() {
 		exe: "Blockyfish.exe",
 		setupExe: "Pi-blockyfishclient-setup-v" + version + ".exe",
 		setupIcon: path.join(rootPath, "img", "icons", "win", "icon.ico"),
-		iconUrl:
-			"https://raw.githubusercontent.com/blockyfish-client/Desktop-Client/master/img/icons/win/icon.ico",
+		iconUrl: "https://raw.githubusercontent.com/blockyfish-client/Desktop-Client/master/img/icons/win/icon.ico",
 		loadingGif: path.join(rootPath, "img", "loading.gif")
 	});
 }
