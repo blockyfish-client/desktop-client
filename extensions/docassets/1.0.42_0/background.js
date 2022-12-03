@@ -260,7 +260,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 	miscHandler,
 	{
 		urls: [MISC_SCHEME],
-		types: ["main_frame", "sub_frame", "script", "image", "object", "xmlhttprequest", "other"]
+		types: ["main_frame", "sub_frame", "stylesheet", "script", "image", "object", "xmlhttprequest", "other"]
 	},
 	["blocking"]
 );
