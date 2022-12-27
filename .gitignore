@@ -270,3 +270,4 @@ release-builds/
 yarn-error.log
 notes
 test.html
+plugins/allEmotes.js
