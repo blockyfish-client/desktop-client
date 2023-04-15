@@ -1244,7 +1244,7 @@ app.whenReady().then(async function makeNewWindow() {
                     let url_json = await (await (fetch('https://api.github.com/repos/blockyfish-client/desktop-client/releases/latest'))).json();
                     for (let i = 0; i < url_json.assets.length; i++) {
                         if (matches(url_json.assets[i].name, Name)) {
-                            var download_url = url_json.assets[1].browser_download_url
+                            var download_url = url_json.assets[i].browser_download_url
                             var download_ver = url_json.tag_name
                         }
                     }
