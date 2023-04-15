@@ -25,7 +25,7 @@ const os = require("os");
 const fetch = require("node-fetch");
 
 // debug mode
-const debug = true;
+const debug = false;
 
 // if (!debug) {
 process.on("uncaughtException", () => {
