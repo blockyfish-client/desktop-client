@@ -25,7 +25,7 @@ const os = require("os");
 const fetch = require("node-fetch");
 
 // debug mode
-const debug = true;
+const debug = false;
 
 // if (!debug) {
 process.on("uncaughtException", () => {
@@ -46,8 +46,8 @@ app.setAsDefaultProtocolClient("deeeepio");
 var extensionsLoaded = false;
 
 // version info
-const version_code = "v2.0.2";
-const version_num = "202";
+const version_code = "v2.0.3";
+const version_num = "203";
 
 // custom function for later
 function matches(text, partial) {
