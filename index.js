@@ -25,7 +25,7 @@ const os = require("os");
 const fetch = require("node-fetch");
 
 // debug mode
-const debug = false;
+const debug = true;
 
 // if (!debug) {
 process.on("uncaughtException", () => {
@@ -508,9 +508,10 @@ app.whenReady().then(async function makeNewWindow() {
                         document.querySelector('div.el-button-group.nice-btn-group.block.mt-2').style.width = '30vw'
                         document.querySelector('div.el-button-group.nice-btn-group.block.mt-2').style.maxWidth = '300px'
                     }
-                    if (document.querySelector('div.sidebar.left.p-2 > a').style.opacity != '0') {
-                        document.querySelector('div.sidebar.left.p-2 > a').style.opacity = '0'
-                        document.querySelector('div.sidebar.left.p-2 > a').style.pointerEvents = 'none'
+                    if (document.querySelector('div.sidebar.left.p-2 > a:nth-child(2)[href="https://iogames.top"]')?.style.opacity != '0') {
+                        document.querySelector('div.sidebar.left.p-2 > a:nth-child(2)[href="https://iogames.top"]')?.style.opacity = '0'
+                        document.querySelector('div.sidebar.left.p-2 > a:nth-child(2)[href="https://iogames.top"]')?.style.pointerEvents = 'none'
+                        document.querySelector('div.sidebar.left.p-2 > a:nth-child(2)[href="https://iogames.top"]')?.style.height = '0'
                     }
                 
                     //GAME UI MOD
@@ -742,43 +743,48 @@ app.whenReady().then(async function makeNewWindow() {
 
 				// build home feed
 				win.webContents.executeJavaScript(`
-                const left_widget_container = document.querySelector('div.p-2.sidebar.left.space-y-2');
-                left_widget_container.style.maxWidth = '30vw'
-                left_widget_container.style.width = '21rem'
-                left_widget_container.style.bottom = '50px'
-                const news_feed_box = document.querySelector('div.p-2.sidebar.right.space-y-2 > div:nth-child(3)').cloneNode(true);
-                left_widget_container.appendChild(news_feed_box)
-                document.querySelector('div.p-2.sidebar.left.space-y-2 > div > div.title').innerText = 'Blockyfish News'
-                document.querySelector('div.p-2.sidebar.left.space-y-2 > div > div:nth-child(2)').outerHTML = '<div id="blockyfish-news"></div>'
-                const blockyfish_news = document.getElementById('blockyfish-news')
-                blockyfish_news.style.maxHeight = '30vh'
-                blockyfish_news.style.overflow = 'scroll'
-                blockyfish_news.style.overflowX = 'hidden'
-                blockyfish_news.style.padding = '10px'
-                blockyfish_news.style.fontSize = 'small'
+                setTimeout(() => {
+                    const left_widget_container = document.querySelector('div.p-2.sidebar.left.space-y-2');
+                    left_widget_container.style.maxWidth = '30vw'
+                    left_widget_container.style.width = '21rem'
+                    left_widget_container.style.bottom = '50px'
+                    const news_feed_box = document.querySelector('div.p-2.sidebar.right.space-y-2 > div:nth-child(3)').cloneNode(true);
+                    left_widget_container.appendChild(news_feed_box)
+                    const tutorial_box = document.querySelector('div.p-2.sidebar.right.space-y-2 > div:nth-child(3)').cloneNode(true);
+                    left_widget_container.appendChild(tutorial_box)
+                }, 2000)
 
-                async function getBlockyfishNews() {
-                    let news = await(await(fetch('https://blockyfish.netlify.app/blockyfishfeed/news'))).text()
-                    blockyfish_news.innerHTML = news
-                }
-                getBlockyfishNews()
+                setTimeout(() => {
+                    document.querySelector('div.p-2.sidebar.left.space-y-2 > div:nth-child(3) > div.title').innerText = 'Blockyfish News'
+                    document.querySelector('div.p-2.sidebar.left.space-y-2 > div:nth-child(3) > div:nth-child(2)').outerHTML = '<div id="blockyfish-news"></div>'
+                    const blockyfish_news = document.getElementById('blockyfish-news')
+                    blockyfish_news.style.maxHeight = '30vh'
+                    blockyfish_news.style.overflow = 'scroll'
+                    blockyfish_news.style.overflowX = 'hidden'
+                    blockyfish_news.style.padding = '10px'
+                    blockyfish_news.style.fontSize = 'small'
+    
+                    async function getBlockyfishNews() {
+                        let news = await(await(fetch('https://blockyfish.netlify.app/blockyfishfeed/news'))).text()
+                        blockyfish_news.innerHTML = news
+                    }
+                    getBlockyfishNews()
 
-                const tutorial_box = document.querySelector('div.p-2.sidebar.right.space-y-2 > div:nth-child(3)').cloneNode(true);
-                left_widget_container.appendChild(tutorial_box)
-                document.querySelector('div.p-2.sidebar.left.space-y-2 > div:nth-child(4) > div.title').innerText = 'How to play'
-                document.querySelector('div.p-2.sidebar.left.space-y-2 > div:nth-child(4) > div:nth-child(2)').outerHTML = '<div id="tutorial"></div>'
-                const tutorial = document.getElementById('tutorial')
-                tutorial.style.maxHeight = '30vh'
-                tutorial.style.overflow = 'scroll'
-                tutorial.style.overflowX = 'hidden'
-                tutorial.style.padding = '10px'
-                tutorial.style.fontSize = 'small'
-
-                async function getBlockyfishTutorial() {
-                    let tut = await(await(fetch('https://blockyfish.netlify.app/blockyfishfeed/tutorial'))).text()
-                    tutorial.innerHTML = tut
-                }
-                getBlockyfishTutorial()
+                    document.querySelector('div.p-2.sidebar.left.space-y-2 > div:nth-child(4) > div.title').innerText = 'How to play'
+                    document.querySelector('div.p-2.sidebar.left.space-y-2 > div:nth-child(4) > div:nth-child(2)').outerHTML = '<div id="tutorial"></div>'
+                    const tutorial = document.getElementById('tutorial')
+                    tutorial.style.maxHeight = '30vh'
+                    tutorial.style.overflow = 'scroll'
+                    tutorial.style.overflowX = 'hidden'
+                    tutorial.style.padding = '10px'
+                    tutorial.style.fontSize = 'small'
+    
+                    async function getBlockyfishTutorial() {
+                        let tut = await(await(fetch('https://blockyfish.netlify.app/blockyfishfeed/tutorial'))).text()
+                        tutorial.innerHTML = tut
+                    }
+                    getBlockyfishTutorial()
+                }, 2100)
                 `);
 
 				// build asset swapper modal
