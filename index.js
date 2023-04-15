@@ -25,7 +25,7 @@ const os = require("os");
 const fetch = require("node-fetch");
 
 // debug mode
-const debug = false;
+const debug = true;
 
 // if (!debug) {
 process.on("uncaughtException", () => {
@@ -155,8 +155,10 @@ app.whenReady().then(async function makeNewWindow() {
 	const createWindow = () => {
 		const win = new BrowserWindow({
 			// load window settings
-			width: store.get("window.width"),
-			height: store.get("window.height"),
+			// width: store.get("window.width"),
+			// height: store.get("window.height"),
+			width: 960,
+			height: 800,
 			x: store.get("window.x"),
 			y: store.get("window.y"),
 			backgroundColor: "#1f2937",
@@ -488,19 +490,6 @@ app.whenReady().then(async function makeNewWindow() {
                     if (document.querySelector('#app > div.ui > div > div.first > div > div > div > div.play-game > div.relative > div > div > input').maxLength != 40) {
                         document.querySelector('#app > div.ui > div > div.first > div > div > div > div.play-game > div.relative > div > div > input').maxLength = 40
                     }
-                    //changing layouts according to fullscreen
-                    if (isFullscreen) {
-                        if (document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div').style.paddingRight != '') {
-                            document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div').style.paddingRight = ''
-                        }
-                        document.getElementById("window-controls").style.display = "none"
-                    }
-                    else {
-                        if (document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div').style.paddingRight != '150px') {
-                            document.querySelector('#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div').style.paddingRight = '150px'
-                        }
-                        document.getElementById("window-controls").style.display = ""
-                    }
                     if (document.querySelector('div.el-button-group.nice-btn-group.block.mt-2').style.position != 'fixed') {
                         document.querySelector('div.el-button-group.nice-btn-group.block.mt-2').style.position = 'fixed'
                         document.querySelector('div.el-button-group.nice-btn-group.block.mt-2').style.bottom = '10px'
@@ -583,9 +572,28 @@ app.whenReady().then(async function makeNewWindow() {
                             document.querySelector('div.sidebar.right > div:nth-child(3) > button > span > span').style.whiteSpace = 'pre-wrap'
                         }
                     }
-                }, 500)
+                }, 500) 
                 `
 				);
+
+				setTimeout(() => {
+					win.webContents.executeJavaScript(`
+					//changing layouts according to fullscreen
+					setInterval(() => {
+						if (isFullscreen) {
+							if (document.querySelector("#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div").style.paddingRight != "") {
+								document.querySelector("#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div").style.paddingRight = "";
+							}
+							document.getElementById("window-controls").style.display = "none";
+						} else {
+							if (document.querySelector("#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div").style.paddingRight != "150px") {
+								document.querySelector("#app > div.ui > div > div.el-row.header.justify-between.flex-nowrap > div:nth-child(2) > div").style.paddingRight = "150px";
+							}
+							document.getElementById("window-controls").style.display = "";
+						}
+					}, 500);
+                    `);
+				}, 2000);
 
 				//url input textfield
 				win.webContents.executeJavaScript(`
