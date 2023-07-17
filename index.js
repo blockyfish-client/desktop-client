@@ -172,7 +172,6 @@ app.whenReady().then(async function makeNewWindow() {
 			minWidth: 960,
 			minHeight: 600
 		});
-		win.webContents.openDevTools();
 		// spoof firefox
 		win.webContents.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0";
 
