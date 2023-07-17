@@ -46,8 +46,8 @@ app.setAsDefaultProtocolClient("deeeepio");
 var extensionsLoaded = false;
 
 // version info
-const version_code = "v2.0.3";
-const version_num = "203";
+const version_code = "v2.0.4";
+const version_num = "204";
 
 // custom function for later
 function matches(text, partial) {
@@ -172,6 +172,9 @@ app.whenReady().then(async function makeNewWindow() {
 			minWidth: 960,
 			minHeight: 600
 		});
+		win.webContents.openDevTools();
+		// spoof firefox
+		win.webContents.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0";
 
 		app.on("second-instance", (event, argv, cwd) => {
 			if (win) {
@@ -270,7 +273,22 @@ app.whenReady().then(async function makeNewWindow() {
 			localshortcut.register("F2", () => {
 				win.webContents.capturePage().then((image) => {
 					fs.writeFile(
-						downloadPath + "\\" + new Date().getFullYear() + "-" + (new Date().getMonth() + 1) + "-" + new Date().getDate() + "-" + new Date().getHours() + "-" + new Date().getMinutes() + "-" + new Date().getSeconds() + "-" + new Date().getMilliseconds() + ".png",
+						downloadPath +
+							"\\" +
+							new Date().getFullYear() +
+							"-" +
+							(new Date().getMonth() + 1) +
+							"-" +
+							new Date().getDate() +
+							"-" +
+							new Date().getHours() +
+							"-" +
+							new Date().getMinutes() +
+							"-" +
+							new Date().getSeconds() +
+							"-" +
+							new Date().getMilliseconds() +
+							".png",
 						image.toPNG(),
 						(err) => {
 							if (err) throw err;
@@ -1639,7 +1657,22 @@ app.whenReady().then(async function makeNewWindow() {
 							if (matches(msg, "TAKE_SCREENSHOT_REQUEST_PICTURE_NOW")) {
 								win.webContents.capturePage().then((image) => {
 									fs.writeFile(
-										downloadPath + "\\" + new Date().getFullYear() + "-" + (new Date().getMonth() + 1) + "-" + new Date().getDate() + "-" + new Date().getHours() + "-" + new Date().getMinutes() + "-" + new Date().getSeconds() + "-" + new Date().getMilliseconds() + ".png",
+										downloadPath +
+											"\\" +
+											new Date().getFullYear() +
+											"-" +
+											(new Date().getMonth() + 1) +
+											"-" +
+											new Date().getDate() +
+											"-" +
+											new Date().getHours() +
+											"-" +
+											new Date().getMinutes() +
+											"-" +
+											new Date().getSeconds() +
+											"-" +
+											new Date().getMilliseconds() +
+											".png",
 										image.toPNG(),
 										(err) => {
 											if (err) throw err;
@@ -2059,9 +2092,43 @@ app.whenReady().then(async function makeNewWindow() {
 					// no u electron xd
 					// open all links in the default browser
 					// instead of yucky electron windows
-					win.webContents.on("new-window", function (e, url) {
+					win.webContents.on("new-window", async function (e, url) {
 						e.preventDefault();
-						require("electron").shell.openExternal(url);
+						const allowedUrls = [
+							"https://beta.deeeep.io",
+							"https://deeeep.io",
+							"https://www.facebook.com/v13.0/dialog/oauth",
+							"https://accounts.google.com/o/oauth2",
+							"https://oauth.vk.com/authorize"
+						];
+						var allow = false;
+						allowedUrls.forEach((value) => {
+							if (url.startsWith(value)) allow = true;
+						});
+						if (!allow) {
+							require("electron").shell.openExternal(url);
+							return { action: "deny" };
+						} else {
+							const signInWin = new BrowserWindow({
+								width: 480,
+								height: 640,
+								webPreferences: {
+									nodeIntegration: false,
+									sandbox: true,
+									contextIsolation: true
+								},
+								frame: true,
+								titleBarStyle: "default",
+								show: true,
+								modal: true,
+								parent: win,
+								icon: path.join(__dirname, "img/icon.png")
+							});
+							// Spoof firefox to prevent Google Sign-in from seeing that this is an electron
+							signInWin.webContents.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0";
+							signInWin.loadURL(url);
+							signInWin.removeMenu();
+						}
 					});
 
 					//discord rpc
