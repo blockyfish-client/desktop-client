@@ -8,15 +8,33 @@ const store = new Store({
 		adblock: {
 			type: "boolean",
 			default: true
+		},
+		plugins: {
+			type: "object",
+			patternProperties: {
+				".*": {
+					type: "object",
+					properties: {
+						enabled: {
+							type: "boolean",
+							default: true
+						},
+						settings: {
+							type: "object"
+						}
+					}
+				}
+			}
 		}
-	}
+	},
+	clearInvalidConfig: true
 });
 
 function getSettings(key) {
 	return store.get(key);
 }
-function setSettings(key) {
-	return store.set(key);
+function setSettings(key, value) {
+	return store.set(key, value);
 }
 
 module.exports = { getSettings, setSettings };

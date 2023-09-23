@@ -254,6 +254,11 @@ plugin_button.addEventListener("click", async () => {
 				loadedPlugins.add(module.name);
 			}
 			document.querySelector(".plugin-list").appendChild(createPluginBox(module.name, module.description, module.author, module.version));
+			var ts = document.querySelector(`.plugin-list input#${module.name.split(" ").join("_").toLowerCase() + "_switch"}[type="checkbox"]`);
+			getSettings("plugins." + module.name.split(" ").join("_").toLowerCase() + ".enabled") ? ts.setAttribute("checked", null) : ts.removeAttribute("checked");
+			ts.addEventListener("change", (e) => {
+				setSettings("plugins." + module.name.split(" ").join("_").toLowerCase() + ".enabled", e.target.checked);
+			});
 		} catch {}
 	});
 });
