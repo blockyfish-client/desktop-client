@@ -1,3 +1,7 @@
+const { app, shell } = require("@electron/remote");
+const fs = require("fs");
+const path = require("path");
+
 const plugins_css = document.createElement("style");
 document.querySelector("body").appendChild(plugins_css);
 plugins_css.id = "plugins-css";
@@ -139,6 +143,7 @@ function createPluginsModal() {
 		</div>
 		<div class="plugin-modal-actions">
 			<button class="secondary plugin-modal-close">Close</button>
+			<button class="primary plugin-folder-open">Open plugins folder</button>
 		</div>
 	</div>
 	`;
@@ -150,8 +155,14 @@ function createPluginsModal() {
 			plugin_modal.remove();
 		});
 	});
+
+	document.querySelectorAll(".plugin-modal-box .plugin-folder-open").forEach((el) => {
+		el.addEventListener("click", () => {
+			shell.openPath(path.join(app.getPath("userData"), "plugins"));
+		});
+	});
 }
-createPluginsModal();
+// createPluginsModal();
 
 const plugin_button_clone = document.querySelector("div.p-2.sidebar.right.space-y-2 > div.container > div > div").cloneNode(true);
 document.querySelector("div.p-2.sidebar.right.space-y-2 > div.container > div").appendChild(plugin_button_clone);
@@ -168,4 +179,13 @@ pluginIcon.setAttribute("fill", "currentColor");
 
 plugin_button.addEventListener("click", () => {
 	createPluginsModal();
+	getPlugins();
 });
+
+function getPlugins() {
+	return new Promise((resolve) => {
+		if (!fs.existsSync(path.join(app.getPath("userData"), "plugins"))) fs.mkdirSync(path.join(app.getPath("userData"), "plugins"));
+		console.log(path.join(app.getPath("userData"), "plugins"));
+		resolve();
+	});
+}
