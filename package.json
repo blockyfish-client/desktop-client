@@ -1,0 +1,30 @@
+{
+	"name": "blockyfish-client",
+	"productName": "Blockyfish Client",
+	"version": "3.0.0",
+	"description": "A custom desktop client for deeeep.io v4 with some improvements. Made by pi. ",
+	"main": "index.js",
+	"icon": "icons/png/128x128.png",
+	"scripts": {
+		"start": "npx electron .",
+		"test": "npx electron . --testing=true"
+	},
+	"author": "Pi",
+	"license": "GPL-3.0",
+	"keywords": [
+		"deeeep",
+		"deeeepio",
+		"client"
+	],
+	"dependencies": {
+		"@electron/remote": "^2.0.9",
+		"electron-better-web-request": "^1.0.1",
+		"electron-store": "^8.1.0",
+		"path": "^0.12.7",
+		"tslib": "^2.5.2"
+	},
+	"devDependencies": {
+		"electron": "^24.4.0",
+		"electron-rebuild": "^3.2.9"
+	}
+}
