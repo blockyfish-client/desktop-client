@@ -2,6 +2,8 @@ const { app, shell } = require("@electron/remote");
 const fs = require("fs");
 const path = require("path");
 
+const { setSettings, getSettings } = require("../store.js");
+
 const plugins_css = document.createElement("style");
 document.querySelector("body").appendChild(plugins_css);
 plugins_css.id = "plugins-css";
@@ -106,9 +108,16 @@ button.small-x {
 	gap: 32px;
 }
 .plugin-list {
-	display: flex;
-    min-height: 300px;
-    width: calc(100vw - 200px)
+    height: 300px;
+    width: calc(100vw - 200px);
+	gap: 8px;
+	overflow: auto;
+    padding: 0 8px;
+}
+.plugin-item {
+	background: #fff2;
+	padding: 8px 12px;
+	border-radius: 8px;
 }
 .plugin-modal-actions {
 	display: flex;
@@ -117,11 +126,65 @@ button.small-x {
 	align-items: center;
 	padding-top: 0.75rem;
 }
+
+.switch > input[type="checkbox"] {
+	height: 0;
+	width: 0;
+	visibility: hidden;
+}
+.switch > label {
+	cursor: pointer;
+	text-indent: -9999px;
+	width: 48px;
+	height: 24px;
+	background: #fff3;
+	display: block;
+	border-radius: 100px;
+	position: relative;
+	transition: all 0.2s;
+	border: 1px solid #fff0;
+}
+.switch > label:after {
+	content: "";
+	position: absolute;
+	top: 1px;
+	left: 1px;
+	width: 20px;
+	height: 20px;
+	background: #fff;
+	border-radius: 90px;
+	transition: all 0.2s;
+}
+.switch > input:checked + label {
+	background: #409eff;
+	border: 1px solid #409eff;
+}
+.switch > input:checked + label:after {
+	left: calc(100% - 1px);
+	transform: translateX(-100%);
+}
 `;
 
 function createPluginBox(name, description, author, version, hasSettings) {
 	var html = document.createElement("div");
 	html.id = name.split(" ").join("_").toLowerCase();
+	html.classList.add("plugin-item", "flex-row");
+	html.style.justifyContent = "space-between";
+	html.innerHTML = `
+<div>
+	<h2 style="font-size: large;">${name} <span style="font-size: small; color: #ccc;">${version}</span></h2>
+	<p style="font-size: small; color: #ddd;">${description}<br>Made by ${author}</p>
+</div>
+<div>
+	<div class="switch">
+		<input
+			type="checkbox"
+			id="${name.split(" ").join("_").toLowerCase() + "_switch"}"
+		/><label for="${name.split(" ").join("_").toLowerCase() + "_switch"}"></label>
+	</div>
+</div>
+	`;
+	return html;
 }
 
 function createPluginsModal() {
@@ -137,7 +200,7 @@ function createPluginsModal() {
 			</button>
 		</div>
 		<div class="plugin-modal-content">
-			<div class="plugin-list">
+			<div class="plugin-list flex-column">
 				
 			</div>
 		</div>
@@ -177,15 +240,39 @@ pluginIcon.innerHTML = `<path d="M1 0 0 1l2.2 3.081a1 1 0 0 0 .815.419h.07a1 1 0
 pluginIcon.setAttribute("viewBox", "-4 -4 24 24");
 pluginIcon.setAttribute("fill", "currentColor");
 
-plugin_button.addEventListener("click", () => {
+plugin_button.addEventListener("click", async () => {
+	var loadedPlugins = new Set();
 	createPluginsModal();
-	getPlugins();
+	const plugins = await getPlugins();
+
+	plugins.forEach((plugin) => {
+		try {
+			const module = require(path.join(app.getPath("userData"), "plugins", plugin));
+			if (loadedPlugins.has(module.name)) {
+				return;
+			} else {
+				loadedPlugins.add(module.name);
+			}
+			document.querySelector(".plugin-list").appendChild(createPluginBox(module.name, module.description, module.author, module.version));
+		} catch {}
+	});
 });
 
 function getPlugins() {
 	return new Promise((resolve) => {
 		if (!fs.existsSync(path.join(app.getPath("userData"), "plugins"))) fs.mkdirSync(path.join(app.getPath("userData"), "plugins"));
-		console.log(path.join(app.getPath("userData"), "plugins"));
-		resolve();
+		var plugins = fs.readdirSync(path.join(app.getPath("userData"), "plugins"), {
+			encoding: "utf8"
+		});
+		plugins = plugins.filter((plugin) => plugin.endsWith(".js"));
+		plugins = plugins.filter((plugin) => {
+			const module = require(path.join(app.getPath("userData"), "plugins", plugin));
+			try {
+				if (module.name && module.version && module.description && module.author && module.scripts) return true;
+			} catch {
+				return false;
+			}
+		});
+		resolve(plugins);
 	});
 }
