@@ -274,7 +274,19 @@ function registerRedirects() {
 		// Adblock
 		enhancedSession.webRequest.onBeforeRequest(
 			{
-				urls: ["*://*.doubleclick.net/*", "*://*.googlesyndication.com/*", "*://adservice.google.com/*", "*://*.googleadservices.com/*", "*://app-measurement.com/*", "*://analytics.google.com/*", "*://*.googleanalytics.com/*", "*://google-analytics.com/*", "*://*.google-analytics.com/*"]
+				urls: [
+					"*://*.doubleclick.net/*",
+					"*://*.googlesyndication.com/*",
+					"*://adservice.google.com/*",
+					"*://*.googleadservices.com/*",
+					"*://app-measurement.com/*",
+					"*://analytics.google.com/*",
+					"*://*.googleanalytics.com/*",
+					"*://google-analytics.com/*",
+					"*://*.google-analytics.com/*",
+					"*://*.googletagmanager.com/*",
+					"*://*.googleapis.com/*"
+				]
 			},
 			(_details, callback) => {
 				callback({
