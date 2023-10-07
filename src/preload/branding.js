@@ -1,3 +1,5 @@
+window.blockyfish = new (require("../blockyfish.js").Blockyfish)();
+
 const brand_css = document.createElement("style");
 document.querySelector("body").appendChild(brand_css);
 brand_css.outerHTML = '<link rel="stylesheet" href="https://blockyfish.netlify.app/themes/branding.css">';
