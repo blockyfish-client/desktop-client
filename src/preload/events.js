@@ -7,7 +7,7 @@ document.querySelector("button.play").addEventListener("click", () => {
 		if (document.contains(document.querySelector(".playing"))) {
 			openObserver.disconnect();
 			scriptExecuted = true;
-			window.blockyfish.emit("game-start");
+			window.blockyfish.emit(window.blockyfish.events.game_load);
 		}
 	});
 	openObserver.observe(document.getElementById("app"), {

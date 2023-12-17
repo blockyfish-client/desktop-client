@@ -130,14 +130,22 @@ titlebar_style.innerHTML = `
 `;
 
 document.getElementById("max-button").addEventListener("click", () => {
-	document.getElementById("max-button").style.display = "none";
-	document.getElementById("restore-button").style.display = "";
 	BrowserWindow.getFocusedWindow().maximize();
 });
 document.getElementById("restore-button").addEventListener("click", () => {
-	document.getElementById("max-button").style.display = "";
-	document.getElementById("restore-button").style.display = "none";
 	BrowserWindow.getFocusedWindow().unmaximize();
+});
+BrowserWindow.getAllWindows().forEach((win) => {
+	win.on("maximize", () => {
+		document.getElementById("max-button").style.display = "none";
+		document.getElementById("restore-button").style.display = "";
+	});
+});
+BrowserWindow.getAllWindows().forEach((win) => {
+	win.on("unmaximize", () => {
+		document.getElementById("max-button").style.display = "";
+		document.getElementById("restore-button").style.display = "none";
+	});
 });
 document.getElementById("min-button").addEventListener("click", () => {
 	BrowserWindow.getFocusedWindow().minimize();

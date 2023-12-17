@@ -1,4 +1,5 @@
-window.blockyfish = new (require("../blockyfish.js").Blockyfish)();
+window.blockyfish = new (require("../blockyfish.js").Blockyfish)(window);
+require("./events.js");
 
 const brand_css = document.createElement("style");
 document.querySelector("body").appendChild(brand_css);
