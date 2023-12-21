@@ -1,4 +1,5 @@
 window.addEventListener("load", () => {
+	window.bfi = require("../../info.json");
 	require("./titlebar.js");
 	require("./branding.js");
 	require("../store.js");

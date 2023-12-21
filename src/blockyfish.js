@@ -35,29 +35,38 @@ Function.prototype.bind = bind;
 
 class Blockyfish {
 	constructor(window) {
-		this.window = window;
 		this.events = {
 			"first-game-load": new Event("first-game-load", { bubbles: true, cancelable: false }),
 			"game-load": new Event("game-load", { bubbles: true, cancelable: false }),
+			"play-button-click": new Event("play-button-click", { bubbles: true, cancelable: false }),
 			"death": new Event("death", { bubbles: true, cancelable: false }),
 			"settings-open": new Event("settings-open", { bubbles: true, cancelable: false }),
 			"forums-open": new Event("forums-open", { bubbles: true, cancelable: false })
 		};
+		// makes it harder to tamper with blockyfish info
+		this.config = window.bfi;
+		window.bfi = undefined;
 	}
 	emit(event) {
 		if (!this.events[event]) return false;
-		dispatchEvent(this.events[event]);
+		document.dispatchEvent(this.events[event]);
 		return true;
 	}
 	addEventListener(event, callback) {
 		if (!this.events[event] || !callback) return false;
-		addEventListener(this.events[event], callback);
+		document.addEventListener(this.events[event], callback);
 		return true;
 	}
 	removeEventListener(event, callback) {
 		if (!this.events[event] || !callback) return false;
-		removeEventListener(this.events[event], callback);
+		document.removeEventListener(this.events[event], callback);
 		return true;
+	}
+	getVersion() {
+		return this.config.version;
+	}
+	getVersionNumber() {
+		return this.config.versionNumber;
 	}
 }
 

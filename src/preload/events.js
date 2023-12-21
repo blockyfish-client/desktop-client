@@ -1,16 +1,20 @@
-let scriptExecuted = false;
+window.bfe = {};
+// game-load
+// first-game-load
+window.bfe.firstLoad = true;
 document.querySelector("button.play").addEventListener("click", () => {
+	window.blockyfish.emit("play-button-click");
+	if (document.querySelector(".playing")) return;
 	console.log("Play button clicked");
-	if (!document.querySelector(".playing")) scriptExecuted = false;
 	const openObserver = new MutationObserver(() => {
-		if (document.contains(document.querySelector(".playing"))) {
+		if (document.querySelector(".playing")) {
 			openObserver.disconnect();
-			scriptExecuted = true;
-			if (scriptExecuted) {
-				window.blockyfish.emit("game-load");
-			} else {
+			if (window.bfe.firstLoad) {
 				window.blockyfish.emit("first-game-load");
+			} else {
+				window.blockyfish.emit("game-load");
 			}
+			window.bfe.firstLoad = false;
 		}
 	});
 	openObserver.observe(document.getElementById("app"), {
