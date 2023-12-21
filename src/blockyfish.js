@@ -47,14 +47,17 @@ class Blockyfish {
 	emit(event) {
 		if (!this.events[event]) return false;
 		dispatchEvent(this.events[event]);
+		return true;
 	}
 	addEventListener(event, callback) {
 		if (!this.events[event] || !callback) return false;
 		addEventListener(this.events[event], callback);
+		return true;
 	}
 	removeEventListener(event, callback) {
 		if (!this.events[event] || !callback) return false;
 		removeEventListener(this.events[event], callback);
+		return true;
 	}
 }
 
