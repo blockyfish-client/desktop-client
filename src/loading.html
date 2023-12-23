@@ -2,8 +2,14 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta
+			http-equiv="X-UA-Compatible"
+			content="IE=edge"
+		/>
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0"
+		/>
 		<title>Loading Blockyfish...</title>
 
 		<style>
@@ -13,7 +19,8 @@
 				flex-direction: column;
 				height: 600px;
 				width: -webkit-fill-available;
-				animation: container-rise 10s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1 both, rotate-sts 5s ease-in-out infinite, container-return 8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1 12s forwards, container-idle 10s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite 20s forwards;
+				animation: container-rise 10s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1 both, rotate-sts 5s ease-in-out infinite,
+					container-return 8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1 12s forwards, container-idle 10s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite 20s forwards;
 				transform-origin: top center;
 			}
 			.waves {
@@ -134,7 +141,7 @@
 				position: relative;
 				width: 80px;
 				height: 80px;
-				animation: fade-in 1s ease-in 1 6s both, blur-in 3s ease-out 1 6s both;
+				animation: fade-in 1s ease-in 1 6s both, blur-in 1s ease-out 1 6s both;
 				animation-fill-mode: backwards;
 			}
 			.lds-roller div {
@@ -316,15 +323,45 @@
 	<body>
 		<div class="bg">
 			<div class="wave-container">
-				<svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+				<svg
+					class="waves"
+					xmlns="http://www.w3.org/2000/svg"
+					xmlns:xlink="http://www.w3.org/1999/xlink"
+					viewBox="0 24 150 28"
+					preserveAspectRatio="none"
+					shape-rendering="auto"
+				>
 					<defs>
-						<path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+						<path
+							id="gentle-wave"
+							d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"
+						/>
 					</defs>
 					<g class="parallax">
-						<use xlink:href="#gentle-wave" x="48" y="0" fill="#2265b366" />
-						<use xlink:href="#gentle-wave" x="48" y="3" fill="#2265b399" />
-						<use xlink:href="#gentle-wave" x="48" y="5" fill="#2265b3bb" />
-						<use xlink:href="#gentle-wave" x="48" y="7" fill="#2265b3" />
+						<use
+							xlink:href="#gentle-wave"
+							x="48"
+							y="0"
+							fill="#2265b366"
+						/>
+						<use
+							xlink:href="#gentle-wave"
+							x="48"
+							y="3"
+							fill="#2265b399"
+						/>
+						<use
+							xlink:href="#gentle-wave"
+							x="48"
+							y="5"
+							fill="#2265b3bb"
+						/>
+						<use
+							xlink:href="#gentle-wave"
+							x="48"
+							y="7"
+							fill="#2265b3"
+						/>
 					</g>
 				</svg>
 				<div class="wave-bottom-fill"></div>
