@@ -248,7 +248,7 @@ pluginIcon.setAttribute("fill", "currentColor");
 	window.plugins.forEach((plugin) => {
 		try {
 			const module = require(path.join(app.getPath("userData"), "plugins", plugin));
-			console.log(module);
+			module.script();
 			if (window.loadedPlugins.has(module)) {
 				return;
 			} else if (getSettings("plugins." + module.name.split(" ").join("_").toLowerCase() + ".enabled")) {
@@ -259,6 +259,7 @@ pluginIcon.setAttribute("fill", "currentColor");
 			}
 		} catch {}
 	});
+	window.blockyfish.emit("plugins-load");
 })();
 
 plugin_button.addEventListener("click", async () => {
@@ -290,7 +291,7 @@ function getPlugins() {
 		plugins = plugins.filter((plugin) => {
 			const module = require(path.join(app.getPath("userData"), "plugins", plugin));
 			try {
-				if (module.name && module.version && module.description && module.author && module.scripts) return true;
+				if (module.name && module.version && module.description && module.author && module.script) return true;
 			} catch {
 				return false;
 			}

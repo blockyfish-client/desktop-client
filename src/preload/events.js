@@ -8,7 +8,6 @@ window.bfe.firstLoad = true;
 document.querySelector("button.play").addEventListener("click", () => {
 	window.blockyfish.emit("play-button-click");
 	if (document.querySelector(".playing")) return;
-	console.log("Play button clicked");
 	const playObserver = new MutationObserver(() => {
 		if (document.querySelector(".playing")) {
 			playObserver.disconnect();
