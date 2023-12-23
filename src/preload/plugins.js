@@ -240,24 +240,41 @@ pluginIcon.innerHTML = `<path d="M1 0 0 1l2.2 3.081a1 1 0 0 0 .815.419h.07a1 1 0
 pluginIcon.setAttribute("viewBox", "-4 -4 24 24");
 pluginIcon.setAttribute("fill", "currentColor");
 
-plugin_button.addEventListener("click", async () => {
-	var loadedPlugins = new Set();
-	createPluginsModal();
-	const plugins = await getPlugins();
+(async () => {
+	window.loadedPlugins = new Set();
+	window.allPlugins = new Set();
+	window.plugins = await getPlugins();
 
-	plugins.forEach((plugin) => {
+	window.plugins.forEach((plugin) => {
 		try {
 			const module = require(path.join(app.getPath("userData"), "plugins", plugin));
-			if (loadedPlugins.has(module.name)) {
+			console.log(module);
+			if (window.loadedPlugins.has(module)) {
 				return;
+			} else if (getSettings("plugins." + module.name.split(" ").join("_").toLowerCase() + ".enabled")) {
+				window.loadedPlugins.add(module);
+				window.allPlugins.add(module);
 			} else {
-				loadedPlugins.add(module.name);
+				window.allPlugins.add(module);
 			}
-			document.querySelector(".plugin-list").appendChild(createPluginBox(module.name, module.description, module.author, module.version));
-			var ts = document.querySelector(`.plugin-list input#${module.name.split(" ").join("_").toLowerCase() + "_switch"}[type="checkbox"]`);
-			getSettings("plugins." + module.name.split(" ").join("_").toLowerCase() + ".enabled") ? ts.setAttribute("checked", null) : ts.removeAttribute("checked");
+		} catch {}
+	});
+})();
+
+plugin_button.addEventListener("click", async () => {
+	createPluginsModal();
+
+	window.allPlugins.forEach((plugin) => {
+		try {
+			document.querySelector(".plugin-list").appendChild(createPluginBox(plugin.name, plugin.description, plugin.author, plugin.version));
+			var ts = document.querySelector(`.plugin-list input#${plugin.name.split(" ").join("_").toLowerCase() + "_switch"}[type="checkbox"]`);
+			if (getSettings("plugins." + plugin.name.split(" ").join("_").toLowerCase() + ".enabled")) {
+				ts.setAttribute("checked", null);
+			} else {
+				ts.removeAttribute("checked");
+			}
 			ts.addEventListener("change", (e) => {
-				setSettings("plugins." + module.name.split(" ").join("_").toLowerCase() + ".enabled", e.target.checked);
+				setSettings("plugins." + plugin.name.split(" ").join("_").toLowerCase() + ".enabled", e.target.checked);
 			});
 		} catch {}
 	});
