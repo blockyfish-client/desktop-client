@@ -36,6 +36,7 @@ Function.prototype.bind = bind;
 class Blockyfish {
 	constructor(window) {
 		this.events = {
+			"plugins-load": new Event("plugins-load", { bubbles: true, cancelable: false }),
 			"first-game-load": new Event("first-game-load", { bubbles: true, cancelable: false }),
 			"game-load": new Event("game-load", { bubbles: true, cancelable: false }),
 			"play-button-click": new Event("play-button-click", { bubbles: true, cancelable: false }),
@@ -54,12 +55,12 @@ class Blockyfish {
 	}
 	addEventListener(event, callback) {
 		if (!this.events[event] || !callback) return false;
-		document.addEventListener(this.events[event], callback);
+		document.addEventListener(event, callback);
 		return true;
 	}
 	removeEventListener(event, callback) {
 		if (!this.events[event] || !callback) return false;
-		document.removeEventListener(this.events[event], callback);
+		document.removeEventListener(event, callback);
 		return true;
 	}
 	getVersion() {
