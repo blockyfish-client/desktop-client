@@ -34,7 +34,7 @@ document.querySelector("button.play").addEventListener("click", () => {
 			});
 		}
 	});
-	openObserver.observe(document.getElementById("app"), {
+	playObserver.observe(document.getElementById("app"), {
 		attributes: false,
 		childList: true,
 		characterData: false,
