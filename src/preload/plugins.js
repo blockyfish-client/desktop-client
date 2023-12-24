@@ -330,8 +330,8 @@ pluginIcon.setAttribute("fill", "currentColor");
 		try {
 			if (!installedPlugins.find((p) => p.id == plugin.id)) {
 				window.onlinePlugins.add(plugin);
-			} else if (installedPlugins.find((p) => p.version < plugin.versionNumber)) {
-				window.updatablePlugins.add(plugin);
+			} else if (installedPlugins.find((p) => p.id == plugin.id && p.version < plugin.versionNumber)) {
+				window.updatablePlugins.add(plugin.id);
 			}
 		} catch {}
 	});
@@ -379,6 +379,26 @@ function renderPluginList() {
 				window.onlinePlugins.add(plugin);
 				renderPluginList();
 			});
+			if (updatable) {
+				var ub = document.querySelector(`.plugin-list button#${plugin.name.split(" ").join("_").toLowerCase() + "_update_button"}`);
+				ub.addEventListener("click", async (e) => {
+					modified = true;
+					if (!plugin.url) {
+						try {
+							var temp_url = "";
+							window.remotePlugins.forEach((e) => {
+								if (e.name == plugin.name) temp_url = e.url;
+							});
+							if (temp_url != "") {
+								plugin.url = temp_url;
+							}
+						} catch {}
+					}
+					await downloadPlugin(`${config.remoteEndpoint}/plugins${plugin.url}`);
+					window.updatablePlugins.delete(plugin.id);
+					renderPluginList();
+				});
+			}
 		} catch {}
 	});
 	window.onlinePlugins.forEach((plugin) => {
