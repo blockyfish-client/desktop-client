@@ -1,7 +1,9 @@
+# Node.js
 node_modules/
-out/
-release-builds/
-yarn-error.log
-notes
-test.html
 package-lock.json
+
+# VSC
+.vscode/
+
+# Electron
+dist/

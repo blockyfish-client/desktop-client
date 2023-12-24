@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			http-equiv="X-UA-Compatible"
+			content="IE=edge"
+		/>
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0"
+		/>
+		<title>Modal</title>
+
+		<style>
+			@font-face {
+				font-family: Quicksand;
+				src: url(../fonts/Quicksand.ttf);
+			}
+			:root {
+				--font: #e5e7eb;
+				--background: #1f2937;
+				--secondary: #374151;
+			}
+			* {
+				font-family: Quicksand;
+				color: var(--font);
+				user-select: none;
+			}
+			body {
+				margin: 50px;
+				/* background: black; */
+			}
+			.flex-row {
+				display: flex;
+				flex-direction: row;
+			}
+			.flex-column {
+				display: flex;
+				flex-direction: column;
+			}
+			.modal-box {
+				background: var(--background);
+				border: var(--secondary) 1px solid;
+				border-radius: 0.75rem;
+				padding: 8px 12px;
+				box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+			}
+			.modal-header {
+				justify-content: center;
+				align-items: center;
+				-webkit-app-region: drag;
+			}
+			.modal-header p {
+				margin: 0;
+				font-size: 1.25em;
+			}
+			button.small-x {
+				background: none;
+				border: none;
+				outline: none;
+				cursor: pointer;
+				padding: 0;
+				top: 60px;
+				right: 60px;
+				position: absolute;
+				min-width: 16px;
+				height: 16px;
+				min-height: 16px;
+				-webkit-app-region: no-drag;
+			}
+			.modal-content {
+				display: flex;
+				gap: 32px;
+			}
+			.modal-thumbnail {
+				max-width: 48px;
+				max-height: 48px;
+			}
+			.modal-text {
+				width: -webkit-fill-available;
+			}
+			.modal-actions {
+				display: flex;
+				gap: 12px;
+				justify-content: center;
+				align-items: center;
+				padding-top: 0.75rem;
+			}
+		</style>
+
+		<style>
+			button {
+				display: inline-flex;
+				justify-content: center;
+				align-items: center;
+				line-height: 1;
+				height: 32px;
+				min-width: 64px;
+				white-space: nowrap;
+				cursor: pointer;
+				text-align: center;
+				box-sizing: border-box;
+				outline: 0;
+				transition: 0.1s;
+				-webkit-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+				vertical-align: middle;
+				-webkit-appearance: none;
+				appearance: none;
+				min-height: 2.5rem;
+				padding: 0.75rem 1.25rem;
+				font-size: 0.875rem;
+				outline: none;
+				border: none;
+				border-bottom: 4px solid;
+				border-radius: 1rem;
+				font-weight: 600;
+			}
+			button.secondary {
+				background-color: #6b7280;
+				border-color: #4b5563;
+			}
+			button.secondary:hover {
+				background-color: #4b5563;
+				border-color: #374151;
+			}
+			button.primary {
+				background-color: #10b981;
+				border-color: #059669;
+			}
+			button.primary:hover {
+				background-color: #059669;
+				border-color: #047957;
+			}
+		</style>
+
+		<style>
+			:root:has(body.themed) {
+				--background: #115262;
+				--secondary: #0000;
+			}
+			body.themed button.secondary {
+				background-color: #0004;
+				border: none !important;
+			}
+			body.themed button.secondary:hover {
+				background-color: #4b5563;
+			}
+			body.themed button.primary {
+				background-color: #0003;
+				border: none !important;
+			}
+			body.themed button.primary:hover {
+				background-color: #059669;
+			}
+			body.themed button {
+				transition: all 0.3s;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="modal-box flex-column">
+			<div class="modal-header flex-row">
+				<p id="title">Title</p>
+				<button class="modal-close small-x flex-row">
+					<svg
+						width="1.125em"
+						height="1.125em"
+						viewBox="0 0 24 24"
+						fill="gray"
+					>
+						<path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"></path>
+					</svg>
+				</button>
+			</div>
+			<div class="modal-content">
+				<img
+					class="modal-thumbnail"
+					id="img"
+					src="../icons/256x256.png"
+					draggable="false"
+				/>
+				<div class="modal-text">
+					<p id="content">Are you sure you want to close?</p>
+				</div>
+			</div>
+			<div class="modal-actions">
+				<button class="secondary modal-close">Cancel</button>
+				<button class="primary modal-confirm">Confirm</button>
+			</div>
+		</div>
+
+		<script>
+			const { ipcRenderer } = require("electron");
+
+			const queryString = window.location.search;
+			const urlParams = new URLSearchParams(queryString);
+			document.getElementById("title").innerText = urlParams.get("title") || "";
+			document.getElementById("content").innerText = urlParams.get("content") || "";
+			if (urlParams.get("img")) {
+				document.getElementById("img").setAttribute("src", urlParams.get("img"));
+			} else {
+				document.getElementById("img").style.display = "none";
+			}
+			if (urlParams.get("themed") == "true") {
+				document.body.classList.add("themed");
+			}
+
+			document.querySelectorAll(".modal-close").forEach((el) => {
+				el.addEventListener("click", () => {
+					ipcRenderer.send("modal-action", ["cancel"]);
+				});
+			});
+			document.querySelectorAll(".modal-confirm").forEach((el) => {
+				el.addEventListener("click", () => {
+					ipcRenderer.send("modal-action", ["confirm"]);
+				});
+			});
+		</script>
+	</body>
+</html>

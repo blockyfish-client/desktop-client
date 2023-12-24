@@ -1,36 +1,42 @@
 {
-	"name": "blockyfish",
-	"version": "2.0.3",
+	"name": "blockyfish-client",
+	"productName": "Blockyfish Client",
+	"version": "3.0.0",
 	"description": "A custom desktop client for deeeep.io v4 with some improvements. Made by pi. ",
 	"main": "index.js",
+	"icon": "icons/128x128.png",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"start": "electron .",
-		"make-win": "npx electron-packager . Blockyfish --overwrite --platform=win32 --arch=x64 --icon=img/icons/win/icon.ico --prune=true --electron-version=10.4.7 --app-copyright=\"Pi 2022\" --out=release-builds --version-string.CompanyName=Pi --version-string.ProductName=\"Blockyfish Client\"",
-		"pack-win": "node installers/windows/createinstaller.js",
-		"make-linux": "npx electron-packager . Blockyfish --overwrite --platform=linux --arch=x64 --icon=img/icons/win/icon.ico --prune=true --electron-version=10.4.7 --app-copyright=\"Pi 2022\" --out=release-builds --version-string.CompanyName=Pi --version-string.ProductName=\"Blockyfish Client\""
+		"start": "npx electron .",
+		"test": "npx electron . --testing=true",
+		"dist": "electron-builder"
 	},
 	"author": "Pi",
-	"license": "GPLV3",
-	"protocols": {
-		"name": "main",
-		"schemes": [
-			"deeeepio"
-		]
-	},
-	"devDependencies": {
-		"electron": "^10.4.7",
-		"electron-packager": "^15.5.1",
-		"electron-winstaller": "^5.0.0"
+	"license": "GPL-3.0",
+	"keywords": [
+		"deeeep",
+		"deeeepio",
+		"client"
+	],
+	"build": {
+		"appId": "com.pi.blockyfish",
+		"win": {
+			"target": "nsis"
+		},
+		"nsis": {
+			"oneClick": true,
+			"perMachine": false
+		}
 	},
 	"dependencies": {
-		"discord-rpc": "^4.0.1",
-		"electron-chrome-extensions": "^3.9.0",
-		"electron-dl": "^3.3.1",
-		"electron-localshortcut": "^3.2.1",
-		"electron-squirrel-startup": "^1.0.0",
+		"@electron/remote": "^2.0.9",
+		"electron-better-web-request": "^1.0.1",
 		"electron-store": "^8.1.0",
-		"node-fetch": "^2.6.7",
-		"request": "^2.88.2"
+		"path": "^0.12.7",
+		"tslib": "^2.5.2"
+	},
+	"devDependencies": {
+		"electron": "^24.4.0",
+		"electron-builder": "^24.9.1",
+		"electron-rebuild": "^3.2.9"
 	}
 }
