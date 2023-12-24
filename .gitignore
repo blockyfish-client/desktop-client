@@ -4,3 +4,6 @@ package-lock.json
 
 # VSC
 .vscode/
+
+# Electron
+dist/

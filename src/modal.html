@@ -2,8 +2,14 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta
+			http-equiv="X-UA-Compatible"
+			content="IE=edge"
+		/>
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0"
+		/>
 		<title>Modal</title>
 
 		<style>
@@ -103,6 +109,7 @@
 				user-select: none;
 				vertical-align: middle;
 				-webkit-appearance: none;
+				appearance: none;
 				min-height: 2.5rem;
 				padding: 0.75rem 1.25rem;
 				font-size: 0.875rem;
@@ -159,13 +166,23 @@
 			<div class="modal-header flex-row">
 				<p id="title">Title</p>
 				<button class="modal-close small-x flex-row">
-					<svg width="1.125em" height="1.125em" viewBox="0 0 24 24" fill="gray">
+					<svg
+						width="1.125em"
+						height="1.125em"
+						viewBox="0 0 24 24"
+						fill="gray"
+					>
 						<path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"></path>
 					</svg>
 				</button>
 			</div>
 			<div class="modal-content">
-				<img class="modal-thumbnail" id="img" src="../icons/png/256x256.png" draggable="false" />
+				<img
+					class="modal-thumbnail"
+					id="img"
+					src="../icons/256x256.png"
+					draggable="false"
+				/>
 				<div class="modal-text">
 					<p id="content">Are you sure you want to close?</p>
 				</div>
