@@ -1,4 +1,4 @@
-const { BrowserWindow, app, shell, ipcMain, session, Menu, dialog } = require("electron");
+const { BrowserWindow, app, shell, ipcMain, session, Menu, dialog, globalShortcut } = require("electron");
 const path = require("path");
 require("@electron/remote/main").initialize();
 const os = require("os");
@@ -86,7 +86,7 @@ function loadingWindow() {
 	});
 	loadingWin.loadFile(path.join(__dirname, "src", "loading.html"));
 	loadingWin.show();
-	loadTimer = Date.now() + 8000; // 8 seconds from now;
+	loadTimer = Date.now() + 3000; // 3 seconds from now;
 }
 
 var win;
@@ -169,6 +169,13 @@ function createWindow() {
 		});
 	});
 
+	win.on("focus", () => {
+		registerFullscreenShortcuts(win, true);
+	});
+	win.on("blur", () => {
+		registerFullscreenShortcuts(win, false);
+	});
+
 	registerRedirects();
 	registerExternalLinkHandler();
 }
@@ -199,6 +206,16 @@ app.on("window-all-closed", () => {
 app.on("activate", () => {
 	if (win == null) createWindow();
 });
+
+function registerFullscreenShortcuts(win, register) {
+	if (register) {
+		globalShortcut.register("F11", () => {
+			win.webContents.executeJavaScript(`if (document.fullscreen) {document.exitFullscreen()} else {document.querySelector("html").requestFullscreen()}`);
+		});
+	} else {
+		globalShortcut.unregister("F11");
+	}
+}
 
 function registerRedirects() {
 	const { genericRedirectHandler } = require("./src/redirect.js");

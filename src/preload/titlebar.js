@@ -85,6 +85,15 @@ titlebar_style.innerHTML = `
 		height: 10px;
 	}
 }
+div.ui div.header div.top-right-nav {
+	padding-right: 150px;
+}
+html.fullscreen div.ui div.header div.top-right-nav {
+	padding-right: .75rem;
+}
+html.fullscreen #window-controls {
+	display: none !important;
+}
 #window-controls {
 	z-index: 9999999999999999;
 	color: #fff;
@@ -140,23 +149,31 @@ BrowserWindow.getAllWindows().forEach((win) => {
 		document.getElementById("max-button").style.display = "none";
 		document.getElementById("restore-button").style.display = "";
 	});
-});
-BrowserWindow.getAllWindows().forEach((win) => {
 	win.on("unmaximize", () => {
 		document.getElementById("max-button").style.display = "";
 		document.getElementById("restore-button").style.display = "none";
 	});
+	win.on("enter-full-screen", () => {
+		document.getElementById("window-controls").style.display = "none";
+		document.querySelector("html").classList.add("fullscreen");
+	});
+	win.on("leave-full-screen", () => {
+		document.getElementById("window-controls").style.display = "";
+		document.querySelector("html").classList.remove("fullscreen");
+	});
+});
+window.addEventListener("keypress", (e) => {
+	if (e.key.toLowerCase() == "f11") {
+		document.querySelector("html").requestFullscreen();
+	}
 });
 document.getElementById("min-button").addEventListener("click", () => {
 	BrowserWindow.getFocusedWindow().minimize();
 });
 document.getElementById("close-button").addEventListener("click", () => {
-	// BrowserWindow.getFocusedWindow().close();
 	ipcRenderer.send("close");
 });
 
 const drag = document.createElement("div");
 document.querySelector("#app > div.ui > div").appendChild(drag);
 drag.outerHTML = '<div style="-webkit-app-region: drag;width: 100vw;height: 20px;position: absolute;top: 0;left: 0;cursor: move;"></div>';
-
-document.querySelector("div.ui div.header div.top-right-nav").style.paddingRight = "150px";
