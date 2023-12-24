@@ -2,6 +2,8 @@ const { app, shell } = require("@electron/remote");
 const fs = require("fs");
 const path = require("path");
 
+const config = require("../../config.json");
+
 const { setSettings, getSettings } = require("../store.js");
 
 const plugins_css = document.createElement("style");
@@ -57,6 +59,7 @@ plugins_css.innerHTML = `
 .flex-row {
 	display: flex;
 	flex-direction: row;
+	align-items: center;
 }
 .flex-column {
 	display: flex;
@@ -127,6 +130,9 @@ button.small-x {
 	padding-top: 0.75rem;
 }
 
+.switch {
+	translate: 0 -8px;
+}
 .switch > input[type="checkbox"] {
 	height: 0;
 	width: 0;
@@ -163,25 +169,48 @@ button.small-x {
 	left: calc(100% - 1px);
 	transform: translateX(-100%);
 }
+.plugin-action-button {
+	width: 36px !important;
+	height: 36px !important;
+	min-width: 36px !important;
+	min-height: 36px !important;
+	border: none !important;
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	padding: 0 !important;
+	background: #fff3 !important;
+	border-radius: 8px !important;
+}
+.plugin-action-button.download:hover {
+	background: #409eff !important;
+}
 `;
 
-function createPluginBox(name, description, author, version, hasSettings) {
+function createPluginBox(name, description, author, version, hasSettings, online) {
 	var html = document.createElement("div");
 	html.id = name.split(" ").join("_").toLowerCase();
 	html.classList.add("plugin-item", "flex-row");
 	html.style.justifyContent = "space-between";
+	const sw = `<div class="switch">
+		<input
+			type="checkbox"
+			id="${name.split(" ").join("_").toLowerCase() + "_switch"}"
+		/><label for="${name.split(" ").join("_").toLowerCase() + "_switch"}"></label>
+	</div>`;
+	const db = `<button id="${name.split(" ").join("_").toLowerCase() + "_download_button"}" class="plugin-action-button download">
+	<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+		<path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+		<path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+	</svg>
+</button>`;
 	html.innerHTML = `
 <div>
 	<h2 style="font-size: large;">${name} <span style="font-size: small; color: #ccc;">${version}</span></h2>
 	<p style="font-size: small; color: #ddd;">${description}<br>Made by ${author}</p>
 </div>
 <div>
-	<div class="switch">
-		<input
-			type="checkbox"
-			id="${name.split(" ").join("_").toLowerCase() + "_switch"}"
-		/><label for="${name.split(" ").join("_").toLowerCase() + "_switch"}"></label>
-	</div>
+	${online ? db : sw}
 </div>
 	`;
 	return html;
@@ -243,19 +272,32 @@ pluginIcon.setAttribute("fill", "currentColor");
 (async () => {
 	window.loadedPlugins = new Set();
 	window.allPlugins = new Set();
+	window.onlinePlugins = new Set();
 	window.plugins = await getPlugins();
+	window.remotePlugins = await getRemotePlugins();
 
 	window.plugins.forEach((plugin) => {
 		try {
 			const module = require(path.join(app.getPath("userData"), "plugins", plugin));
-			module.script();
 			if (window.loadedPlugins.has(module)) {
 				return;
 			} else if (getSettings("plugins." + module.name.split(" ").join("_").toLowerCase() + ".enabled")) {
+				module.script();
 				window.loadedPlugins.add(module);
 				window.allPlugins.add(module);
 			} else {
 				window.allPlugins.add(module);
+			}
+		} catch {}
+	});
+	var pluginIds = [];
+	window.allPlugins.forEach((plugin) => {
+		pluginIds.push(plugin.id);
+	});
+	window.remotePlugins.forEach((plugin) => {
+		try {
+			if (!pluginIds.includes(plugin.id)) {
+				window.onlinePlugins.add(plugin);
 			}
 		} catch {}
 	});
@@ -267,7 +309,7 @@ plugin_button.addEventListener("click", async () => {
 
 	window.allPlugins.forEach((plugin) => {
 		try {
-			document.querySelector(".plugin-list").appendChild(createPluginBox(plugin.name, plugin.description, plugin.author, plugin.version));
+			document.querySelector(".plugin-list").appendChild(createPluginBox(plugin.name, plugin.description, plugin.author, plugin.version, false, false));
 			var ts = document.querySelector(`.plugin-list input#${plugin.name.split(" ").join("_").toLowerCase() + "_switch"}[type="checkbox"]`);
 			if (getSettings("plugins." + plugin.name.split(" ").join("_").toLowerCase() + ".enabled")) {
 				ts.setAttribute("checked", null);
@@ -277,6 +319,12 @@ plugin_button.addEventListener("click", async () => {
 			ts.addEventListener("change", (e) => {
 				setSettings("plugins." + plugin.name.split(" ").join("_").toLowerCase() + ".enabled", e.target.checked);
 			});
+		} catch {}
+	});
+	window.onlinePlugins.forEach((plugin) => {
+		try {
+			document.querySelector(".plugin-list").appendChild(createPluginBox(plugin.name, plugin.description, plugin.author, plugin.version, false, true));
+			var ts = document.querySelector(`.plugin-list input#${plugin.name.split(" ").join("_").toLowerCase() + "_switch"}[type="checkbox"]`);
 		} catch {}
 	});
 });
@@ -291,11 +339,19 @@ function getPlugins() {
 		plugins = plugins.filter((plugin) => {
 			const module = require(path.join(app.getPath("userData"), "plugins", plugin));
 			try {
-				if (module.name && module.version && module.description && module.author && module.script) return true;
+				return !!(module.name && typeof module.id != undefined && module.author && module.version && module.versionNumber && module.description && module.script);
 			} catch {
 				return false;
 			}
 		});
 		resolve(plugins);
+	});
+}
+
+function getRemotePlugins() {
+	return new Promise((resolve) => {
+		fetch(`${config.remoteEndpoint}/plugins/plugins.json`)
+			.then((r) => resolve(r.json()))
+			.catch(() => resolve([]));
 	});
 }
