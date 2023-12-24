@@ -33,11 +33,11 @@ document.querySelectorAll("div.ui div.sidebar.left > a").forEach((el) => {
 	tutorial.style.fontSize = "small";
 
 	(async () => {
-		let news = await (await fetch("https://blockyfish.netlify.app/blockyfishfeed/news")).text();
+		let news = await (await fetch("https://blockyfish.netlify.app/blockyfishfeed/news.txt")).text();
 		blockyfish_news.innerHTML = news;
 	})();
 	(async () => {
-		let tut = await (await fetch("https://blockyfish.netlify.app/blockyfishfeed/tutorial")).text();
+		let tut = await (await fetch("https://blockyfish.netlify.app/blockyfishfeed/tutorial.txt")).text();
 		tutorial.innerHTML = tut;
 	})();
 })();
