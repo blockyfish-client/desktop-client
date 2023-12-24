@@ -324,7 +324,11 @@ plugin_button.addEventListener("click", async () => {
 	window.onlinePlugins.forEach((plugin) => {
 		try {
 			document.querySelector(".plugin-list").appendChild(createPluginBox(plugin.name, plugin.description, plugin.author, plugin.version, false, true));
-			var ts = document.querySelector(`.plugin-list input#${plugin.name.split(" ").join("_").toLowerCase() + "_switch"}[type="checkbox"]`);
+			var db = document.querySelector(`.plugin-list button#${plugin.name.split(" ").join("_").toLowerCase() + "_download_button"}`);
+			db.addEventListener("click", async (e) => {
+				e.target.setAttribute("disabled", "true");
+				e.target.parentElement.parentElement.innerHTML = createPluginBox(plugin.name, plugin.description, plugin.author, plugin.version, false, false).innerHTML;
+			});
 		} catch {}
 	});
 });
