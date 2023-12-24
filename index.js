@@ -19,7 +19,7 @@ if (process.defaultApp) {
 const debug = app.commandLine.getSwitchValue("testing");
 
 var modal;
-function createModal(title, text, img, themed) {
+function createModal(title, text, img, themed, onConfirm) {
 	modal = new BrowserWindow({
 		width: 530,
 		height: 250,
@@ -63,7 +63,7 @@ function createModal(title, text, img, themed) {
 		}
 	});
 	ipcMain.on("confirm", () => {
-		modal.getParentWindow().close();
+		onConfirm();
 	});
 }
 
@@ -147,7 +147,9 @@ function createWindow() {
 	});
 
 	ipcMain.on("close", () => {
-		createModal("Leave Blockyfish", "Are you sure you want to exit Blockyfish", "../icons/png/64x64.png", true);
+		createModal("Leave Blockyfish", "Are you sure you want to exit Blockyfish", "../icons/png/64x64.png", true, () => {
+			win.close();
+		});
 	});
 
 	registerRedirects();
