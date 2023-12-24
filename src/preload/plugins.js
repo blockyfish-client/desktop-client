@@ -202,14 +202,14 @@ function createPluginBox(name, description, author, version, hasSettings, online
 	// For installed plugins
 	// Update button
 	const ub = `<button id="${name.split(" ").join("_").toLowerCase() + "_update_button"}" class="plugin-action-button update">
-	<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
+	<svg style="pointer-events: none" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
 		<path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
 		<path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3M3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9z"/>
 	</svg>
 </button>`;
 	const sw = `${updatable ? ub : ""}
 <button id="${name.split(" ").join("_").toLowerCase() + "_delete_button"}" class="plugin-action-button delete">
-	<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+	<svg style="pointer-events: none" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
 		<path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
 		<path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
 	</svg>
@@ -223,7 +223,7 @@ function createPluginBox(name, description, author, version, hasSettings, online
 
 	// For online plugins
 	const db = `<button id="${name.split(" ").join("_").toLowerCase() + "_download_button"}" class="plugin-action-button download">
-	<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+	<svg style="pointer-events: none" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
 		<path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
 		<path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
 	</svg>
@@ -336,7 +336,11 @@ pluginIcon.setAttribute("fill", "currentColor");
 
 plugin_button.addEventListener("click", async () => {
 	createPluginsModal();
+	renderPluginList();
+});
 
+function renderPluginList() {
+	document.querySelector(".plugin-list").innerHTML = "";
 	window.allPlugins.forEach((plugin) => {
 		try {
 			var updatable = window.updatablePlugins.has(plugin.id);
@@ -350,19 +354,26 @@ plugin_button.addEventListener("click", async () => {
 			ts.addEventListener("change", (e) => {
 				setSettings("plugins." + plugin.name.split(" ").join("_").toLowerCase() + ".enabled", e.target.checked);
 			});
+			var rb = document.querySelector(`.plugin-list button#${plugin.name.split(" ").join("_").toLowerCase() + "_delete_button"}`);
+			rb.addEventListener("click", (e) => {
+				window.allPlugins.delete(plugin);
+				window.onlinePlugins.add(plugin);
+				renderPluginList();
+			});
 		} catch {}
 	});
 	window.onlinePlugins.forEach((plugin) => {
 		try {
 			document.querySelector(".plugin-list").appendChild(createPluginBox(plugin.name, plugin.description, plugin.author, plugin.version, false, true, false));
 			var db = document.querySelector(`.plugin-list button#${plugin.name.split(" ").join("_").toLowerCase() + "_download_button"}`);
-			db.addEventListener("click", async (e) => {
-				e.target.setAttribute("disabled", "true");
-				e.target.parentElement.parentElement.innerHTML = createPluginBox(plugin.name, plugin.description, plugin.author, plugin.version, false, false, false).innerHTML;
+			db.addEventListener("click", (e) => {
+				window.onlinePlugins.delete(plugin);
+				window.allPlugins.add(plugin);
+				renderPluginList();
 			});
 		} catch {}
 	});
-});
+}
 
 function getPlugins() {
 	return new Promise((resolve) => {
