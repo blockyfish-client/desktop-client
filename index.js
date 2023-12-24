@@ -6,6 +6,12 @@ const platform = os.platform();
 
 const { getSettings, setSettings } = require("./src/store.js");
 
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+	app.quit();
+}
+
 app.commandLine.appendSwitch("lang", "en-US");
 
 if (process.defaultApp) {
@@ -63,6 +69,10 @@ function createModal(title, text, img, themed, onConfirm) {
 		}
 	});
 	ipcMain.on("confirm", () => {
+		if (modal != null) {
+			modal.destroy();
+			modal = null;
+		}
 		onConfirm();
 	});
 }
@@ -152,18 +162,25 @@ function createWindow() {
 		});
 	});
 
+	ipcMain.on("restart-required", () => {
+		createModal("Restart Required", "Please restart Blockyfish to apply changes", "../icons/png/64x64.png", true, () => {
+			app.relaunch();
+			app.exit();
+		});
+	});
+
 	registerRedirects();
 	registerExternalLinkHandler();
 }
 
-app.on("second-instance", (_event, commandLine) => {
+app.on("second-instance", (event, commandLine) => {
 	if (win) {
 		if (win.isMinimized()) win.restore();
 		win.focus();
 	}
 	// windows deeplink handling
-	console.log(commandLine.pop().slice(0, -1));
-	dialog.showErrorBox("Welcome Back", commandLine.pop().slice(0, -1));
+	// console.log(commandLine.pop().slice(0, -1));
+	// dialog.showErrorBox("Welcome Back", commandLine.pop().slice(0, -1));
 });
 
 // darwin & linux deeplink handling
@@ -196,7 +213,7 @@ function registerRedirects() {
 				urls: ["*://*.deeeep.io/assets/animations/*"],
 				types: ["main_frame", "sub_frame", "stylesheet", "script", "image", "object", "xmlhttprequest", "other"]
 			},
-			genericRedirectHandler(/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/assets\/animations/, "https://hacked-doc-assets.netlify.app/images/default/animations", false)
+			genericRedirectHandler(/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/assets\/animations/, "https://the-doctorpus.github.io/doc-assets/images/default/animations", false)
 		);
 
 		// Animals
@@ -205,7 +222,7 @@ function registerRedirects() {
 				urls: ["*://*.deeeep.io/assets/characters/*"],
 				types: ["main_frame", "sub_frame", "stylesheet", "script", "image", "object", "xmlhttprequest", "other"]
 			},
-			genericRedirectHandler(/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/assets\/characters/, "https://hacked-doc-assets.netlify.app/images/characters", false)
+			genericRedirectHandler(/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/assets\/characters/, "https://the-doctorpus.github.io/doc-assets/images/characters", false)
 		);
 
 		// Spritesheet
@@ -214,7 +231,7 @@ function registerRedirects() {
 				urls: ["*://*.deeeep.io/assets/spritesheets/*"],
 				types: ["main_frame", "sub_frame", "stylesheet", "script", "image", "object", "xmlhttprequest", "other"]
 			},
-			genericRedirectHandler(/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/assets\/spritesheets/, "https://hacked-doc-assets.netlify.app/images/default/spritesheets", false)
+			genericRedirectHandler(/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/assets\/spritesheets/, "https://the-doctorpus.github.io/doc-assets/images/default/spritesheets", false)
 		);
 
 		// Map spritesheet
@@ -223,7 +240,7 @@ function registerRedirects() {
 				urls: ["*://*.deeeep.io/assets/packs/*"],
 				types: ["main_frame", "sub_frame", "stylesheet", "script", "image", "object", "xmlhttprequest", "other"]
 			},
-			genericRedirectHandler(/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/assets\/packs/, "https://hacked-doc-assets.netlify.app/images/default/mapmaker-asset-packs", false)
+			genericRedirectHandler(/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/assets\/packs/, "https://the-doctorpus.github.io/doc-assets/images/default/mapmaker-asset-packs", false)
 		);
 
 		// Misc image assets
@@ -232,7 +249,7 @@ function registerRedirects() {
 				urls: ["*://*.deeeep.io/img/*"],
 				types: ["main_frame", "sub_frame", "stylesheet", "script", "image", "object", "xmlhttprequest", "other"]
 			},
-			genericRedirectHandler(/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/img/, "https://hacked-doc-assets.netlify.app/images/img", false)
+			genericRedirectHandler(/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/img/, "https://the-doctorpus.github.io/doc-assets/images/img", false)
 		);
 
 		// Pets
@@ -241,7 +258,7 @@ function registerRedirects() {
 				urls: ["*://*.deeeep.io/custom/pets/*"],
 				types: ["main_frame", "sub_frame", "stylesheet", "script", "image", "object", "xmlhttprequest", "other"]
 			},
-			genericRedirectHandler(/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/custom\/pets/, "https://hacked-doc-assets.netlify.app/images/custom/pets", false)
+			genericRedirectHandler(/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/custom\/pets/, "https://the-doctorpus.github.io/doc-assets/images/custom/pets", false)
 		);
 
 		// Skins
@@ -250,7 +267,7 @@ function registerRedirects() {
 				urls: ["*://*.deeeep.io/assets/skins/*"],
 				types: ["main_frame", "sub_frame", "stylesheet", "script", "image", "object", "xmlhttprequest", "other"]
 			},
-			genericRedirectHandler(/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/assets\/skins/, "https://hacked-doc-assets.netlify.app/images/skans", false)
+			genericRedirectHandler(/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/assets\/skins/, "https://the-doctorpus.github.io/doc-assets/images/skans", false)
 		);
 
 		// Custom skins (from Creators Center)
@@ -259,7 +276,7 @@ function registerRedirects() {
 				urls: ["*://cdn.deeeep.io/custom/skins/*"],
 				types: ["main_frame", "sub_frame", "stylesheet", "script", "image", "object", "xmlhttprequest", "other"]
 			},
-			genericRedirectHandler(/https?:\/\/cdn\.deeeep\.io\/custom\/skins/, "https://hacked-doc-assets.netlify.app/images/skans/custom", "skin")
+			genericRedirectHandler(/https?:\/\/cdn\.deeeep\.io\/custom\/skins/, "https://the-doctorpus.github.io/doc-assets/images/skans/custom", "skin")
 		);
 	}
 

@@ -1,3 +1,6 @@
+const { ipcRenderer } = require("electron");
+const { setSettings, getSettings } = require("../store.js");
+
 window.blockyfish = new (require("../blockyfish.js").Blockyfish)(window);
 require("./events.js");
 
@@ -30,4 +33,42 @@ setInterval(() => {
 			el.remove();
 		});
 	}
+}, 100);
+
+window.blockyfish.addEventListener("settings-open", () => {
+	// Inject docassets toggle
+	const docassets = document.querySelector("#pane-0 > form > div.el-form-item:nth-child(3)").cloneNode(true);
+	docassets.setAttribute("id", "docassets-toggle");
+	document.querySelector("#pane-0 > form").appendChild(docassets);
+	document.querySelector("#docassets-toggle > div.el-form-item__label").innerText = "Docassets";
+	document.querySelector("#docassets-toggle > div.el-form-item__content > span.notes").innerText = "Makes the game take on a different, more cartoony look";
+	if (getSettings("docassets")) {
+		document.querySelector("#docassets-toggle input.el-checkbox__original").checked = true;
+		document.querySelector("#docassets-toggle label.el-checkbox").classList.add("is-checked");
+		document.querySelector("#docassets-toggle span.el-checkbox__input").classList.add("is-checked");
+	} else {
+		document.querySelector("#docassets-toggle input.el-checkbox__original").checked = false;
+		document.querySelector("#docassets-toggle label.el-checkbox").classList.remove("is-checked");
+		document.querySelector("#docassets-toggle span.el-checkbox__input").classList.remove("is-checked");
+	}
+	document.querySelector("#docassets-toggle > div.el-form-item__content span.el-checkbox__inner").addEventListener("click", () => {
+		setTimeout(() => {
+			const enabled = document.querySelector("#docassets-toggle input.el-checkbox__original").checked;
+			var c = document.querySelector("#docassets-toggle label.el-checkbox");
+			var i = document.querySelector("#docassets-toggle span.el-checkbox__input");
+			if (enabled) {
+				c.classList.add("is-checked");
+				i.classList.add("is-checked");
+			} else {
+				c.classList.remove("is-checked");
+				i.classList.remove("is-checked");
+			}
+			setSettings("docassets", enabled);
+			document.querySelector("#docassets-toggle input.el-checkbox__original").style.pointerEvents = "none";
+			setTimeout(() => {
+				ipcRenderer.send("restart-required");
+				document.querySelector("#docassets-toggle input.el-checkbox__original").style.pointerEvents = "";
+			}, 200);
+		}, 10);
+	});
 });
