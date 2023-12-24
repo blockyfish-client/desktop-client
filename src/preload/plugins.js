@@ -185,19 +185,34 @@ button.small-x {
 .plugin-action-button.download:hover {
 	background: #409eff !important;
 }
+.plugin-action-button.update:hover {
+	background: #d97706 !important;
+}
 `;
 
-function createPluginBox(name, description, author, version, hasSettings, online) {
+function createPluginBox(name, description, author, version, hasSettings, online, updatable) {
 	var html = document.createElement("div");
 	html.id = name.split(" ").join("_").toLowerCase();
 	html.classList.add("plugin-item", "flex-row");
 	html.style.justifyContent = "space-between";
-	const sw = `<div class="switch">
+
+	// For installed plugins
+	// Update button
+	const ub = `<button id="${name.split(" ").join("_").toLowerCase() + "_update_button"}" class="plugin-action-button update">
+	<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
+		<path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
+		<path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3M3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9z"/>
+	</svg>
+</button>`;
+	const sw = `${updatable ? ub : ""}
+	<div class="switch" style="margin-left: 0.5rem;">
 		<input
 			type="checkbox"
 			id="${name.split(" ").join("_").toLowerCase() + "_switch"}"
 		/><label for="${name.split(" ").join("_").toLowerCase() + "_switch"}"></label>
 	</div>`;
+
+	// For online plugins
 	const db = `<button id="${name.split(" ").join("_").toLowerCase() + "_download_button"}" class="plugin-action-button download">
 	<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
 		<path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
@@ -209,7 +224,7 @@ function createPluginBox(name, description, author, version, hasSettings, online
 	<h2 style="font-size: large;">${name} <span style="font-size: small; color: #ccc;">${version}</span></h2>
 	<p style="font-size: small; color: #ddd;">${description}<br>Made by ${author}</p>
 </div>
-<div>
+<div style="display: flex; flex-direction: row; gap: 0.5rem; align-items: center">
 	${online ? db : sw}
 </div>
 	`;
@@ -273,6 +288,7 @@ pluginIcon.setAttribute("fill", "currentColor");
 	window.loadedPlugins = new Set();
 	window.allPlugins = new Set();
 	window.onlinePlugins = new Set();
+	window.updatablePlugins = new Set();
 	window.plugins = await getPlugins();
 	window.remotePlugins = await getRemotePlugins();
 
@@ -290,14 +306,19 @@ pluginIcon.setAttribute("fill", "currentColor");
 			}
 		} catch {}
 	});
-	var pluginIds = [];
+	var installedPlugins = [];
 	window.allPlugins.forEach((plugin) => {
-		pluginIds.push(plugin.id);
+		installedPlugins.push({
+			id: plugin.id,
+			version: plugin.versionNumber
+		});
 	});
 	window.remotePlugins.forEach((plugin) => {
 		try {
-			if (!pluginIds.includes(plugin.id)) {
+			if (!installedPlugins.find((p) => p.id == plugin.id)) {
 				window.onlinePlugins.add(plugin);
+			} else if (installedPlugins.find((p) => p.version < plugin.versionNumber)) {
+				window.updatablePlugins.add(plugin);
 			}
 		} catch {}
 	});
@@ -309,7 +330,8 @@ plugin_button.addEventListener("click", async () => {
 
 	window.allPlugins.forEach((plugin) => {
 		try {
-			document.querySelector(".plugin-list").appendChild(createPluginBox(plugin.name, plugin.description, plugin.author, plugin.version, false, false));
+			var updatable = window.updatablePlugins.has(plugin.id);
+			document.querySelector(".plugin-list").appendChild(createPluginBox(plugin.name, plugin.description, plugin.author, plugin.version, false, false, updatable));
 			var ts = document.querySelector(`.plugin-list input#${plugin.name.split(" ").join("_").toLowerCase() + "_switch"}[type="checkbox"]`);
 			if (getSettings("plugins." + plugin.name.split(" ").join("_").toLowerCase() + ".enabled")) {
 				ts.setAttribute("checked", null);
@@ -323,11 +345,11 @@ plugin_button.addEventListener("click", async () => {
 	});
 	window.onlinePlugins.forEach((plugin) => {
 		try {
-			document.querySelector(".plugin-list").appendChild(createPluginBox(plugin.name, plugin.description, plugin.author, plugin.version, false, true));
+			document.querySelector(".plugin-list").appendChild(createPluginBox(plugin.name, plugin.description, plugin.author, plugin.version, false, true, false));
 			var db = document.querySelector(`.plugin-list button#${plugin.name.split(" ").join("_").toLowerCase() + "_download_button"}`);
 			db.addEventListener("click", async (e) => {
 				e.target.setAttribute("disabled", "true");
-				e.target.parentElement.parentElement.innerHTML = createPluginBox(plugin.name, plugin.description, plugin.author, plugin.version, false, false).innerHTML;
+				e.target.parentElement.parentElement.innerHTML = createPluginBox(plugin.name, plugin.description, plugin.author, plugin.version, false, false, false).innerHTML;
 			});
 		} catch {}
 	});
