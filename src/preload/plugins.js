@@ -277,7 +277,7 @@ function createPluginsModal() {
 
 	document.querySelectorAll(".plugin-modal-box .plugin-folder-open").forEach((el) => {
 		el.addEventListener("click", () => {
-			shell.openPath(path.join(app.getPath("userData"), "plugins"));
+			ipcRenderer.send("open-plugins-folder");
 		});
 	});
 }

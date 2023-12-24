@@ -28,7 +28,7 @@ var modal;
 function createModal(title, text, img, themed, onConfirm) {
 	modal = new BrowserWindow({
 		width: 530,
-		height: 250,
+		height: 360,
 		resizable: false,
 		frame: false,
 		icon: platform == "darwin" ? path.join(__dirname, "icons", "icon.icns") : path.join(__dirname, "icons", "128x128.png"),
@@ -62,18 +62,12 @@ function createModal(title, text, img, themed, onConfirm) {
 	params.push(titleUri, textUri, imgUri, themedUri);
 	modalUrl += "?" + params.join("&");
 	modal.loadURL(modalUrl);
-	ipcMain.on("cancel", () => {
+	ipcMain.once("modal-action", (e, args) => {
 		if (modal != null) {
 			modal.destroy();
 			modal = null;
 		}
-	});
-	ipcMain.on("confirm", () => {
-		if (modal != null) {
-			modal.destroy();
-			modal = null;
-		}
-		onConfirm();
+		if (args[0] == "confirm") onConfirm();
 	});
 }
 
@@ -166,6 +160,12 @@ function createWindow() {
 		createModal("Restart Required", "Please restart Blockyfish to apply changes", "../icons/64x64.png", true, () => {
 			app.relaunch();
 			app.exit();
+		});
+	});
+
+	ipcMain.on("open-plugins-folder", () => {
+		createModal("Open Plugins Folder", "Installing unofficial plugins could give other people access to your account.", "../icons/64x64.png", true, () => {
+			shell.openPath(path.join(app.getPath("userData"), "plugins"));
 		});
 	});
 

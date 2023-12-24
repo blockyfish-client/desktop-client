@@ -211,12 +211,12 @@
 
 			document.querySelectorAll(".modal-close").forEach((el) => {
 				el.addEventListener("click", () => {
-					ipcRenderer.send("cancel");
+					ipcRenderer.send("modal-action", ["cancel"]);
 				});
 			});
 			document.querySelectorAll(".modal-confirm").forEach((el) => {
 				el.addEventListener("click", () => {
-					ipcRenderer.send("confirm");
+					ipcRenderer.send("modal-action", ["confirm"]);
 				});
 			});
 		</script>
