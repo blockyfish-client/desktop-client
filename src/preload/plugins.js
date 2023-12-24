@@ -248,7 +248,7 @@ function createPluginsModal() {
 	plugin_modal.innerHTML = `
 	<div class="plugin-modal-box flex-column">
 		<div class="plugin-modal-header flex-row">
-			<p id="title">Plugins</p>
+			<p id="title">Plu<span class="plugin-folder-open">g</span>ins</p>
 			<button class="plugin-modal-close small-x flex-row">
 				<svg width="1.125em" height="1.125em" viewBox="0 0 24 24" fill="gray">
 					<path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"></path>
@@ -262,7 +262,6 @@ function createPluginsModal() {
 		</div>
 		<div class="plugin-modal-actions">
 			<button class="secondary plugin-modal-close">Close</button>
-			<button class="primary plugin-folder-open">Open plugins folder</button>
 		</div>
 	</div>
 	`;
