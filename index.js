@@ -263,15 +263,6 @@ function registerRedirects() {
 		);
 	}
 
-	// Script injector
-	// enhancedSession.webRequest.onBeforeRequest(
-	// 	{
-	// 		urls: ["*://*.deeeep.io/assets/*.js"],
-	// 		types: ["script"]
-	// 	},
-	// 	genericRedirectHandler(/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/assets/, "https://hacked-doc-assets.netlify.app/images/misc", false)
-	// );
-
 	if (getSettings("adblock")) {
 		// Adblock
 		enhancedSession.webRequest.onBeforeRequest(
