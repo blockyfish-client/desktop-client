@@ -5,6 +5,9 @@ const path = require("path");
 const config = require("../../config.json");
 
 const { setSettings, getSettings } = require("../store.js");
+const { ipcRenderer } = require("electron");
+
+var modified = false;
 
 const plugins_css = document.createElement("style");
 document.querySelector("body").appendChild(plugins_css);
@@ -268,6 +271,7 @@ function createPluginsModal() {
 
 	document.querySelectorAll(".plugin-modal-box .plugin-modal-close").forEach((el) => {
 		el.addEventListener("click", () => {
+			if (modified) ipcRenderer.send("restart-required");
 			plugin_modal.remove();
 		});
 	});
@@ -304,6 +308,7 @@ pluginIcon.setAttribute("fill", "currentColor");
 	window.plugins.forEach((plugin) => {
 		try {
 			const module = require(path.join(app.getPath("userData"), "plugins", plugin));
+			module.fn = plugin;
 			if (window.loadedPlugins.has(module)) {
 				return;
 			} else if (getSettings("plugins." + module.name.split(" ").join("_").toLowerCase() + ".enabled")) {
@@ -352,10 +357,25 @@ function renderPluginList() {
 				ts.removeAttribute("checked");
 			}
 			ts.addEventListener("change", (e) => {
+				modified = true;
 				setSettings("plugins." + plugin.name.split(" ").join("_").toLowerCase() + ".enabled", e.target.checked);
 			});
 			var rb = document.querySelector(`.plugin-list button#${plugin.name.split(" ").join("_").toLowerCase() + "_delete_button"}`);
-			rb.addEventListener("click", (e) => {
+			rb.addEventListener("click", async (e) => {
+				modified = true;
+				if (!plugin.fn) {
+					try {
+						var temp_fn = "";
+						window.remotePlugins.forEach((e) => {
+							console.log(e.name);
+							if (e.name == plugin.name) temp_fn = e.url.split("/").pop();
+						});
+						if (temp_fn != "") {
+							plugin.fn = temp_fn;
+						}
+					} catch {}
+				}
+				await deletePlugin(plugin.fn);
 				window.allPlugins.delete(plugin);
 				window.onlinePlugins.add(plugin);
 				renderPluginList();
@@ -366,7 +386,20 @@ function renderPluginList() {
 		try {
 			document.querySelector(".plugin-list").appendChild(createPluginBox(plugin.name, plugin.description, plugin.author, plugin.version, false, true, false));
 			var db = document.querySelector(`.plugin-list button#${plugin.name.split(" ").join("_").toLowerCase() + "_download_button"}`);
-			db.addEventListener("click", (e) => {
+			db.addEventListener("click", async (e) => {
+				modified = true;
+				if (!plugin.url) {
+					try {
+						var temp_url = "";
+						window.remotePlugins.forEach((e) => {
+							if (e.name == plugin.name) temp_url = e.url;
+						});
+						if (temp_url != "") {
+							plugin.url = temp_url;
+						}
+					} catch {}
+				}
+				await downloadPlugin(`${config.remoteEndpoint}/plugins${plugin.url}`);
 				window.onlinePlugins.delete(plugin);
 				window.allPlugins.add(plugin);
 				renderPluginList();
@@ -399,5 +432,21 @@ function getRemotePlugins() {
 		fetch(`${config.remoteEndpoint}/plugins/plugins.json`)
 			.then((r) => resolve(r.json()))
 			.catch(() => resolve([]));
+	});
+}
+
+function downloadPlugin(url) {
+	return new Promise(async (resolve) => {
+		plugin = await (await fetch(url)).text();
+		const fn = url.split("/").pop();
+		fs.writeFileSync(path.join(app.getPath("userData"), "plugins", fn), plugin);
+		resolve(plugin);
+	});
+}
+
+function deletePlugin(fn) {
+	return new Promise((resolve) => {
+		fs.rmSync(path.join(app.getPath("userData"), "plugins", fn));
+		resolve();
 	});
 }
