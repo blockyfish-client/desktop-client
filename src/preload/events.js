@@ -1,44 +1,28 @@
-window.bfe = {};
+if (!window.bfe) {
+	window.bfe = {};
+}
 
 // GAME UI LISTENERS
-// game-load
-// first-game-load
 // death
-window.bfe.firstLoad = true;
+window.bfe.deathScreenObserving = false;
 document.querySelector("button.play").addEventListener("click", () => {
 	window.blockyfish.emit("play-button-click");
-	if (document.querySelector(".playing")) return;
-	const playObserver = new MutationObserver(() => {
-		if (document.querySelector(".playing")) {
-			playObserver.disconnect();
-			if (window.bfe.firstLoad) {
-				window.blockyfish.emit("first-game-load");
-			} else {
-				window.blockyfish.emit("game-load");
-			}
-			window.bfe.firstLoad = false;
-
-			// death event
-			const deathScreenObserver = new MutationObserver(() => {
-				if (document.querySelector(".death-screen-container")) {
-					deathScreenObserver.disconnect();
-					window.blockyfish.emit("death");
-				}
-			});
-			deathScreenObserver.observe(document.getElementById("app"), {
-				attributes: false,
-				childList: true,
-				characterData: false,
-				subtree: true
-			});
+	// death event
+	if (window.bfe.deathScreenObserving) return;
+	const deathScreenObserver = new MutationObserver(() => {
+		if (document.querySelector(".death-screen-container")) {
+			deathScreenObserver.disconnect();
+			window.bfe.deathScreenObserving = false;
+			window.blockyfish.emit("death");
 		}
 	});
-	playObserver.observe(document.getElementById("app"), {
+	deathScreenObserver.observe(document.getElementById("app"), {
 		attributes: false,
 		childList: true,
 		characterData: false,
 		subtree: true
 	});
+	window.bfe.deathScreenObserving = true;
 });
 
 // MODAL LISTENERS

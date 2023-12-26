@@ -1,5 +1,9 @@
 const old = Function.prototype.bind;
 let game;
+if (!window.bfe) {
+	window.bfe = {};
+}
+window.bfe.firstLoad = true;
 const bind = function (...args) {
 	if (this == console.log) {
 		return old.apply(this, args);
@@ -12,6 +16,18 @@ const bind = function (...args) {
 		console.log("%c[TheJ Injector] Logged game object.", "color: #ff6969; font-size:125%");
 		game = args[0];
 		window.game = game;
+		setTimeout(() => {
+			try {
+				// game-load event
+				// first-game-load event
+				if (window.bfe.firstLoad) {
+					window.blockyfish.emit("first-game-load");
+				} else {
+					window.blockyfish.emit("game-load");
+				}
+				window.bfe.firstLoad = false;
+			} catch {}
+		}, 100);
 	} else if (args[0] && Object.prototype.hasOwnProperty.call(args[0], "prepareUpload")) {
 		// GIF pfp upload patch injector
 		// Made by Pi
@@ -26,8 +42,6 @@ const bind = function (...args) {
 			args[0].createImgUrl = args[0].sourceImgUrl;
 			return opu.apply(this);
 		};
-		game = args[0];
-		window.game = game;
 	}
 	return old.apply(this, args);
 };
