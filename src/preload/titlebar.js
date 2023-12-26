@@ -162,11 +162,6 @@ BrowserWindow.getAllWindows().forEach((win) => {
 		document.querySelector("html").classList.remove("fullscreen");
 	});
 });
-window.addEventListener("keypress", (e) => {
-	if (e.key.toLowerCase() == "f11") {
-		document.querySelector("html").requestFullscreen();
-	}
-});
 document.getElementById("min-button").addEventListener("click", () => {
 	BrowserWindow.getFocusedWindow().minimize();
 });

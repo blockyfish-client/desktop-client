@@ -210,10 +210,10 @@ app.on("activate", () => {
 function registerFullscreenShortcuts(win, register) {
 	if (register) {
 		globalShortcut.register("F11", () => {
-			win.webContents.executeJavaScript(`if (document.fullscreen) {document.exitFullscreen()} else {document.querySelector("html").requestFullscreen()}`);
+			win.setFullScreen(!win.fullScreen);
 		});
 	} else {
-		globalShortcut.unregister("F11");
+		globalShortcut.unregisterAll();
 	}
 }
 
