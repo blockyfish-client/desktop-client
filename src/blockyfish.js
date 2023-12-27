@@ -16,18 +16,16 @@ const bind = function (...args) {
 		console.log("%c[TheJ Injector] Logged game object.", "color: #ff6969; font-size:125%");
 		game = args[0];
 		window.game = game;
-		setTimeout(() => {
-			try {
-				// game-load event
-				// first-game-load event
-				if (window.bfe.firstLoad) {
-					window.blockyfish.emit("first-game-load");
-				} else {
-					window.blockyfish.emit("game-load");
-				}
-				window.bfe.firstLoad = false;
-			} catch {}
-		}, 100);
+		try {
+			// game-load event
+			// first-game-load event
+			if (window.bfe.firstLoad) {
+				window.blockyfish.emit("first-game-load");
+			} else {
+				window.blockyfish.emit("game-load");
+			}
+			window.bfe.firstLoad = false;
+		} catch {}
 	} else if (args[0] && Object.prototype.hasOwnProperty.call(args[0], "prepareUpload")) {
 		// GIF pfp upload patch injector
 		// Made by Pi
