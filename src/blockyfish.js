@@ -58,7 +58,7 @@ class Blockyfish {
 		};
 		// makes it harder to tamper with blockyfish info
 		this.config = window.bfi;
-		window.bfi = undefined;
+		delete window.bfi;
 		this.Animals = {
 			0: "fish",
 			1: "crab",
