@@ -9,6 +9,10 @@ const store = new Store({
 			type: "boolean",
 			default: true
 		},
+		apiCrashWorkaround: {
+			type: "boolean",
+			default: false
+		},
 		plugins: {
 			type: "object",
 			patternProperties: {

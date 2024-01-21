@@ -1,10 +1,13 @@
-const { BrowserWindow, app, shell, ipcMain, session, Menu, dialog, globalShortcut } = require("electron");
+const { BrowserWindow, app, shell, ipcMain, session, Menu, dialog, globalShortcut, protocol } = require("electron");
 const path = require("path");
 require("@electron/remote/main").initialize();
 const os = require("os");
 const platform = os.platform();
 
+const config = require("./config.json");
+
 const { getSettings, setSettings } = require("./src/store.js");
+const UrlPattern = require("url-pattern");
 
 const gotTheLock = app.requestSingleInstanceLock();
 
@@ -37,7 +40,8 @@ function createModal(title, text, img, themed, onConfirm) {
 			nodeIntegration: true,
 			contextIsolation: false,
 			enableRemoteModule: true,
-			sandbox: false
+			sandbox: false,
+			webSecurity: false
 		},
 		parent: win,
 		modal: true
@@ -321,6 +325,39 @@ function registerRedirects() {
 				});
 			}
 		);
+	}
+
+	if (getSettings("apiCrashWorkaround")) {
+		const redirectedApiSpoof = [
+			"*://apibeta.deeeep.io/animals*",
+			"*://apibeta.deeeep.io/auth/timezone*",
+			"*://apibeta.deeeep.io/auth/me*",
+			"*://apibeta.deeeep.io/hosts*",
+			"*://apibeta.deeeep.io/maps/11953/packs*",
+			"*://apibeta.deeeep.io/regions*",
+			"*://apibeta.deeeep.io/servers/l*"
+		];
+		enhancedSession.webRequest.onBeforeRequest(
+			{
+				urls: redirectedApiSpoof
+			},
+			(details, callback) => {
+				callback({
+					cancel: false,
+					redirectURL: details.url.replace("https://apibeta.deeeep.io", "apispoof://api/apispoof")
+				});
+			}
+		);
+		protocol.interceptBufferProtocol("apispoof", (request, callback) => {
+			const willRedirect = ["animals", "auth/timezone", "auth/me", "hosts", "maps/11953/packs", "regions", "servers/l"]
+				.map((value) => request.url.includes("apispoof://api/apispoof/" + value))
+				.reduce((a, b) => a || b);
+			if (!willRedirect) return;
+			const newUrl = request.url.replace("apispoof:/", config.remoteEndpoint);
+			fetch(newUrl)
+				.then((r) => r.text())
+				.then((t) => callback(new Buffer(t)));
+		});
 	}
 }
 
