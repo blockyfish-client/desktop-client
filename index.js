@@ -330,12 +330,20 @@ function registerRedirects() {
 	if (getSettings("apiCrashWorkaround")) {
 		const redirectedApiSpoof = [
 			"*://apibeta.deeeep.io/animals*",
-			"*://apibeta.deeeep.io/auth/timezone*",
 			"*://apibeta.deeeep.io/auth/me*",
+			"*://apibeta.deeeep.io/auth/timezone*",
+			"*://apibeta.deeeep.io/forumPosts/*",
 			"*://apibeta.deeeep.io/hosts*",
-			"*://apibeta.deeeep.io/maps/11953/packs*",
+			"*://apibeta.deeeep.io/leaderboard*",
+			"*://apibeta.deeeep.io/maps/*",
+			"*://apibeta.deeeep.io/playHistories/u/*",
 			"*://apibeta.deeeep.io/regions*",
-			"*://apibeta.deeeep.io/servers/l*"
+			"*://apibeta.deeeep.io/servers/l*",
+			"*://apibeta.deeeep.io/socialNetworks/u/*",
+			"*://apibeta.deeeep.io/twitch*",
+			"*://apibeta.deeeep.io/users/*",
+			"*://apibeta.deeeep.io/userStats/*",
+			"*://apibeta.deeeep.io/videos*"
 		];
 		enhancedSession.webRequest.onBeforeRequest(
 			{
@@ -349,10 +357,6 @@ function registerRedirects() {
 			}
 		);
 		protocol.interceptBufferProtocol("apispoof", (request, callback) => {
-			const willRedirect = ["animals", "auth/timezone", "auth/me", "hosts", "maps/11953/packs", "regions", "servers/l"]
-				.map((value) => request.url.includes("apispoof://api/apispoof/" + value))
-				.reduce((a, b) => a || b);
-			if (!willRedirect) return;
 			const newUrl = request.url.replace("apispoof:/", config.remoteEndpoint);
 			fetch(newUrl)
 				.then((r) => r.text())
