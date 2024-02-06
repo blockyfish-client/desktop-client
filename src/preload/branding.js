@@ -6,11 +6,11 @@ require("./events.js");
 
 const brand_css = document.createElement("style");
 document.querySelector("body").appendChild(brand_css);
-brand_css.outerHTML = '<link rel="stylesheet" href="https://blockyfish.netlify.app/themes/branding.css">';
+brand_css.outerHTML = '<link rel="stylesheet" href="https://blockyfish.vercel.app/themes/branding.css">';
 
 const custom_css = document.createElement("style");
 document.querySelector("body").appendChild(custom_css);
-custom_css.outerHTML = '<link id="customcss" rel="stylesheet" href="https://blockyfish.netlify.app/themes/reefpenguin/theme.css">';
+custom_css.outerHTML = '<link id="customcss" rel="stylesheet" href="https://blockyfish.vercel.app/themes/reefpenguin/theme.css">';
 
 const adblock_css = document.createElement("style");
 document.querySelector("body").appendChild(adblock_css);
