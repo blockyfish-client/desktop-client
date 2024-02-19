@@ -43,7 +43,8 @@ function createModal(title, text, img, themed, onConfirm) {
 			enableRemoteModule: true,
 			sandbox: false,
 			webSecurity: false
-		}
+		},
+		modal: true
 	});
 	require("@electron/remote/main").enable(modal.webContents);
 
