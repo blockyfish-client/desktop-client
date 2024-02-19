@@ -34,7 +34,6 @@ function createModal(title, text, img, themed, onConfirm) {
 		height: 360,
 		resizable: false,
 		frame: false,
-		titleBarStyle: "hidden",
 		icon: platform == "darwin" ? path.join(__dirname, "src", "icons", "icon.icns") : path.join(__dirname, "src", "icons", "128x128.png"),
 		transparent: true,
 		webPreferences: {
@@ -83,7 +82,6 @@ function loadingWindow() {
 		height: 480,
 		resizable: false,
 		frame: false,
-		titleBarStyle: "hidden",
 		show: false,
 		icon: platform == "darwin" ? path.join(__dirname, "src", "icons", "icon.icns") : path.join(__dirname, "src", "icons", "128x128.png"),
 		alwaysOnTop: true,
