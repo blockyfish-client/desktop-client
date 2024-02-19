@@ -64,7 +64,7 @@ function createModal(title, text, img, themed, onConfirm) {
 	}
 	params.push(titleUri, textUri, imgUri, themedUri);
 	modalUrl += "?" + params.join("&");
-	modal.loadURL(modalUrl);
+	modal.loadURL((platform == "win32" ? "" : "file://") + modalUrl);
 	ipcMain.once("modal-action", (e, args) => {
 		if (modal != null) {
 			modal.destroy();
