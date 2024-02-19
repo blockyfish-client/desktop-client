@@ -23,6 +23,7 @@
 	],
 	"build": {
 		"appId": "com.pi.blockyfish",
+		"publish": "never",
 		"win": {
 			"target": "nsis"
 		},
