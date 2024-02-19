@@ -1,0 +1,87 @@
+name: Build and release
+
+on:
+    workflow_dispatch:
+        inputs:
+            version:
+                description: "Don't include the v"
+                required: true
+
+jobs:
+    windows-x64-release:
+        runs-on: windows-latest
+        steps:
+            - name: Git clone
+              uses: actions/checkout@v3
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 20
+
+            - name: Dependencies
+              run: |
+                  npm install
+
+            - name: Build and package
+              run: |
+                  npm run dist-win
+
+            - name: Upload artifacts
+              uses: actions/upload-artifact@v3
+              with:
+                  name: windows-x64
+                  path: |
+                      dist/blockyfish-client-win-${{github.event.inputs.version}}.exe
+
+    macos-universal-release:
+        runs-on: macos-latest
+        steps:
+            - name: Git clone
+              uses: actions/checkout@v3
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 20
+
+            - name: Dependencies
+              run: |
+                  npm install
+
+            - name: Build and package
+              run: |
+                  npm run dist-mac
+
+            - name: Upload artifacts
+              uses: actions/upload-artifact@v3
+              with:
+                  name: macos-x64
+                  path: |
+                      dist/blockyfish-client-mac-${{github.event.inputs.version}}.dmg
+
+    linux-x64-release:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Git clone
+              uses: actions/checkout@v3
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 20
+
+            - name: Dependencies
+              run: |
+                  npm install
+
+            - name: Build and package
+              run: |
+                  npm run dist-linux
+
+            - name: Upload artifacts
+              uses: actions/upload-artifact@v3
+              with:
+                  name: linux-x64
+                  path: |
+                      dist/blockyfish-client-linux-${{github.event.inputs.version}}.tar.xz

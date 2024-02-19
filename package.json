@@ -28,13 +28,25 @@
 		},
 		"nsis": {
 			"oneClick": true,
-			"perMachine": false
+			"perMachine": false,
+			"artifactName": "${name}-win-${version}.${ext}"
 		},
 		"mac": {
-			"target": "dmg"
+			"target": [
+				{
+					"target": "dmg",
+					"arch": [
+						"universal"
+					]
+				}
+			]
+		},
+		"dmg": {
+			"artifactName": "${name}-mac-${version}.${ext}"
 		},
 		"linux": {
-			"target": "tar.xz"
+			"target": "tar.xz",
+			"artifactName": "${name}-linux-${version}.${ext}"
 		}
 	},
 	"dependencies": {
