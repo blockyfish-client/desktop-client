@@ -9,9 +9,9 @@
 	"scripts": {
 		"start": "npx electron .",
 		"test": "npx electron . --testing=true",
-		"dist-win": "electron-builder -w",
-		"dist-mac": "electron-builder -m",
-		"dist-linux": "electron-builder -l",
+		"dist-win": "electron-builder -w -p never",
+		"dist-mac": "electron-builder -m -p never",
+		"dist-linux": "electron-builder -l -p never",
 		"postinstall": "electron-builder install-app-deps"
 	},
 	"author": "Pi",
@@ -23,7 +23,6 @@
 	],
 	"build": {
 		"appId": "com.pi.blockyfish",
-		"publish": "never",
 		"win": {
 			"target": "nsis"
 		},
