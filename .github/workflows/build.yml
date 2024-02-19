@@ -30,7 +30,7 @@ jobs:
             - name: Upload artifacts
               uses: actions/upload-artifact@v3
               with:
-                  name: blockyfish-client-win-x64-${{github.event.inputs.version}}.exe
+                  name: blockyfish-client-win-x64-${{github.event.inputs.version}}
                   path: |
                       dist/blockyfish-client-win-${{github.event.inputs.version}}.exe
 
@@ -56,7 +56,7 @@ jobs:
             - name: Upload artifacts
               uses: actions/upload-artifact@v3
               with:
-                  name: blockyfish-client-mac-universal-${{github.event.inputs.version}}.dmg
+                  name: blockyfish-client-mac-universal-${{github.event.inputs.version}}
                   path: |
                       dist/blockyfish-client-mac-${{github.event.inputs.version}}.dmg
 
@@ -82,6 +82,6 @@ jobs:
             - name: Upload artifacts
               uses: actions/upload-artifact@v3
               with:
-                  name: blockyfish-client-linux-x64-${{github.event.inputs.version}}.tar.xz
+                  name: blockyfish-client-linux-x64-${{github.event.inputs.version}}
                   path: |
                       dist/blockyfish-client-linux-${{github.event.inputs.version}}.tar.xz
