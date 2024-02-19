@@ -111,7 +111,6 @@ function createWindow() {
 			preload: path.join(__dirname, "src", "preload", "preload.js"),
 			sandbox: false
 		},
-		frame: false,
 		titleBarStyle: "hidden",
 		icon: platform == "darwin" ? path.join(__dirname, "src", "icons", "icon.icns") : path.join(__dirname, "src", "icons", "128x128.png"),
 		show: false
