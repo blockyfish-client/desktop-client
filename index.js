@@ -43,9 +43,7 @@ function createModal(title, text, img, themed, onConfirm) {
 			enableRemoteModule: true,
 			sandbox: false,
 			webSecurity: false
-		},
-		parent: win,
-		modal: true
+		}
 	});
 	require("@electron/remote/main").enable(modal.webContents);
 
@@ -153,6 +151,12 @@ function createWindow() {
 		} else {
 			win.show();
 			win.focus();
+		}
+	});
+
+	win.on("focus", () => {
+		if (modal) {
+			modal.focus();
 		}
 	});
 
