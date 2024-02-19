@@ -5,10 +5,14 @@
 	"description": "A custom desktop client for deeeep.io v4 with some improvements. Made by pi. ",
 	"main": "index.js",
 	"icon": "icons/128x128.png",
+	"homepage": "https://github.com/blockyfish-client/desktop-client",
 	"scripts": {
 		"start": "npx electron .",
 		"test": "npx electron . --testing=true",
-		"dist": "electron-builder"
+		"dist-win": "electron-builder -w",
+		"dist-mac": "electron-builder -m",
+		"dist-linux": "electron-builder -l",
+		"postinstall": "electron-builder install-app-deps"
 	},
 	"author": "Pi",
 	"license": "GPL-3.0",
@@ -25,6 +29,12 @@
 		"nsis": {
 			"oneClick": true,
 			"perMachine": false
+		},
+		"mac": {
+			"target": "dmg"
+		},
+		"linux": {
+			"target": "tar.xz"
 		}
 	},
 	"dependencies": {
@@ -32,7 +42,6 @@
 		"electron-better-web-request": "^1.0.1",
 		"electron-store": "^8.1.0",
 		"path": "^0.12.7",
-		"tslib": "^2.5.2",
 		"url-pattern": "^1.0.3"
 	},
 	"devDependencies": {
