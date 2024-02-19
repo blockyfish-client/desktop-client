@@ -42,8 +42,7 @@
 			]
 		},
 		"dmg": {
-			"artifactName": "${name}-mac-${version}.${ext}",
-			"backgroundColor": "#1f2937"
+			"artifactName": "${name}-mac-${version}.${ext}"
 		},
 		"linux": {
 			"target": "tar.xz",
