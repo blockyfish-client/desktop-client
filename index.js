@@ -35,7 +35,7 @@ function createModal(title, text, img, themed, onConfirm) {
 		resizable: false,
 		frame: false,
 		titleBarStyle: "hidden",
-		icon: platform == "darwin" ? path.join(__dirname, "icons", "icon.icns") : path.join(__dirname, "build", "icons", "128x128.png"),
+		icon: platform == "darwin" ? path.join(__dirname, "src", "icons", "icon.icns") : path.join(__dirname, "src", "icons", "128x128.png"),
 		transparent: true,
 		webPreferences: {
 			nodeIntegration: true,
@@ -86,7 +86,7 @@ function loadingWindow() {
 		frame: false,
 		titleBarStyle: "hidden",
 		show: false,
-		icon: platform == "darwin" ? path.join(__dirname, "icons", "icon.icns") : path.join(__dirname, "build", "icons", "128x128.png"),
+		icon: platform == "darwin" ? path.join(__dirname, "src", "icons", "icon.icns") : path.join(__dirname, "src", "icons", "128x128.png"),
 		alwaysOnTop: true,
 		transparent: true
 	});
@@ -113,7 +113,7 @@ function createWindow() {
 		},
 		frame: false,
 		titleBarStyle: "hidden",
-		icon: platform == "darwin" ? path.join(__dirname, "icons", "icon.icns") : path.join(__dirname, "build", "icons", "128x128.png"),
+		icon: platform == "darwin" ? path.join(__dirname, "src", "icons", "icon.icns") : path.join(__dirname, "src", "icons", "128x128.png"),
 		show: false
 	});
 
@@ -158,20 +158,20 @@ function createWindow() {
 	});
 
 	ipcMain.on("close", () => {
-		createModal("Leave Blockyfish", "Are you sure you want to exit Blockyfish", "../build/icons/64x64.png", true, () => {
+		createModal("Leave Blockyfish", "Are you sure you want to exit Blockyfish", "./icons/64x64.png", true, () => {
 			win.close();
 		});
 	});
 
 	ipcMain.on("restart-required", () => {
-		createModal("Restart Required", "Please restart Blockyfish to apply changes", "../build/icons/64x64.png", true, () => {
+		createModal("Restart Required", "Please restart Blockyfish to apply changes", "./icons/64x64.png", true, () => {
 			app.relaunch();
 			app.exit();
 		});
 	});
 
 	ipcMain.on("open-plugins-folder", () => {
-		createModal("Open Plugins Folder", "Installing unofficial plugins could give other people access to your account.", "../build/icons/64x64.png", true, () => {
+		createModal("Open Plugins Folder", "Installing unofficial plugins could give other people access to your account.", "./icons/64x64.png", true, () => {
 			shell.openPath(path.join(app.getPath("userData"), "plugins"));
 		});
 	});
@@ -382,7 +382,7 @@ function registerExternalLinkHandler() {
 			return {
 				action: "allow",
 				overrideBrowserWindowOptions: {
-					icon: platform == "darwin" ? path.join(__dirname, "icons", "icon.icns") : path.join(__dirname, "build", "icons", "128x128.png")
+					icon: platform == "darwin" ? path.join(__dirname, "src", "icons", "icon.icns") : path.join(__dirname, "src", "icons", "128x128.png")
 				}
 			};
 		}
