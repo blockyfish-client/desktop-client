@@ -12,10 +12,10 @@ jobs:
         runs-on: windows-latest
         steps:
             - name: Git clone
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
 
             - name: Setup Node.js
-              uses: actions/setup-node@v3
+              uses: actions/setup-node@v4
               with:
                   node-version: 20
 
@@ -28,7 +28,7 @@ jobs:
                   npm run dist-win
 
             - name: Upload artifacts
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               with:
                   name: blockyfish-client-win-x64-${{github.event.inputs.version}}
                   path: |
@@ -38,10 +38,10 @@ jobs:
         runs-on: macos-latest
         steps:
             - name: Git clone
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
 
             - name: Setup Node.js
-              uses: actions/setup-node@v3
+              uses: actions/setup-node@v4
               with:
                   node-version: 20
 
@@ -54,7 +54,7 @@ jobs:
                   npm run dist-mac
 
             - name: Upload artifacts
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               with:
                   name: blockyfish-client-mac-universal-${{github.event.inputs.version}}
                   path: |
@@ -64,10 +64,10 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Git clone
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
 
             - name: Setup Node.js
-              uses: actions/setup-node@v3
+              uses: actions/setup-node@v4
               with:
                   node-version: 20
 
@@ -80,7 +80,7 @@ jobs:
                   npm run dist-linux
 
             - name: Upload artifacts
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               with:
                   name: blockyfish-client-linux-x64-${{github.event.inputs.version}}
                   path: |
