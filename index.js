@@ -1,4 +1,14 @@
-const { BrowserWindow, app, shell, ipcMain, session, Menu, dialog, globalShortcut, protocol } = require("electron");
+const {
+	BrowserWindow,
+	app,
+	shell,
+	ipcMain,
+	session,
+	Menu,
+	dialog,
+	globalShortcut,
+	protocol,
+} = require("electron");
 const path = require("path");
 require("@electron/remote/main").initialize();
 const os = require("os");
@@ -19,7 +29,9 @@ app.commandLine.appendSwitch("lang", "en-US");
 
 if (process.defaultApp) {
 	if (process.argv.length >= 2) {
-		app.setAsDefaultProtocolClient("deeeepio", process.execPath, [path.resolve(process.argv[1])]);
+		app.setAsDefaultProtocolClient("deeeepio", process.execPath, [
+			path.resolve(process.argv[1]),
+		]);
 	}
 } else {
 	app.setAsDefaultProtocolClient("deeeepio");
@@ -34,16 +46,19 @@ function createModal(title, text, img, themed, onConfirm) {
 		height: 360,
 		resizable: false,
 		frame: false,
-		icon: platform == "darwin" ? path.join(__dirname, "src", "icons", "icon.icns") : path.join(__dirname, "src", "icons", "128x128.png"),
+		icon:
+			platform == "darwin"
+				? path.join(__dirname, "src", "icons", "icon.icns")
+				: path.join(__dirname, "src", "icons", "128x128.png"),
 		transparent: true,
 		webPreferences: {
 			nodeIntegration: true,
 			contextIsolation: false,
 			enableRemoteModule: true,
 			sandbox: false,
-			webSecurity: false
+			webSecurity: false,
 		},
-		modal: true
+		modal: true,
 	});
 	require("@electron/remote/main").enable(modal.webContents);
 
@@ -83,9 +98,12 @@ function loadingWindow() {
 		resizable: false,
 		frame: false,
 		show: false,
-		icon: platform == "darwin" ? path.join(__dirname, "src", "icons", "icon.icns") : path.join(__dirname, "src", "icons", "128x128.png"),
+		icon:
+			platform == "darwin"
+				? path.join(__dirname, "src", "icons", "icon.icns")
+				: path.join(__dirname, "src", "icons", "128x128.png"),
 		alwaysOnTop: true,
-		transparent: true
+		transparent: true,
 	});
 	loadingWin.loadFile(path.join(__dirname, "src", "loading.html"));
 	loadingWin.show();
@@ -106,11 +124,14 @@ function createWindow() {
 			enableRemoteModule: true,
 			// devTools: false,
 			preload: path.join(__dirname, "src", "preload", "preload.js"),
-			sandbox: false
+			sandbox: false,
 		},
 		frame: false,
-		icon: platform == "darwin" ? path.join(__dirname, "src", "icons", "icon.icns") : path.join(__dirname, "src", "icons", "128x128.png"),
-		show: false
+		icon:
+			platform == "darwin"
+				? path.join(__dirname, "src", "icons", "icon.icns")
+				: path.join(__dirname, "src", "icons", "128x128.png"),
+		show: false,
 	});
 
 	require("@electron/remote/main").enable(win.webContents);
@@ -160,22 +181,40 @@ function createWindow() {
 	});
 
 	ipcMain.on("close", () => {
-		createModal("Leave Blockyfish", "Are you sure you want to exit Blockyfish", "./icons/64x64.png", true, () => {
-			win.close();
-		});
+		createModal(
+			"Leave Blockyfish",
+			"Are you sure you want to exit Blockyfish",
+			"./icons/64x64.png",
+			true,
+			() => {
+				win.close();
+			}
+		);
 	});
 
 	ipcMain.on("restart-required", () => {
-		createModal("Restart Required", "Please restart Blockyfish to apply changes", "./icons/64x64.png", true, () => {
-			app.relaunch();
-			app.exit();
-		});
+		createModal(
+			"Restart Required",
+			"Please restart Blockyfish to apply changes",
+			"./icons/64x64.png",
+			true,
+			() => {
+				app.relaunch();
+				app.exit();
+			}
+		);
 	});
 
 	ipcMain.on("open-plugins-folder", () => {
-		createModal("Open Plugins Folder", "Installing unofficial plugins could give other people access to your account.", "./icons/64x64.png", true, () => {
-			shell.openPath(path.join(app.getPath("userData"), "plugins"));
-		});
+		createModal(
+			"Open Plugins Folder",
+			"Installing unofficial plugins could give other people access to your account.",
+			"./icons/64x64.png",
+			true,
+			() => {
+				shell.openPath(path.join(app.getPath("userData"), "plugins"));
+			}
+		);
 	});
 
 	win.on("focus", () => {
@@ -201,9 +240,13 @@ app.on("second-instance", (event, commandLine) => {
 
 // Google sign-in
 app.on("browser-window-created", (_e, win) => {
-	win.webContents.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36");
+	win.webContents.setUserAgent(
+		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+	);
 	win.webContents.on("did-create-window", (childWin) => {
-		childWin.webContents.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36");
+		childWin.webContents.setUserAgent(
+			"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+		);
 	});
 });
 
@@ -236,7 +279,9 @@ function registerFullscreenShortcuts(win, register) {
 
 function registerRedirects() {
 	const { genericRedirectHandler } = require("./src/redirect.js");
-	const { default: enhanceWebRequest } = require("electron-better-web-request");
+	const {
+		default: enhanceWebRequest,
+	} = require("electron-better-web-request");
 
 	var enhancedSession = enhanceWebRequest(session.defaultSession);
 
@@ -245,72 +290,176 @@ function registerRedirects() {
 		enhancedSession.webRequest.onBeforeRequest(
 			{
 				urls: ["*://*.deeeep.io/assets/animations/*"],
-				types: ["main_frame", "sub_frame", "stylesheet", "script", "image", "object", "xmlhttprequest", "other"]
+				types: [
+					"main_frame",
+					"sub_frame",
+					"stylesheet",
+					"script",
+					"image",
+					"object",
+					"xmlhttprequest",
+					"other",
+				],
 			},
-			genericRedirectHandler(/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/assets\/animations/, "https://the-doctorpus.github.io/doc-assets/images/default/animations", false)
+			genericRedirectHandler(
+				/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/assets\/animations/,
+				"https://the-doctorpus.github.io/doc-assets/images/default/animations",
+				false
+			)
 		);
 
 		// Animals
 		enhancedSession.webRequest.onBeforeRequest(
 			{
 				urls: ["*://*.deeeep.io/assets/characters/*"],
-				types: ["main_frame", "sub_frame", "stylesheet", "script", "image", "object", "xmlhttprequest", "other"]
+				types: [
+					"main_frame",
+					"sub_frame",
+					"stylesheet",
+					"script",
+					"image",
+					"object",
+					"xmlhttprequest",
+					"other",
+				],
 			},
-			genericRedirectHandler(/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/assets\/characters/, "https://the-doctorpus.github.io/doc-assets/images/characters", false)
+			genericRedirectHandler(
+				/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/assets\/characters/,
+				"https://the-doctorpus.github.io/doc-assets/images/characters",
+				false
+			)
 		);
 
 		// Spritesheet
 		enhancedSession.webRequest.onBeforeRequest(
 			{
 				urls: ["*://*.deeeep.io/assets/spritesheets/*"],
-				types: ["main_frame", "sub_frame", "stylesheet", "script", "image", "object", "xmlhttprequest", "other"]
+				types: [
+					"main_frame",
+					"sub_frame",
+					"stylesheet",
+					"script",
+					"image",
+					"object",
+					"xmlhttprequest",
+					"other",
+				],
 			},
-			genericRedirectHandler(/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/assets\/spritesheets/, "https://the-doctorpus.github.io/doc-assets/images/default/spritesheets", false)
+			genericRedirectHandler(
+				/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/assets\/spritesheets/,
+				"https://the-doctorpus.github.io/doc-assets/images/default/spritesheets",
+				false
+			)
 		);
 
 		// Map spritesheet
 		enhancedSession.webRequest.onBeforeRequest(
 			{
 				urls: ["*://*.deeeep.io/assets/packs/*"],
-				types: ["main_frame", "sub_frame", "stylesheet", "script", "image", "object", "xmlhttprequest", "other"]
+				types: [
+					"main_frame",
+					"sub_frame",
+					"stylesheet",
+					"script",
+					"image",
+					"object",
+					"xmlhttprequest",
+					"other",
+				],
 			},
-			genericRedirectHandler(/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/assets\/packs/, "https://the-doctorpus.github.io/doc-assets/images/default/mapmaker-asset-packs", false)
+			genericRedirectHandler(
+				/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/assets\/packs/,
+				"https://the-doctorpus.github.io/doc-assets/images/default/mapmaker-asset-packs",
+				false
+			)
 		);
 
 		// Misc image assets
 		enhancedSession.webRequest.onBeforeRequest(
 			{
 				urls: ["*://*.deeeep.io/img/*"],
-				types: ["main_frame", "sub_frame", "stylesheet", "script", "image", "object", "xmlhttprequest", "other"]
+				types: [
+					"main_frame",
+					"sub_frame",
+					"stylesheet",
+					"script",
+					"image",
+					"object",
+					"xmlhttprequest",
+					"other",
+				],
 			},
-			genericRedirectHandler(/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/img/, "https://the-doctorpus.github.io/doc-assets/images/img", false)
+			genericRedirectHandler(
+				/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/img/,
+				"https://the-doctorpus.github.io/doc-assets/images/img",
+				false
+			)
 		);
 
 		// Pets
 		enhancedSession.webRequest.onBeforeRequest(
 			{
 				urls: ["*://*.deeeep.io/custom/pets/*"],
-				types: ["main_frame", "sub_frame", "stylesheet", "script", "image", "object", "xmlhttprequest", "other"]
+				types: [
+					"main_frame",
+					"sub_frame",
+					"stylesheet",
+					"script",
+					"image",
+					"object",
+					"xmlhttprequest",
+					"other",
+				],
 			},
-			genericRedirectHandler(/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/custom\/pets/, "https://the-doctorpus.github.io/doc-assets/images/custom/pets", false)
+			genericRedirectHandler(
+				/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/custom\/pets/,
+				"https://the-doctorpus.github.io/doc-assets/images/custom/pets",
+				false
+			)
 		);
 
 		// Skins
 		enhancedSession.webRequest.onBeforeRequest(
 			{
 				urls: ["*://*.deeeep.io/assets/skins/*"],
-				types: ["main_frame", "sub_frame", "stylesheet", "script", "image", "object", "xmlhttprequest", "other"]
+				types: [
+					"main_frame",
+					"sub_frame",
+					"stylesheet",
+					"script",
+					"image",
+					"object",
+					"xmlhttprequest",
+					"other",
+				],
 			},
-			genericRedirectHandler(/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/assets\/skins/, "https://the-doctorpus.github.io/doc-assets/images/skans", false)
+			genericRedirectHandler(
+				/https?:\/\/((beta|mapmaker|cdn)\.)?deeeep\.io\/assets\/skins/,
+				"https://the-doctorpus.github.io/doc-assets/images/skans",
+				false
+			)
 		);
 
 		// Custom skins (from Creators Center)
 		enhancedSession.webRequest.onBeforeRequest(
 			{
 				urls: ["*://cdn.deeeep.io/custom/skins/*"],
-				types: ["main_frame", "sub_frame", "stylesheet", "script", "image", "object", "xmlhttprequest", "other"]
+				types: [
+					"main_frame",
+					"sub_frame",
+					"stylesheet",
+					"script",
+					"image",
+					"object",
+					"xmlhttprequest",
+					"other",
+				],
 			},
-			genericRedirectHandler(/https?:\/\/cdn\.deeeep\.io\/custom\/skins/, "https://the-doctorpus.github.io/doc-assets/images/skans/custom", "skin")
+			genericRedirectHandler(
+				/https?:\/\/cdn\.deeeep\.io\/custom\/skins/,
+				"https://the-doctorpus.github.io/doc-assets/images/skans/custom",
+				"skin"
+			)
 		);
 	}
 
@@ -328,12 +477,12 @@ function registerRedirects() {
 					"*://*.googleanalytics.com/*",
 					"*://google-analytics.com/*",
 					"*://*.google-analytics.com/*",
-					"*://*.googletagmanager.com/*"
-				]
+					"*://*.googletagmanager.com/*",
+				],
 			},
 			(_details, callback) => {
 				callback({
-					cancel: true
+					cancel: true,
 				});
 			}
 		);
@@ -355,21 +504,27 @@ function registerRedirects() {
 			"*://apibeta.deeeep.io/twitch*",
 			"*://apibeta.deeeep.io/users/*",
 			"*://apibeta.deeeep.io/userStats/*",
-			"*://apibeta.deeeep.io/videos*"
+			"*://apibeta.deeeep.io/videos*",
 		];
 		enhancedSession.webRequest.onBeforeRequest(
 			{
-				urls: redirectedApiSpoof
+				urls: redirectedApiSpoof,
 			},
 			(details, callback) => {
 				callback({
 					cancel: false,
-					redirectURL: details.url.replace("https://apibeta.deeeep.io", "apispoof://api/apispoof")
+					redirectURL: details.url.replace(
+						"https://apibeta.deeeep.io",
+						"apispoof://api/apispoof"
+					),
 				});
 			}
 		);
 		protocol.interceptBufferProtocol("apispoof", (request, callback) => {
-			const newUrl = request.url.replace("apispoof:/", config.remoteEndpoint);
+			const newUrl = request.url.replace(
+				"apispoof:/",
+				config.remoteEndpoint
+			);
 			fetch(newUrl)
 				.then((r) => r.text())
 				.then((t) => callback(new Buffer(t)));
@@ -378,7 +533,13 @@ function registerRedirects() {
 }
 
 function registerExternalLinkHandler() {
-	const allowedUrls = ["https://beta.deeeep.io", "https://deeeep.io", "https://www.facebook.com/v13.0/dialog/oauth", "https://accounts.google.com/o/oauth2", "https://oauth.vk.com/authorize"];
+	const allowedUrls = [
+		"https://beta.deeeep.io",
+		"https://deeeep.io",
+		"https://www.facebook.com/v13.0/dialog/oauth",
+		"https://accounts.google.com/o/oauth2",
+		"https://oauth.vk.com/authorize",
+	];
 	win.webContents.setWindowOpenHandler(({ url }) => {
 		var allow = false;
 		allowedUrls.forEach((value) => {
@@ -391,8 +552,16 @@ function registerExternalLinkHandler() {
 			return {
 				action: "allow",
 				overrideBrowserWindowOptions: {
-					icon: platform == "darwin" ? path.join(__dirname, "src", "icons", "icon.icns") : path.join(__dirname, "src", "icons", "128x128.png")
-				}
+					icon:
+						platform == "darwin"
+							? path.join(__dirname, "src", "icons", "icon.icns")
+							: path.join(
+									__dirname,
+									"src",
+									"icons",
+									"128x128.png"
+							  ),
+				},
 			};
 		}
 	});

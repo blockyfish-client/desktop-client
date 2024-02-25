@@ -3,15 +3,15 @@ const store = new Store({
 	schema: {
 		docassets: {
 			type: "boolean",
-			default: false
+			default: false,
 		},
 		adblock: {
 			type: "boolean",
-			default: true
+			default: true,
 		},
 		apiCrashWorkaround: {
 			type: "boolean",
-			default: false
+			default: false,
 		},
 		plugins: {
 			type: "object",
@@ -21,17 +21,17 @@ const store = new Store({
 					properties: {
 						enabled: {
 							type: "boolean",
-							default: true
+							default: true,
 						},
 						settings: {
-							type: "object"
-						}
-					}
-				}
-			}
-		}
+							type: "object",
+						},
+					},
+				},
+			},
+		},
 	},
-	clearInvalidConfig: true
+	clearInvalidConfig: true,
 });
 
 function getSettings(key) {

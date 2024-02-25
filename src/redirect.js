@@ -8,8 +8,13 @@ function genericRedirectHandler(regex, target, custom_type) {
 		var url = details.url;
 		var newUrl = url.replace(regex, target);
 		if (custom_type == "skin") {
-			var skinParams = /skins\/(?:(?<skin_name>[A-Za-z]+)|(?:(?<skin_id>[0-9]+)(?<version>-[0-9]+)(?<post_version>(?<extra_asset_name>-[A-Za-z0-9-_]+)?)))(?<suffix>\.[a-zA-Z0-9]+)/.exec(details.url).groups;
-			var strippedSkin = (skinParams.skin_id || skinParams.skin_name) + skinParams.suffix;
+			var skinParams =
+				/skins\/(?:(?<skin_name>[A-Za-z]+)|(?:(?<skin_id>[0-9]+)(?<version>-[0-9]+)(?<post_version>(?<extra_asset_name>-[A-Za-z0-9-_]+)?)))(?<suffix>\.[a-zA-Z0-9]+)/.exec(
+					details.url
+				).groups;
+			var strippedSkin =
+				(skinParams.skin_id || skinParams.skin_name) +
+				skinParams.suffix;
 			newUrl = target + "/" + strippedSkin;
 		}
 		// console.log(newUrl);

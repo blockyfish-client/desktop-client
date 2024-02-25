@@ -2,14 +2,8 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta
-			http-equiv="X-UA-Compatible"
-			content="IE=edge"
-		/>
-		<meta
-			name="viewport"
-			content="width=device-width, initial-scale=1.0"
-		/>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Loading Blockyfish...</title>
 
 		<style>
@@ -19,8 +13,13 @@
 				flex-direction: column;
 				height: 600px;
 				width: -webkit-fill-available;
-				animation: container-rise 10s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1 both, rotate-sts 5s ease-in-out infinite,
-					container-return 8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1 12s forwards, container-idle 10s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite 20s forwards;
+				animation: container-rise 10s
+						cubic-bezier(0.68, -0.55, 0.265, 1.55) 1 both,
+					rotate-sts 5s ease-in-out infinite,
+					container-return 8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1
+						12s forwards,
+					container-idle 10s cubic-bezier(0.68, -0.55, 0.265, 1.55)
+						infinite 20s forwards;
 				transform-origin: top center;
 			}
 			.waves {
@@ -29,7 +28,8 @@
 				height: 300px;
 				min-height: 100px;
 				max-height: 150px;
-				animation: waves-rise 7s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1;
+				animation: waves-rise 7s cubic-bezier(0.68, -0.55, 0.265, 1.55)
+					1;
 			}
 
 			.wave-bottom-fill {
@@ -40,7 +40,8 @@
 			}
 
 			.parallax > use {
-				animation: move-forever 25s cubic-bezier(0.55, 0.5, 0.45, 0.5) infinite;
+				animation: move-forever 25s cubic-bezier(0.55, 0.5, 0.45, 0.5)
+					infinite;
 			}
 			.parallax > use:nth-child(1) {
 				animation-delay: -2s;
@@ -141,11 +142,13 @@
 				position: relative;
 				width: 80px;
 				height: 80px;
-				animation: fade-in 1s ease-in 1 6s both, blur-in 1s ease-out 1 6s both;
+				animation: fade-in 1s ease-in 1 6s both,
+					blur-in 1s ease-out 1 6s both;
 				animation-fill-mode: backwards;
 			}
 			.lds-roller div {
-				animation: lds-roller 3.5s cubic-bezier(0.7, 0, 0.3, 1) infinite, rotate 7s linear infinite;
+				animation: lds-roller 3.5s cubic-bezier(0.7, 0, 0.3, 1) infinite,
+					rotate 7s linear infinite;
 				transform-origin: 40px 40px;
 			}
 			.lds-roller div:after {
@@ -270,7 +273,8 @@
 				margin: 40px;
 				padding-top: 50px;
 				z-index: 69420;
-				animation: fade-in 1s ease-in 1 1s both, slide-in 1s ease-out 1 1s both;
+				animation: fade-in 1s ease-in 1 1s both,
+					slide-in 1s ease-out 1 1s both;
 			}
 			.logo {
 				width: 500px;

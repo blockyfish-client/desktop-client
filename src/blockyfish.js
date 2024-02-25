@@ -10,10 +10,16 @@ const bind = function (...args) {
 	}
 	if (Function.prototype.bind == old) {
 		return old.apply(this, args);
-	} else if (args[0] && Object.prototype.hasOwnProperty.call(args[0], "currentScene")) {
+	} else if (
+		args[0] &&
+		Object.prototype.hasOwnProperty.call(args[0], "currentScene")
+	) {
 		// Game object script injector
 		// Made by TheJ, aka noam
-		console.log("%c[TheJ Injector] Logged game object.", "color: #ff6969; font-size:125%");
+		console.log(
+			"%c[TheJ Injector] Logged game object.",
+			"color: #ff6969; font-size:125%"
+		);
 		game = args[0];
 		window.game = game;
 		try {
@@ -26,14 +32,20 @@ const bind = function (...args) {
 			}
 			window.bfe.firstLoad = false;
 		} catch {}
-	} else if (args[0] && Object.prototype.hasOwnProperty.call(args[0], "prepareUpload")) {
+	} else if (
+		args[0] &&
+		Object.prototype.hasOwnProperty.call(args[0], "prepareUpload")
+	) {
 		// GIF pfp upload patch injector
 		// Made by Pi
 
 		// console log throttling
 		if (Date.now() - (window.pi_igpup_llts || 0) > 1000) {
 			window.pi_igpup_llts = Date.now();
-			console.log("%c[Pi Injector] Injected GIF pfp uploader patch.", "color: #e9c2ff; font-size:125%");
+			console.log(
+				"%c[Pi Injector] Injected GIF pfp uploader patch.",
+				"color: #e9c2ff; font-size:125%"
+			);
 		}
 		var opu = args[0].prepareUpload;
 		args[0].prepareUpload = function () {
@@ -48,13 +60,31 @@ Function.prototype.bind = bind;
 class Blockyfish {
 	constructor(window) {
 		this.events = {
-			"plugins-load": new Event("plugins-load", { bubbles: true, cancelable: false }),
-			"first-game-load": new Event("first-game-load", { bubbles: true, cancelable: false }),
-			"game-load": new Event("game-load", { bubbles: true, cancelable: false }),
-			"play-button-click": new Event("play-button-click", { bubbles: true, cancelable: false }),
-			"death": new Event("death", { bubbles: true, cancelable: false }),
-			"settings-open": new Event("settings-open", { bubbles: true, cancelable: false }),
-			"forums-open": new Event("forums-open", { bubbles: true, cancelable: false })
+			"plugins-load": new Event("plugins-load", {
+				bubbles: true,
+				cancelable: false,
+			}),
+			"first-game-load": new Event("first-game-load", {
+				bubbles: true,
+				cancelable: false,
+			}),
+			"game-load": new Event("game-load", {
+				bubbles: true,
+				cancelable: false,
+			}),
+			"play-button-click": new Event("play-button-click", {
+				bubbles: true,
+				cancelable: false,
+			}),
+			death: new Event("death", { bubbles: true, cancelable: false }),
+			"settings-open": new Event("settings-open", {
+				bubbles: true,
+				cancelable: false,
+			}),
+			"forums-open": new Event("forums-open", {
+				bubbles: true,
+				cancelable: false,
+			}),
 		};
 		// makes it harder to tamper with blockyfish info
 		this.config = window.bfi;
@@ -301,7 +331,7 @@ class Blockyfish {
 			wolfeel: 117,
 			giantsinophore: 118,
 			coelacanth: 119,
-			napoleonwrasse: 120
+			napoleonwrasse: 120,
 		};
 		this.FishPacket = {
 			1: "Boost",
@@ -339,7 +369,7 @@ class Blockyfish {
 			SpitBones: 15,
 			BullsharkScar: 16,
 			Emoji: 17,
-			Emote: 18
+			Emote: 18,
 		};
 		this.GeneralPacket = {
 			1: "Play",
@@ -481,7 +511,7 @@ class Blockyfish {
 			RoomInfo: 252,
 			ServerStats: 253,
 			ServerInfo: 254,
-			Servers: 255
+			Servers: 255,
 		};
 		this.RequestPacket = {
 			1: "JoinRoom",
@@ -521,7 +551,7 @@ class Blockyfish {
 			JoinTribe: 16,
 			TribeKick: 17,
 			TribeQuit: 18,
-			CRequest: 19
+			CRequest: 19,
 		};
 		this.DeathType = {
 			1: "lackOfOxygen",
@@ -535,7 +565,7 @@ class Blockyfish {
 			disconnected: 3,
 			temperature: 4,
 			pressure: 5,
-			toxin: 6
+			toxin: 6,
 		};
 	}
 	emit(event) {
@@ -563,12 +593,19 @@ class Blockyfish {
 	// GAME METHODS
 	// CORE PACKET STUFF
 	formBytePacket(t, e = null) {
-		const s = new ArrayBuffer(e != null ? (t == this.FishPacket.ScalingBoost ? 3 : 4) : 2),
+		const s = new ArrayBuffer(
+				e != null ? (t == this.FishPacket.ScalingBoost ? 3 : 4) : 2
+			),
 			a = new DataView(s);
-		if ((a.setUint8(0, this.GeneralPacket.Action), a.setUint8(1, t), null != e))
+		if (
+			(a.setUint8(0, this.GeneralPacket.Action),
+			a.setUint8(1, t),
+			null != e)
+		)
 			if (t == this.FishPacket.ScalingBoost) a.setUint8(2, e);
 			else {
-				if (t != this.FishPacket.Emote) throw new Error("Other actions dont have value");
+				if (t != this.FishPacket.Emote)
+					throw new Error("Other actions dont have value");
 				a.setUint16(2, e, true);
 			}
 		return s;
@@ -576,7 +613,13 @@ class Blockyfish {
 	formMovePacket(x, y, n) {
 		const a = new ArrayBuffer(10),
 			i = new DataView(a);
-		return i.setUint8(0, 2), i.setUint32(1, x, !0), i.setUint16(5, y, !0), i.setUint8(9, Math.min(255, n)), a;
+		return (
+			i.setUint8(0, 2),
+			i.setUint32(1, x, !0),
+			i.setUint16(5, y, !0),
+			i.setUint8(9, Math.min(255, n)),
+			a
+		);
 	}
 
 	// GAME STUFF
@@ -587,7 +630,7 @@ class Blockyfish {
 				JSON.stringify({
 					p: this.GeneralPacket.ChatMessage,
 					te: toEveryone,
-					message: message
+					message: message,
 				})
 			);
 		} catch {}

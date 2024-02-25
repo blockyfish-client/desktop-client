@@ -20,7 +20,7 @@ document.querySelector("button.play").addEventListener("click", () => {
 		attributes: false,
 		childList: true,
 		characterData: false,
-		subtree: true
+		subtree: true,
 	});
 	window.bfe.deathScreenObserving = true;
 });
@@ -31,7 +31,9 @@ document.querySelector("button.play").addEventListener("click", () => {
 	var settingsOpen = false;
 	const modalObserver = new MutationObserver(() => {
 		// settings
-		if (document.querySelector(".modal-content #pane-0 ~ #pane-1 ~ #pane-2")) {
+		if (
+			document.querySelector(".modal-content #pane-0 ~ #pane-1 ~ #pane-2")
+		) {
 			if (!settingsOpen) {
 				settingsOpen = true;
 				window.blockyfish.emit("settings-open");
@@ -44,6 +46,6 @@ document.querySelector("button.play").addEventListener("click", () => {
 		attributes: false,
 		childList: true,
 		characterData: false,
-		subtree: true
+		subtree: true,
 	});
 })();
