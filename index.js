@@ -199,6 +199,14 @@ app.on("second-instance", (event, commandLine) => {
 	// dialog.showErrorBox("Welcome Back", commandLine.pop().slice(0, -1));
 });
 
+// Google sign-in
+app.on("browser-window-created", (_e, win) => {
+	win.webContents.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36");
+	win.webContents.on("did-create-window", (childWin) => {
+		childWin.webContents.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36");
+	});
+});
+
 // darwin & linux deeplink handling
 app.on("open-url", (_event, url) => {
 	console.log(url);
@@ -320,8 +328,7 @@ function registerRedirects() {
 					"*://*.googleanalytics.com/*",
 					"*://google-analytics.com/*",
 					"*://*.google-analytics.com/*",
-					"*://*.googletagmanager.com/*",
-					"*://*.googleapis.com/*"
+					"*://*.googletagmanager.com/*"
 				]
 			},
 			(_details, callback) => {
