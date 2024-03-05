@@ -489,23 +489,25 @@ function registerRedirects() {
 	}
 
 	if (getSettings("apiCrashWorkaround")) {
-		const redirectedApiSpoof = [
-			"*://apibeta.deeeep.io/animals*",
-			"*://apibeta.deeeep.io/auth/me*",
-			"*://apibeta.deeeep.io/auth/timezone*",
-			"*://apibeta.deeeep.io/forumPosts/*",
-			"*://apibeta.deeeep.io/hosts*",
-			"*://apibeta.deeeep.io/leaderboard*",
-			"*://apibeta.deeeep.io/maps/*",
-			"*://apibeta.deeeep.io/playHistories/u/*",
-			"*://apibeta.deeeep.io/regions*",
-			"*://apibeta.deeeep.io/servers/l*",
-			"*://apibeta.deeeep.io/socialNetworks/u/*",
-			"*://apibeta.deeeep.io/twitch*",
-			"*://apibeta.deeeep.io/users/*",
-			"*://apibeta.deeeep.io/userStats/*",
-			"*://apibeta.deeeep.io/videos*",
-		];
+		const redirectedApiSpoof = getSettings("apiCrashWorkaroundHostOnly")
+			? ["*://apibeta.deeeep.io/hosts*"]
+			: [
+					"*://apibeta.deeeep.io/animals*",
+					"*://apibeta.deeeep.io/auth/me*",
+					"*://apibeta.deeeep.io/auth/timezone*",
+					"*://apibeta.deeeep.io/forumPosts/*",
+					"*://apibeta.deeeep.io/hosts*",
+					"*://apibeta.deeeep.io/leaderboard*",
+					"*://apibeta.deeeep.io/maps/*",
+					"*://apibeta.deeeep.io/playHistories/u/*",
+					"*://apibeta.deeeep.io/regions*",
+					"*://apibeta.deeeep.io/servers/l*",
+					"*://apibeta.deeeep.io/socialNetworks/u/*",
+					"*://apibeta.deeeep.io/twitch*",
+					"*://apibeta.deeeep.io/users/*",
+					"*://apibeta.deeeep.io/userStats/*",
+					"*://apibeta.deeeep.io/videos*",
+			  ];
 		enhancedSession.webRequest.onBeforeRequest(
 			{
 				urls: redirectedApiSpoof,

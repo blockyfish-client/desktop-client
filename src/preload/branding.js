@@ -173,4 +173,73 @@ window.blockyfish.addEventListener("settings-open", () => {
 				}, 200);
 			}, 10);
 		});
+
+	// Inject API crash workaround toggle for hosts only mode
+	const acwho = document
+		.querySelector("#pane-0 > form > div.el-form-item:nth-child(3)")
+		.cloneNode(true);
+	acwho.setAttribute("id", "acwho-toggle");
+	document.querySelector("#pane-0 > form").appendChild(acwho);
+	document.querySelector(
+		"#acwho-toggle > div.el-form-item__label"
+	).innerText = "Only spoof hosts API";
+	document.querySelector(
+		"#acwho-toggle > div.el-form-item__content > span.notes"
+	).innerText =
+		"Only spoof the hosts API, this will allow you to sign-in to your account and use most features.";
+	if (getSettings("apiCrashWorkaroundHostOnly")) {
+		document.querySelector(
+			"#acwho-toggle input.el-checkbox__original"
+		).checked = true;
+		document
+			.querySelector("#acwho-toggle label.el-checkbox")
+			.classList.add("is-checked");
+		document
+			.querySelector("#acwho-toggle span.el-checkbox__input")
+			.classList.add("is-checked");
+	} else {
+		document.querySelector(
+			"#acwho-toggle input.el-checkbox__original"
+		).checked = false;
+		document
+			.querySelector("#acwho-toggle label.el-checkbox")
+			.classList.remove("is-checked");
+		document
+			.querySelector("#acwho-toggle span.el-checkbox__input")
+			.classList.remove("is-checked");
+	}
+	document
+		.querySelector(
+			"#acwho-toggle > div.el-form-item__content span.el-checkbox__inner"
+		)
+		.addEventListener("click", () => {
+			setTimeout(() => {
+				const enabled = document.querySelector(
+					"#acwho-toggle input.el-checkbox__original"
+				).checked;
+				var c = document.querySelector(
+					"#acwho-toggle label.el-checkbox"
+				);
+				var i = document.querySelector(
+					"#acwho-toggle span.el-checkbox__input"
+				);
+				if (enabled) {
+					c.classList.add("is-checked");
+					i.classList.add("is-checked");
+				} else {
+					c.classList.remove("is-checked");
+					i.classList.remove("is-checked");
+				}
+				setSettings("apiCrashWorkaroundHostOnly", enabled);
+				document.querySelector(
+					"#acwho-toggle input.el-checkbox__original"
+				).style.pointerEvents = "none";
+				setTimeout(() => {
+					ipcRenderer.send("restart-required");
+					document.querySelector(
+						"#acwho-toggle input.el-checkbox__original"
+					).style.pointerEvents = "";
+				}, 200);
+			}, 10);
+		});
 });
