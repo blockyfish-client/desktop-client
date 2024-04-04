@@ -1,6 +1,10 @@
 const Store = require("electron-store");
 const store = new Store({
 	schema: {
+		Vsync: {
+			type: "boolean",
+			default: true,
+		},
 		docassets: {
 			type: "boolean",
 			default: false,

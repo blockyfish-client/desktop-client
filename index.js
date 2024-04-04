@@ -25,6 +25,10 @@ if (!gotTheLock) {
 	app.quit();
 }
 
+if (!getSettings("Vsync")) {
+	app.commandLine.appendSwitch("disable-gpu-vsync");
+}
+
 app.commandLine.appendSwitch("lang", "en-US");
 
 if (process.defaultApp) {
