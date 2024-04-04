@@ -38,6 +38,77 @@ setInterval(() => {
 }, 100);
 
 window.blockyfish.addEventListener("settings-open", () => {
+	// Inject Vsync toggle
+	// Adapted from docassets toggle logic
+	const Vsync = document
+		.querySelector("#pane-0 > form > div.el-form-item:nth-child(3)")
+		.cloneNode(true);
+		Vsync.setAttribute("id", "Vsync-toggle");
+	document.querySelector("#pane-0 > form").appendChild(Vsync);
+	document.querySelector(
+		"#Vsync-toggle > div.el-form-item__label"
+	).innerText = "Vsync";
+	document.querySelector(
+		"#Vsync-toggle > div.el-form-item__content > span.notes"
+	).innerText = "Disabling it may cause screen tearing but can reduce input lag";
+	if (getSettings("Vsync")) {
+		document.querySelector(
+			"#Vsync-toggle input.el-checkbox__original"
+		).checked = true;
+		document
+			.querySelector("#Vsync-toggle label.el-checkbox")
+			.classList.add("is-checked");
+		document
+			.querySelector("#Vsync-toggle span.el-checkbox__input")
+			.classList.add("is-checked");
+	} else {
+		document.querySelector(
+			"#Vsync-toggle input.el-checkbox__original"
+		).checked = false;
+		document
+			.querySelector("#Vsync-toggle label.el-checkbox")
+			.classList.remove("is-checked");
+		document
+			.querySelector("#Vsync-toggle span.el-checkbox__input")
+			.classList.remove("is-checked");
+	}
+	document
+		.querySelector(
+			"#Vsync-toggle > div.el-form-item__content span.el-checkbox__inner"
+		)
+		.addEventListener("click", () => {
+			setTimeout(() => {
+				const enabled = document.querySelector(
+					"#Vsync-toggle input.el-checkbox__original"
+				).checked;
+				var c = document.querySelector(
+					"#Vsync-toggle label.el-checkbox"
+				);
+				var i = document.querySelector(
+					"#Vsync-toggle span.el-checkbox__input"
+				);
+				if (enabled) {
+					c.classList.add("is-checked");
+					i.classList.add("is-checked");
+				} else {
+					c.classList.remove("is-checked");
+					i.classList.remove("is-checked");
+				}
+				setSettings("Vsync", enabled);
+				document.querySelector(
+					"#Vsync-toggle input.el-checkbox__original"
+				).style.pointerEvents = "none";
+				setTimeout(() => {
+					ipcRenderer.send("restart-required");
+					document.querySelector(
+						"#Vsync-toggle input.el-checkbox__original"
+					).style.pointerEvents = "";
+				}, 200);
+			}, 10);
+		});
+});
+
+window.blockyfish.addEventListener("settings-open", () => {
 	// Inject docassets toggle
 	const docassets = document
 		.querySelector("#pane-0 > form > div.el-form-item:nth-child(3)")
