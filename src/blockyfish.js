@@ -25,6 +25,7 @@ const bind = function (...args) {
 		try {
 			// game-load event
 			// first-game-load event
+			window.blockyfish.emit("any-game-load")
 			if (window.bfe.firstLoad) {
 				window.blockyfish.emit("first-game-load");
 			} else {
@@ -69,6 +70,10 @@ class Blockyfish {
 				cancelable: false,
 			}),
 			"game-load": new Event("game-load", {
+				bubbles: true,
+				cancelable: false,
+			}),
+			"any-game-load": new Event("any-game-load", {
 				bubbles: true,
 				cancelable: false,
 			}),
