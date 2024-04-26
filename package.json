@@ -50,16 +50,16 @@
 		}
 	},
 	"dependencies": {
-		"@electron/remote": "^2.0.9",
+		"@electron/remote": "^2.1.2",
 		"electron-better-web-request": "^1.0.1",
-		"electron-store": "^8.1.0",
+		"electron-store": "^8.2.0",
 		"path": "^0.12.7",
 		"tslib": "^2.6.2",
 		"url-pattern": "^1.0.3"
 	},
 	"devDependencies": {
-		"electron": "^24.4.0",
-		"electron-builder": "^24.9.1",
-		"electron-rebuild": "^3.2.9"
+		"electron": "^30.0.1",
+		"electron-builder": "^24.13.3",
+		"@electron/rebuild": "^3.6.0"
 	}
 }
