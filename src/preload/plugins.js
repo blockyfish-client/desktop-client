@@ -301,89 +301,99 @@ function createPluginsModal() {
 }
 // createPluginsModal();
 
-const plugin_button_clone = document
-	.querySelector(
-		"div.p-2.sidebar.right.space-y-2 > div.container > div > div"
-	)
-	.cloneNode(true);
-document
-	.querySelector("div.p-2.sidebar.right.space-y-2 > div.container > div")
-	.appendChild(plugin_button_clone);
-const plugin_button = plugin_button_clone.firstElementChild;
-plugin_button.classList.remove("pink");
-plugin_button.classList.add("orange", "plugin", "plugin-close");
-const pluginText = document.querySelector(
-	"button.plugin > span:nth-child(1) > span:nth-child(2)"
-);
-pluginText.innerHTML = "Plugins";
-const pluginIcon = document.querySelector(
-	"button.plugin > span:nth-child(1) > svg:nth-child(1)"
-);
+function initializePlugins() {
+	try {
+		const plugin_button_clone = document
+			.querySelector(
+				"div.p-2.sidebar.right.space-y-2 > div.container > div > div"
+			)
+			.cloneNode(true);
+		document
+			.querySelector(
+				"div.p-2.sidebar.right.space-y-2 > div.container > div"
+			)
+			.appendChild(plugin_button_clone);
+		const plugin_button = plugin_button_clone.firstElementChild;
+		plugin_button.classList.remove("pink");
+		plugin_button.classList.add("orange", "plugin", "plugin-close");
+		const pluginText = document.querySelector(
+			"button.plugin > span:nth-child(1) > span:nth-child(2)"
+		);
+		pluginText.innerHTML = "Plugins";
+		const pluginIcon = document.querySelector(
+			"button.plugin > span:nth-child(1) > svg:nth-child(1)"
+		);
 
-pluginIcon.innerHTML = `<path d="M1 0 0 1l2.2 3.081a1 1 0 0 0 .815.419h.07a1 1 0 0 1 .708.293l2.675 2.675-2.617 2.654A3.003 3.003 0 0 0 0 13a3 3 0 1 0 5.878-.851l2.654-2.617.968.968-.305.914a1 1 0 0 0 .242 1.023l3.27 3.27a.997.997 0 0 0 1.414 0l1.586-1.586a.997.997 0 0 0 0-1.414l-3.27-3.27a1 1 0 0 0-1.023-.242L10.5 9.5l-.96-.96 2.68-2.643A3.005 3.005 0 0 0 16 3c0-.269-.035-.53-.102-.777l-2.14 2.141L12 4l-.364-1.757L13.777.102a3 3 0 0 0-3.675 3.68L7.462 6.46 4.793 3.793a1 1 0 0 1-.293-.707v-.071a1 1 0 0 0-.419-.814L1 0Zm9.646 10.646a.5.5 0 0 1 .708 0l2.914 2.915a.5.5 0 0 1-.707.707l-2.915-2.914a.5.5 0 0 1 0-.708ZM3 11l.471.242.529.026.287.445.445.287.026.529L5 13l-.242.471-.026.529-.445.287-.287.445-.529.026L3 15l-.471-.242L2 14.732l-.287-.445L1.268 14l-.026-.529L1 13l.242-.471.026-.529.445-.287.287-.445.529-.026L3 11Z"/>`;
-pluginIcon.setAttribute("viewBox", "-4 -4 24 24");
-pluginIcon.setAttribute("fill", "currentColor");
+		pluginIcon.innerHTML = `<path d="M1 0 0 1l2.2 3.081a1 1 0 0 0 .815.419h.07a1 1 0 0 1 .708.293l2.675 2.675-2.617 2.654A3.003 3.003 0 0 0 0 13a3 3 0 1 0 5.878-.851l2.654-2.617.968.968-.305.914a1 1 0 0 0 .242 1.023l3.27 3.27a.997.997 0 0 0 1.414 0l1.586-1.586a.997.997 0 0 0 0-1.414l-3.27-3.27a1 1 0 0 0-1.023-.242L10.5 9.5l-.96-.96 2.68-2.643A3.005 3.005 0 0 0 16 3c0-.269-.035-.53-.102-.777l-2.14 2.141L12 4l-.364-1.757L13.777.102a3 3 0 0 0-3.675 3.68L7.462 6.46 4.793 3.793a1 1 0 0 1-.293-.707v-.071a1 1 0 0 0-.419-.814L1 0Zm9.646 10.646a.5.5 0 0 1 .708 0l2.914 2.915a.5.5 0 0 1-.707.707l-2.915-2.914a.5.5 0 0 1 0-.708ZM3 11l.471.242.529.026.287.445.445.287.026.529L5 13l-.242.471-.026.529-.445.287-.287.445-.529.026L3 15l-.471-.242L2 14.732l-.287-.445L1.268 14l-.026-.529L1 13l.242-.471.026-.529.445-.287.287-.445.529-.026L3 11Z"/>`;
+		pluginIcon.setAttribute("viewBox", "-4 -4 24 24");
+		pluginIcon.setAttribute("fill", "currentColor");
 
-(async () => {
-	window.loadedPlugins = new Set();
-	window.allPlugins = new Set();
-	window.onlinePlugins = new Set();
-	window.updatablePlugins = new Set();
-	window.plugins = await getPlugins();
-	window.remotePlugins = await getRemotePlugins();
+		(async () => {
+			window.loadedPlugins = new Set();
+			window.allPlugins = new Set();
+			window.onlinePlugins = new Set();
+			window.updatablePlugins = new Set();
+			window.plugins = await getPlugins();
+			window.remotePlugins = await getRemotePlugins();
 
-	window.plugins.forEach((plugin) => {
-		try {
-			const module = require(path.join(
-				app.getPath("userData"),
-				"plugins",
-				plugin
-			));
-			module.fn = plugin;
-			if (window.loadedPlugins.has(module)) {
-				return;
-			} else if (
-				getSettings(
-					"plugins." +
-						module.name.split(" ").join("_").toLowerCase() +
-						".enabled"
-				)
-			) {
-				module.script();
-				window.loadedPlugins.add(module);
-				window.allPlugins.add(module);
-			} else {
-				window.allPlugins.add(module);
-			}
-		} catch {}
-	});
-	var installedPlugins = [];
-	window.allPlugins.forEach((plugin) => {
-		installedPlugins.push({
-			id: plugin.id,
-			version: plugin.versionNumber,
+			window.plugins.forEach((plugin) => {
+				try {
+					const module = require(path.join(
+						app.getPath("userData"),
+						"plugins",
+						plugin
+					));
+					module.fn = plugin;
+					if (window.loadedPlugins.has(module)) {
+						return;
+					} else if (
+						getSettings(
+							"plugins." +
+								module.name.split(" ").join("_").toLowerCase() +
+								".enabled"
+						)
+					) {
+						module.script();
+						window.loadedPlugins.add(module);
+						window.allPlugins.add(module);
+					} else {
+						window.allPlugins.add(module);
+					}
+				} catch {}
+			});
+			var installedPlugins = [];
+			window.allPlugins.forEach((plugin) => {
+				installedPlugins.push({
+					id: plugin.id,
+					version: plugin.versionNumber,
+				});
+			});
+			window.remotePlugins.forEach((plugin) => {
+				try {
+					if (!installedPlugins.find((p) => p.id == plugin.id)) {
+						window.onlinePlugins.add(plugin);
+					} else if (
+						installedPlugins.find(
+							(p) =>
+								p.id == plugin.id &&
+								p.version < plugin.versionNumber
+						)
+					) {
+						window.updatablePlugins.add(plugin.id);
+					}
+				} catch {}
+			});
+			window.blockyfish.emit("plugins-load");
+		})();
+
+		plugin_button.addEventListener("click", async () => {
+			createPluginsModal();
+			renderPluginList();
 		});
-	});
-	window.remotePlugins.forEach((plugin) => {
-		try {
-			if (!installedPlugins.find((p) => p.id == plugin.id)) {
-				window.onlinePlugins.add(plugin);
-			} else if (
-				installedPlugins.find(
-					(p) => p.id == plugin.id && p.version < plugin.versionNumber
-				)
-			) {
-				window.updatablePlugins.add(plugin.id);
-			}
-		} catch {}
-	});
-	window.blockyfish.emit("plugins-load");
-})();
-
-plugin_button.addEventListener("click", async () => {
-	createPluginsModal();
-	renderPluginList();
-});
+	} catch {
+		setTimeout(() => initializePlugins(), 500);
+	}
+}
 
 function renderPluginList() {
 	document.querySelector(".plugin-list").innerHTML = "";

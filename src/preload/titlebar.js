@@ -170,9 +170,15 @@ document.getElementById("close-button").addEventListener("click", () => {
 });
 
 const drag = document.createElement("div");
-document.querySelector("#app > div.ui > div").appendChild(drag);
-drag.outerHTML =
-	'<div style="-webkit-app-region: drag;width: 100vw;height: 20px;position: absolute;top: 0;left: 0;cursor: move;"></div>';
+try {
+	document.querySelector("#app > div.ui > div").appendChild(drag);
+	drag.outerHTML =
+		'<div style="-webkit-app-region: drag;width: 100vw;height: 20px;position: absolute;top: 0;left: 0;cursor: move;"></div>';
+} catch {
+	document.querySelector("body").appendChild(drag);
+	drag.outerHTML =
+		'<div style="-webkit-app-region: drag;width: 100vw;height: 20px;position: fixed;top: 0;left: 0;cursor: move;"></div>';
+}
 
 function toggleFullscreen() {
 	let win = BrowserWindow.getFocusedWindow();
