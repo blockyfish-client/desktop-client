@@ -394,6 +394,7 @@ function initializePlugins() {
 		setTimeout(() => initializePlugins(), 500);
 	}
 }
+initializePlugins();
 
 function renderPluginList() {
 	document.querySelector(".plugin-list").innerHTML = "";
