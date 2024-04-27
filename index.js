@@ -244,12 +244,9 @@ app.on("second-instance", (event, commandLine) => {
 
 // Google sign-in
 app.on("browser-window-created", (_e, win) => {
-	win.webContents.setUserAgent(
-		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
-	);
 	win.webContents.on("did-create-window", (childWin) => {
 		childWin.webContents.setUserAgent(
-			"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+			"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.6367.60 Safari/537.36"
 		);
 	});
 });
