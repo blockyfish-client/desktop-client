@@ -59,11 +59,7 @@ function initializeEvents() {
 			var signinOpen = false;
 			const modalObserver = new MutationObserver(() => {
 				// settings
-				if (
-					document.querySelector(
-						".modal-content input[type='password']"
-					)
-				) {
+				if (document.querySelector("a[href^='/signup']")) {
 					if (!signinOpen) {
 						signinOpen = true;
 						window.blockyfish.emit("signin-open");
