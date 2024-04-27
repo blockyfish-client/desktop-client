@@ -31,9 +31,9 @@ adblock_css.outerHTML = `
 
 setInterval(() => {
 	if (document.querySelector(".ad-block")) {
-		document.querySelectorAll(".ad-block").forEach((el) => {
+		for (const el of document.querySelectorAll(".ad-block")) {
 			el.remove();
-		});
+		}
 	}
 }, 100);
 
@@ -82,10 +82,10 @@ window.blockyfish.addEventListener("settings-open", () => {
 				const enabled = document.querySelector(
 					"#Vsync-toggle input.el-checkbox__original"
 				).checked;
-				var c = document.querySelector(
+				const c = document.querySelector(
 					"#Vsync-toggle label.el-checkbox"
 				);
-				var i = document.querySelector(
+				const i = document.querySelector(
 					"#Vsync-toggle span.el-checkbox__input"
 				);
 				if (enabled) {
@@ -152,10 +152,10 @@ window.blockyfish.addEventListener("settings-open", () => {
 				const enabled = document.querySelector(
 					"#docassets-toggle input.el-checkbox__original"
 				).checked;
-				var c = document.querySelector(
+				const c = document.querySelector(
 					"#docassets-toggle label.el-checkbox"
 				);
-				var i = document.querySelector(
+				const i = document.querySelector(
 					"#docassets-toggle span.el-checkbox__input"
 				);
 				if (enabled) {
@@ -222,8 +222,10 @@ window.blockyfish.addEventListener("settings-open", () => {
 				const enabled = document.querySelector(
 					"#acw-toggle input.el-checkbox__original"
 				).checked;
-				var c = document.querySelector("#acw-toggle label.el-checkbox");
-				var i = document.querySelector(
+				const c = document.querySelector(
+					"#acw-toggle label.el-checkbox"
+				);
+				const i = document.querySelector(
 					"#acw-toggle span.el-checkbox__input"
 				);
 				if (enabled) {
@@ -289,10 +291,10 @@ window.blockyfish.addEventListener("settings-open", () => {
 				const enabled = document.querySelector(
 					"#acwho-toggle input.el-checkbox__original"
 				).checked;
-				var c = document.querySelector(
+				const c = document.querySelector(
 					"#acwho-toggle label.el-checkbox"
 				);
-				var i = document.querySelector(
+				const i = document.querySelector(
 					"#acwho-toggle span.el-checkbox__input"
 				);
 				if (enabled) {

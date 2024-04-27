@@ -9,9 +9,9 @@ const {
 	globalShortcut,
 	protocol,
 } = require("electron");
-const path = require("path");
+const path = require("node:path");
 require("@electron/remote/main").initialize();
-const os = require("os");
+const os = require("node:os");
 const platform = os.platform();
 
 const config = require("./config.json");
@@ -43,7 +43,7 @@ if (process.defaultApp) {
 
 const debug = app.commandLine.getSwitchValue("testing");
 
-var modal;
+let modal;
 function createModal(title, text, img, themed, onConfirm) {
 	modal = new BrowserWindow({
 		width: 530,
@@ -51,7 +51,7 @@ function createModal(title, text, img, themed, onConfirm) {
 		resizable: false,
 		frame: false,
 		icon:
-			platform == "darwin"
+			platform === "darwin"
 				? path.join(__dirname, "src", "icons", "icon.icns")
 				: path.join(__dirname, "src", "icons", "128x128.png"),
 		transparent: true,
@@ -66,9 +66,12 @@ function createModal(title, text, img, themed, onConfirm) {
 	});
 	require("@electron/remote/main").enable(modal.webContents);
 
-	var modalUrl = path.join(__dirname, "src", "modal.html");
-	var titleUri, textUri, imgUri, themedUri;
-	var params = [];
+	let modalUrl = path.join(__dirname, "src", "modal.html");
+	let titleUri;
+	let textUri;
+	let imgUri;
+	let themedUri;
+	const params = [];
 	if (title) {
 		titleUri = `title=${encodeURI(title)}`;
 	}
@@ -82,19 +85,19 @@ function createModal(title, text, img, themed, onConfirm) {
 		themedUri = `themed=${encodeURI(themed)}`;
 	}
 	params.push(titleUri, textUri, imgUri, themedUri);
-	modalUrl += "?" + params.join("&");
-	modal.loadURL((platform == "win32" ? "" : "file://") + modalUrl);
+	modalUrl += `?${params.join("&")}`;
+	modal.loadURL((platform === "win32" ? "" : "file://") + modalUrl);
 	ipcMain.once("modal-action", (e, args) => {
 		if (modal != null) {
 			modal.destroy();
 			modal = null;
 		}
-		if (args[0] == "confirm") onConfirm();
+		if (args[0] === "confirm") onConfirm();
 	});
 }
 
-var loadingWin;
-var loadTimer;
+let loadingWin;
+let loadTimer;
 function loadingWindow() {
 	loadingWin = new BrowserWindow({
 		width: 930,
@@ -103,7 +106,7 @@ function loadingWindow() {
 		frame: false,
 		show: false,
 		icon:
-			platform == "darwin"
+			platform === "darwin"
 				? path.join(__dirname, "src", "icons", "icon.icns")
 				: path.join(__dirname, "src", "icons", "128x128.png"),
 		alwaysOnTop: true,
@@ -114,9 +117,9 @@ function loadingWindow() {
 	loadTimer = Date.now() + 3000; // 3 seconds from now;
 }
 
-var win;
+let win;
 function createWindow() {
-	if (debug != "true") loadingWindow();
+	if (debug !== "true") loadingWindow();
 	win = new BrowserWindow({
 		width: 1200,
 		height: 810,
@@ -132,7 +135,7 @@ function createWindow() {
 		},
 		frame: false,
 		icon:
-			platform == "darwin"
+			platform === "darwin"
 				? path.join(__dirname, "src", "icons", "icon.icns")
 				: path.join(__dirname, "src", "icons", "128x128.png"),
 		show: false,
@@ -145,12 +148,12 @@ function createWindow() {
 	win.setMenu(null);
 	Menu.setApplicationMenu(null);
 
-	if (debug == "true") win.webContents.openDevTools();
+	if (debug === "true") win.webContents.openDevTools();
 
 	win.webContents.setBackgroundThrottling(false);
 
 	win.webContents.on("did-finish-load", () => {
-		if (debug != "true") {
+		if (debug !== "true") {
 			if (Date.now() > loadTimer) {
 				loadingWin.webContents.executeJavaScript(`
 				document.body.classList.add("done")
@@ -216,9 +219,15 @@ function createWindow() {
 			"./icons/64x64.png",
 			true,
 			() => {
-				win.webContents.session.clearStorageData().then(() => {
-					win.webContents.reload();
-				});
+				win.webContents.session
+					.clearStorageData({
+						options: {
+							storages: ["cookies"],
+						},
+					})
+					.then(() => {
+						win.webContents.reload();
+					});
 			}
 		);
 	});
@@ -298,7 +307,7 @@ function registerRedirects() {
 		default: enhanceWebRequest,
 	} = require("electron-better-web-request");
 
-	var enhancedSession = enhanceWebRequest(session.defaultSession);
+	const enhancedSession = enhanceWebRequest(session.defaultSession);
 
 	if (getSettings("docassets")) {
 		// Animations
@@ -558,28 +567,22 @@ function registerExternalLinkHandler() {
 		"https://oauth.vk.com/authorize",
 	];
 	win.webContents.setWindowOpenHandler(({ url }) => {
-		var allow = false;
-		allowedUrls.forEach((value) => {
+		let allow = false;
+		for (const value of allowedUrls) {
 			if (url.startsWith(value)) allow = true;
-		});
+		}
 		if (!allow) {
 			shell.openExternal(url);
 			return { action: "deny" };
-		} else {
-			return {
-				action: "allow",
-				overrideBrowserWindowOptions: {
-					icon:
-						platform == "darwin"
-							? path.join(__dirname, "src", "icons", "icon.icns")
-							: path.join(
-									__dirname,
-									"src",
-									"icons",
-									"128x128.png"
-							  ),
-				},
-			};
 		}
+		return {
+			action: "allow",
+			overrideBrowserWindowOptions: {
+				icon:
+					platform === "darwin"
+						? path.join(__dirname, "src", "icons", "icon.icns")
+						: path.join(__dirname, "src", "icons", "128x128.png"),
+			},
+		};
 	});
 }

@@ -144,7 +144,7 @@ document.getElementById("max-button").addEventListener("click", () => {
 document.getElementById("restore-button").addEventListener("click", () => {
 	BrowserWindow.getFocusedWindow().unmaximize();
 });
-BrowserWindow.getAllWindows().forEach((win) => {
+for (const win of BrowserWindow.getAllWindows()) {
 	win.on("maximize", () => {
 		document.getElementById("max-button").style.display = "none";
 		document.getElementById("restore-button").style.display = "";
@@ -161,7 +161,7 @@ BrowserWindow.getAllWindows().forEach((win) => {
 		document.getElementById("window-controls").style.display = "";
 		document.querySelector("html").classList.remove("fullscreen");
 	});
-});
+}
 document.getElementById("min-button").addEventListener("click", () => {
 	BrowserWindow.getFocusedWindow().minimize();
 });
@@ -172,16 +172,14 @@ document.getElementById("close-button").addEventListener("click", () => {
 const drag = document.createElement("div");
 try {
 	document.querySelector("#app > div.ui > div").appendChild(drag);
-	drag.outerHTML =
-		'<div style="-webkit-app-region: drag;width: 100vw;height: 20px;position: absolute;top: 0;left: 0;cursor: move;"></div>';
+	drag.outerHTML = '<div style="-webkit-app-region: drag;width: 100vw;height: 20px;position: absolute;top: 0;left: 0;cursor: move;"></div>';
 } catch {
 	document.querySelector("body").appendChild(drag);
-	drag.outerHTML =
-		'<div style="-webkit-app-region: drag;width: 100vw;height: 20px;position: fixed;top: 0;left: 0;cursor: move;"></div>';
+	drag.outerHTML = '<div style="-webkit-app-region: drag;width: 100vw;height: 20px;position: fixed;top: 0;left: 0;cursor: move;"></div>';
 }
 
 function toggleFullscreen() {
-	let win = BrowserWindow.getFocusedWindow();
+	const win = BrowserWindow.getFocusedWindow();
 	win.setFullScreen(!win.fullScreen);
 }
 document.querySelector("html").requestFullscreen = toggleFullscreen;

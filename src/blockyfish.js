@@ -5,12 +5,13 @@ if (!window.bfe) {
 }
 window.bfe.firstLoad = true;
 const bind = function (...args) {
-	if (this == console.log) {
+	if (this === console.log) {
 		return old.apply(this, args);
 	}
-	if (Function.prototype.bind == old) {
+	if (Function.prototype.bind === old) {
 		return old.apply(this, args);
-	} else if (
+	}
+	if (
 		args[0] &&
 		Object.prototype.hasOwnProperty.call(args[0], "currentScene")
 	) {
@@ -48,7 +49,7 @@ const bind = function (...args) {
 				"color: #e9c2ff; font-size:125%"
 			);
 		}
-		var opu = args[0].prepareUpload;
+		const opu = args[0].prepareUpload;
 		args[0].prepareUpload = function () {
 			args[0].createImgUrl = args[0].sourceImgUrl;
 			return opu.apply(this);
@@ -97,7 +98,6 @@ class Blockyfish {
 		};
 		// makes it harder to tamper with blockyfish info
 		this.config = window.bfi;
-		delete window.bfi;
 		this.Animals = {
 			0: "fish",
 			1: "crab",
@@ -603,32 +603,28 @@ class Blockyfish {
 	// CORE PACKET STUFF
 	formBytePacket(t, e = null) {
 		const s = new ArrayBuffer(
-				e != null ? (t == this.FishPacket.ScalingBoost ? 3 : 4) : 2
-			),
-			a = new DataView(s);
-		if (
-			(a.setUint8(0, this.GeneralPacket.Action),
-			a.setUint8(1, t),
-			null != e)
-		)
-			if (t == this.FishPacket.ScalingBoost) a.setUint8(2, e);
+			e != null ? (t === this.FishPacket.ScalingBoost ? 3 : 4) : 2
+		);
+		const a = new DataView(s);
+		a.setUint8(0, this.GeneralPacket.Action);
+		a.setUint8(1, t);
+		if (null != e)
+			if (t === this.FishPacket.ScalingBoost) a.setUint8(2, e);
 			else {
-				if (t != this.FishPacket.Emote)
+				if (t !== this.FishPacket.Emote)
 					throw new Error("Other actions dont have value");
 				a.setUint16(2, e, true);
 			}
 		return s;
 	}
 	formMovePacket(x, y, n) {
-		const a = new ArrayBuffer(10),
-			i = new DataView(a);
-		return (
-			i.setUint8(0, 2),
-			i.setUint32(1, x, !0),
-			i.setUint16(5, y, !0),
-			i.setUint8(9, Math.min(255, n)),
-			a
-		);
+		const a = new ArrayBuffer(10);
+		const i = new DataView(a);
+		i.setUint8(0, 2);
+		i.setUint32(1, x, !0);
+		i.setUint16(5, y, !0);
+		i.setUint8(9, Math.min(255, n));
+		return a;
 	}
 
 	// GAME STUFF

@@ -1,7 +1,3 @@
-document.querySelectorAll("div.ui div.sidebar.left > a").forEach((el) => {
-	el.remove();
-});
-
 async function initializeNews() {
 	try {
 		const left_widget_container =
@@ -48,7 +44,7 @@ async function initializeNews() {
 		tutorial.style.fontSize = "small";
 
 		(async () => {
-			let news = await (
+			const news = await (
 				await fetch(
 					"https://blockyfish.vercel.app/blockyfishfeed/news.txt"
 				)
@@ -56,7 +52,7 @@ async function initializeNews() {
 			blockyfish_news.innerHTML = news;
 		})();
 		(async () => {
-			let tut = await (
+			const tut = await (
 				await fetch(
 					"https://blockyfish.vercel.app/blockyfishfeed/tutorial.txt"
 				)

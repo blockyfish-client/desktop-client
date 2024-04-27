@@ -30,7 +30,7 @@ function initializeEvents() {
 		// MODAL LISTENERS
 		// settings-open/close
 		(() => {
-			var settingsOpen = false;
+			let settingsOpen = false;
 			const modalObserver = new MutationObserver(() => {
 				// settings
 				if (
@@ -56,7 +56,7 @@ function initializeEvents() {
 
 		// signin-open/close
 		(() => {
-			var signinOpen = false;
+			let signinOpen = false;
 			const modalObserver = new MutationObserver(() => {
 				// settings
 				if (document.querySelector("a[href^='/signup']")) {
