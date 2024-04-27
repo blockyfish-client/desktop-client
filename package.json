@@ -1,7 +1,7 @@
 {
 	"name": "blockyfish-client",
 	"productName": "Blockyfish Client",
-	"version": "3.1.4",
+	"version": "3.2.0",
 	"description": "A custom desktop client for deeeep.io v4 with some improvements. Made by pi. ",
 	"main": "index.js",
 	"icon": "icons/128x128.png",
