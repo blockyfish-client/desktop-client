@@ -209,6 +209,20 @@ function createWindow() {
 		);
 	});
 
+	ipcMain.on("clear-cookies", () => {
+		createModal(
+			"Clear Cookies",
+			"Are you sure you want to clear cookies? This will sign you out of all accounts.",
+			"./icons/64x64.png",
+			true,
+			() => {
+				win.webContents.session.clearStorageData().then(() => {
+					win.webContents.reload();
+				});
+			}
+		);
+	});
+
 	ipcMain.on("open-plugins-folder", () => {
 		createModal(
 			"Open Plugins Folder",

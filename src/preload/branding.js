@@ -43,14 +43,15 @@ window.blockyfish.addEventListener("settings-open", () => {
 	const Vsync = document
 		.querySelector("#pane-0 > form > div.el-form-item:nth-child(3)")
 		.cloneNode(true);
-		Vsync.setAttribute("id", "Vsync-toggle");
+	Vsync.setAttribute("id", "Vsync-toggle");
 	document.querySelector("#pane-0 > form").appendChild(Vsync);
 	document.querySelector(
 		"#Vsync-toggle > div.el-form-item__label"
 	).innerText = "Vsync";
 	document.querySelector(
 		"#Vsync-toggle > div.el-form-item__content > span.notes"
-	).innerText = "Disabling it may cause screen tearing but can reduce input lag";
+	).innerText =
+		"Disabling it may cause screen tearing but can reduce input lag";
 	if (getSettings("Vsync")) {
 		document.querySelector(
 			"#Vsync-toggle input.el-checkbox__original"
@@ -313,4 +314,33 @@ window.blockyfish.addEventListener("settings-open", () => {
 				}, 200);
 			}, 10);
 		});
+});
+
+window.blockyfish.addEventListener("signin-open", () => {
+	// add clear cookies button
+	const signinModal = document.querySelector(
+		"#app div.modal-container div.modal__action > #routeModalActions"
+	);
+	const clearCookiesButton = document.createElement("button");
+	clearCookiesButton.classList.add("clear-cookies-button");
+	const clearCookiesCss = document.createElement("style");
+	clearCookiesCss.innerHTML = `
+    .clear-cookies-button {
+        padding: 5px 10px;
+        background: #0003;
+        border-radius: 8px;
+        width: calc(100% - 16px);
+        margin: 8px 8px 4px 8px;
+        transition: 0.3s;
+    }
+    .clear-cookies-button:hover {
+        background: #dc2626;
+    }
+    `;
+	document.head.appendChild(clearCookiesCss);
+	clearCookiesButton.innerText = "Clear cookies";
+	clearCookiesButton.addEventListener("click", () => {
+		ipcRenderer.send("clear-cookies");
+	});
+	signinModal.appendChild(clearCookiesButton);
 });

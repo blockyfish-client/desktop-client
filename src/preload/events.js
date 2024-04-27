@@ -53,7 +53,34 @@ function initializeEvents() {
 				subtree: true,
 			});
 		})();
+
+		// signin-open/close
+		(() => {
+			var signinOpen = false;
+			const modalObserver = new MutationObserver(() => {
+				// settings
+				if (
+					document.querySelector(
+						".modal-content input[type='password']"
+					)
+				) {
+					if (!signinOpen) {
+						signinOpen = true;
+						window.blockyfish.emit("signin-open");
+					}
+				} else {
+					signinOpen = false;
+				}
+			});
+			modalObserver.observe(document.getElementById("app"), {
+				attributes: false,
+				childList: true,
+				characterData: false,
+				subtree: true,
+			});
+		})();
 	} catch {
 		setTimeout(() => initializeEvents(), 500);
 	}
 }
+initializeEvents();

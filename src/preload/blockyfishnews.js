@@ -6,6 +6,7 @@ async function initializeNews() {
 	try {
 		const left_widget_container =
 			document.querySelector("div.sidebar.left");
+		left_widget_container.innerHTML = "";
 		left_widget_container.style.maxWidth = "30vw";
 		left_widget_container.style.width = "21rem";
 		const news_feed_box = document
@@ -66,3 +67,4 @@ async function initializeNews() {
 		setTimeout(() => initializeNews(), 2000);
 	}
 }
+initializeNews();
