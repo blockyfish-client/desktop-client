@@ -7,7 +7,6 @@ const platform = os.platform();
 const config = require("./config.json");
 
 const { getSettings } = require("./src/store.js");
-const UrlPattern = require("url-pattern");
 
 const gotTheLock = app.requestSingleInstanceLock();
 
