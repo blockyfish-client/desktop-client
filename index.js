@@ -131,29 +131,35 @@ function createWindow() {
 	win.webContents.setBackgroundThrottling(false);
 
 	win.webContents.on("did-finish-load", () => {
-		if (debug !== "true") {
-			if (Date.now() > loadTimer) {
-				loadingWin.webContents.executeJavaScript(`
-				document.body.classList.add("done")
-				`);
-				setTimeout(() => {
-					loadingWin.close();
-					win.show();
-					win.focus();
-				}, 500);
-			} else {
-				setTimeout(() => {
+		try {
+			if (debug !== "true") {
+				if (Date.now() > loadTimer) {
 					loadingWin.webContents.executeJavaScript(`
-					document.body.classList.add("done")
-					`);
+                    document.body.classList.add("done")
+                    `);
 					setTimeout(() => {
 						loadingWin.close();
 						win.show();
 						win.focus();
 					}, 500);
-				}, loadTimer - Date.now());
+				} else {
+					setTimeout(() => {
+						loadingWin.webContents.executeJavaScript(`
+                        document.body.classList.add("done")
+                        `);
+						setTimeout(() => {
+							loadingWin.close();
+							win.show();
+							win.focus();
+						}, 500);
+					}, loadTimer - Date.now());
+				}
+			} else {
+				win.show();
+				win.focus();
 			}
-		} else {
+		} catch {
+			loadingWin.close();
 			win.show();
 			win.focus();
 		}
