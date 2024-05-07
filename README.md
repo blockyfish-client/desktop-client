@@ -1,6 +1,6 @@
 <h1>
     <p align="center">
-        <img src="https://raw.githubusercontent.com/blockyfish-client/desktop-client/master/build/icons/64x64.png" width="64" height="64" />
+        <img src="https://raw.githubusercontent.com/blockyfish-client/assets/main/blockyfishclientlogo.png" width="64" height="64" />
         <br />
         Blockyfish Client
         <br />
