@@ -11,16 +11,10 @@ const bind = function (...args) {
 	if (Function.prototype.bind === old) {
 		return old.apply(this, args);
 	}
-	if (
-		args[0] &&
-		Object.prototype.hasOwnProperty.call(args[0], "currentScene")
-	) {
+	if (args[0] && Object.prototype.hasOwnProperty.call(args[0], "currentScene")) {
 		// Game object script injector
 		// Made by TheJ, aka noam
-		console.log(
-			"%c[TheJ Injector] Logged game object.",
-			"color: #ff6969; font-size:125%"
-		);
+		console.log("%c[TheJ Injector] Logged game object.", "color: #ff6969; font-size:125%");
 		game = args[0];
 		window.game = game;
 		try {
@@ -34,20 +28,14 @@ const bind = function (...args) {
 			}
 			window.bfe.firstLoad = false;
 		} catch {}
-	} else if (
-		args[0] &&
-		Object.prototype.hasOwnProperty.call(args[0], "prepareUpload")
-	) {
+	} else if (args[0] && Object.prototype.hasOwnProperty.call(args[0], "prepareUpload")) {
 		// GIF pfp upload patch injector
 		// Made by Pi
 
 		// console log throttling
 		if (Date.now() - (window.pi_igpup_llts || 0) > 1000) {
 			window.pi_igpup_llts = Date.now();
-			console.log(
-				"%c[Pi Injector] Injected GIF pfp uploader patch.",
-				"color: #e9c2ff; font-size:125%"
-			);
+			console.log("%c[Pi Injector] Injected GIF pfp uploader patch.", "color: #e9c2ff; font-size:125%");
 		}
 		const opu = args[0].prepareUpload;
 		args[0].prepareUpload = function () {
@@ -602,17 +590,14 @@ class Blockyfish {
 	// GAME METHODS
 	// CORE PACKET STUFF
 	formBytePacket(t, e = null) {
-		const s = new ArrayBuffer(
-			e != null ? (t === this.FishPacket.ScalingBoost ? 3 : 4) : 2
-		);
+		const s = new ArrayBuffer(e != null ? (t === this.FishPacket.ScalingBoost ? 3 : 4) : 2);
 		const a = new DataView(s);
 		a.setUint8(0, this.GeneralPacket.Action);
 		a.setUint8(1, t);
 		if (null != e)
 			if (t === this.FishPacket.ScalingBoost) a.setUint8(2, e);
 			else {
-				if (t !== this.FishPacket.Emote)
-					throw new Error("Other actions dont have value");
+				if (t !== this.FishPacket.Emote) throw new Error("Other actions dont have value");
 				a.setUint16(2, e, true);
 			}
 		return s;

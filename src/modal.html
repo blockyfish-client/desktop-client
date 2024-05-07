@@ -156,36 +156,24 @@
 		</style>
 	</head>
 	<body>
-		<div class="modal-box flex-column">
-			<div class="modal-header flex-row">
+		<div class="flex-column modal-box">
+			<div class="flex-row modal-header">
 				<p id="title">Title</p>
-				<button class="modal-close small-x flex-row">
-					<svg
-						width="1.125em"
-						height="1.125em"
-						viewBox="0 0 24 24"
-						fill="gray"
-					>
-						<path
-							d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
-						></path>
+				<button class="flex-row modal-close small-x">
+					<svg width="1.125em" height="1.125em" viewBox="0 0 24 24" fill="gray">
+						<path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"></path>
 					</svg>
 				</button>
 			</div>
 			<div class="modal-content">
-				<img
-					class="modal-thumbnail"
-					id="img"
-					src="./icons/256x256.png"
-					draggable="false"
-				/>
+				<img class="modal-thumbnail" id="img" src="./icons/256x256.png" draggable="false" />
 				<div class="modal-text">
 					<p id="content">Are you sure you want to close?</p>
 				</div>
 			</div>
 			<div class="modal-actions">
-				<button class="secondary modal-close">Cancel</button>
-				<button class="primary modal-confirm">Confirm</button>
+				<button class="modal-close secondary">Cancel</button>
+				<button class="modal-confirm primary">Confirm</button>
 			</div>
 		</div>
 
@@ -194,14 +182,10 @@
 
 			const queryString = window.location.search;
 			const urlParams = new URLSearchParams(queryString);
-			document.getElementById("title").innerText =
-				urlParams.get("title") || "";
-			document.getElementById("content").innerText =
-				urlParams.get("content") || "";
+			document.getElementById("title").innerText = urlParams.get("title") || "";
+			document.getElementById("content").innerText = urlParams.get("content") || "";
 			if (urlParams.get("img")) {
-				document
-					.getElementById("img")
-					.setAttribute("src", urlParams.get("img"));
+				document.getElementById("img").setAttribute("src", urlParams.get("img"));
 			} else {
 				document.getElementById("img").style.display = "none";
 			}
