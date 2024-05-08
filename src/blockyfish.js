@@ -5,12 +5,6 @@ if (!window.bfe) {
 }
 window.bfe.firstLoad = true;
 const bind = function (...args) {
-	if (this === console.log) {
-		return old.apply(this, args);
-	}
-	if (Function.prototype.bind === old) {
-		return old.apply(this, args);
-	}
 	if (args[0] && Object.prototype.hasOwnProperty.call(args[0], "currentScene")) {
 		// Game object script injector
 		// Made by TheJ, aka noam
@@ -349,6 +343,8 @@ class Blockyfish {
 			16: "BullsharkScar",
 			17: "Emoji",
 			18: "Emote",
+			19: "Chat",
+			20: "Request",
 			Boost: 1,
 			Skill: 2,
 			QuitRoom: 3,
@@ -367,6 +363,8 @@ class Blockyfish {
 			BullsharkScar: 16,
 			Emoji: 17,
 			Emote: 18,
+			Chat: 19,
+			Request: 20,
 		};
 		this.GeneralPacket = {
 			1: "Play",
@@ -390,6 +388,7 @@ class Blockyfish {
 			22: "ReSelectServer",
 			23: "ClientReady",
 			24: "ClientGameSession",
+			25: "VerifiedAction",
 			101: "UpdateFish",
 			102: "UpdateFood",
 			103: "Ranking",
@@ -462,6 +461,7 @@ class Blockyfish {
 			ReSelectServer: 22,
 			ClientReady: 23,
 			ClientGameSession: 24,
+			VerifiedAction: 25,
 			UpdateFish: 101,
 			UpdateFood: 102,
 			UpdateDamageableFood: 104,
@@ -564,6 +564,21 @@ class Blockyfish {
 			pressure: 5,
 			toxin: 6,
 		};
+
+		(() => {
+			const This = this;
+			const inter = setInterval(() => {
+				if (!document.getElementById("app")) return;
+				const vnode = document.getElementById("app")._vnode;
+				if (!vnode) return;
+				const states = vnode.appContext?.config?.globalProperties?.$simpleState?.states;
+				if (!states) return;
+				const gameState = states.find((v) => v._storeMeta.id === "game");
+				if (!gameState) return;
+				This.gameState = gameState;
+				clearInterval(inter);
+			});
+		})();
 	}
 	emit(event) {
 		if (!this.events[event]) return false;
@@ -615,15 +630,37 @@ class Blockyfish {
 	// GAME STUFF
 	sendChat(message, toEveryone = true) {
 		if (!message) return;
+		if (!this.gameState)
+			try {
+				this.gameState = document
+					.getElementById("app")
+					._vnode.appContext.config.globalProperties.$simpleState.states.find((v) => v._storeMeta.id === "game");
+			} catch (e) {}
+		if (!this.gameState) return;
 		try {
-			game.socketManager.sendStringPacket(
-				JSON.stringify({
-					p: this.GeneralPacket.ChatMessage,
-					te: toEveryone,
-					message: message,
-				})
-			);
+			game.socketManager.sendBytePacket(this.encrypt(this.gameState.token, this.FishPacket.Chat, toEveryone ? "1" : `0${message}`));
 		} catch {}
+	}
+
+	encrypt(t, e, n = "") {
+		if (!t) return null;
+		const a = ((A, B) => {
+			const enc = new TextEncoder();
+			const a = enc.encode(A);
+			const i = enc.encode(B);
+			const r = new Uint8Array(a.length);
+			for (let o = 0; o < a.length; o++) r[o] = a[o] ^ i[o % i.length];
+			return btoa(String.fromCharCode(...r));
+		})(String.fromCharCode(e).repeat(3) + n, t);
+		const i = new TextEncoder().encode(a);
+		const r = 1 + i.byteLength + 1;
+		const o = new ArrayBuffer(r);
+		const l = new DataView(o);
+
+		l.setUint8(0, 25);
+		new Uint8Array(o).set(i, 1);
+		l.setUint8(r - 1, e);
+		return o;
 	}
 }
 
