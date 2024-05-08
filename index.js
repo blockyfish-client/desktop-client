@@ -159,7 +159,9 @@ function createWindow() {
 				win.focus();
 			}
 		} catch {
-			loadingWin.close();
+			try {
+				loadingWin.destroy();
+			} catch {}
 			win.show();
 			win.focus();
 		}
